@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/cloudwego/eino-ext/components/model/deepseek"
 	"github.com/cloudwego/eino/schema"
@@ -15,9 +16,9 @@ func main() {
 
 	// 2. 创建 ChatModel (使用 DeepSeek)
 	chatModel, err := deepseek.NewChatModel(ctx, &deepseek.ChatModelConfig{
-		APIKey:  "sk-75mQOdkBXedVn5GeHdjOZlVFlnPDV21NvsKXpL9nB80LYVkl",
-		Model:   "hunyuan-turbos-latest",
-		BaseURL: "https://api.hunyuan.cloud.tencent.com/v1",
+		APIKey:  os.Getenv("CNB_TOKEN"),
+		Model:   "hunyuan-2.0-instruct-20251111",
+		BaseURL: fmt.Sprintf("%s/%s/-/ai", os.Getenv("CNB_API_ENDPOINT"), os.Getenv("CNB_REPO_SLUG")),
 	})
 	if err != nil {
 		log.Fatalf("创建 ChatModel 失败: %v", err)
@@ -45,4 +46,19 @@ func main() {
 		fmt.Printf("  输出 Token: %d\n", response.ResponseMeta.Usage.CompletionTokens)
 		fmt.Printf("  总计 Token: %d\n", response.ResponseMeta.Usage.TotalTokens)
 	}
+
+	// reader, err := chatModel.Stream(ctx, messages)
+
+	// if err != nil {
+	// 	log.Fatalf("生成响应失败: %v", err)
+	// }
+	// defer reader.Close()
+	// for {
+	// 	chunk, err := reader.Recv()
+	// 	if err != nil {
+	// 		log.Fatalf("读取消息失败: %v", err)
+	// 	}
+	// 	fmt.Printf("%s", chunk.Content)
+	// }
+
 }
