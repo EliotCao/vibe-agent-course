@@ -1,3 +1,13 @@
+main:
+  push:
+    - name: build
+      stages:
+        - name: build knowledge base
+          image: cnbcool/knowledge-base
+          settings:
+            include:
+              - '**/*.md'
+
 $:
   vscode:
     - docker:
