@@ -10,7 +10,9 @@ main:
 
 $:
   vscode:
-    - docker:
+    - runner:
+        cpus: 64
+      docker:
         image: docker.cnb.cool/looc/default-dev-env:latest
       services:
         - vscode
