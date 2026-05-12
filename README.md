@@ -1,15 +1,52 @@
-# template
+# Hello Agent
 
-## deepseek api key
+基于 **Thought-Action-Observation** 循环的智能旅行助手示例，参考 [Datawhale Hello-Agents 第一章](https://hello-agents.datawhale.cc/#/./chapter1/第一章%20初识智能体)。
 
-eino
+## 项目结构
 
-sk-070158e1b29847cb9a22101ed25095f8
+```
+hello_agent/
+├── __init__.py     # 包初始化
+├── config.py       # 配置管理（环境变量）
+├── prompt.py       # 系统提示词模板
+├── tools.py        # 外部工具（天气查询、景点推荐）
+├── llm.py          # LLM 客户端
+├── agent.py        # 智能体核心循环
+└── main.py         # 入口
+```
 
-## 千问 api key
+## 快速开始
 
-sk-46af641ec717457a885addc61dc01eb0
+### 1. 安装依赖
 
-## 混元 api key
+```bash
+pip install -e .
+```
 
-sk-75mQOdkBXedVn5GeHdjOZlVFlnPDV21NvsKXpL9nB80LYVkl
+### 2. 配置环境变量
+
+在 CNB 平台上运行时，`CNB_API_ENDPOINT`、`CNB_REPO_SLUG`、`CNB_TOKEN` 会自动注入，无需额外配置。
+
+如需本地运行，可复制 `.env.example` 为 `.env` 并填写：
+
+```bash
+cp .env.example .env
+```
+
+### 3. 运行
+
+```bash
+python -m hello_agent.main
+```
+
+## 配置项
+
+| 环境变量 | 说明 | 默认值 |
+|---------|------|--------|
+| `BASE_URL` | LLM API 地址（优先级最高） | - |
+| `CNB_API_ENDPOINT` | CNB 平台 API 端点 | - |
+| `CNB_REPO_SLUG` | CNB 仓库标识 | - |
+| `API_KEY` | API 密钥（优先级最高） | - |
+| `CNB_TOKEN` | CNB 平台 Token | - |
+| `MODEL_ID` | 模型 ID | `hunyuan-turbos-latest` |
+| `TAVILY_API_KEY` | Tavily 搜索 API 密钥 | - |

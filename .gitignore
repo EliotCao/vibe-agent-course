@@ -1,28 +1,17 @@
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+# 环境变量（含敏感信息）
+.env
 
-.idea
-
-# Test binary, built with `go test -c`
-*.test
-
-.DS_Store
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
 dist/
+build/
 
-# Dependency directories (remove the comment below to include it)
-vendor/
+# IDE
+.idea/
+.vscode/
 
-# Go workspace file
-go.work 
-
-# node_modules
-node_modules
+# OS
+.DS_Store
