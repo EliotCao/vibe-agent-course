@@ -1,7 +1,7 @@
 $:
   vscode:
     - runner:
-        cpus: 64
+        cpus: 16
       docker:
         image: docker.cnb.cool/looc/default-dev-env:latest
       services:

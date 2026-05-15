@@ -2,8 +2,8 @@
 
 import requests
 
-from hello_agent.config import get_api_key, get_base_url, MODEL_ID
-from hello_agent.llm import OpenAICompatibleClient
+from config import get_api_key, get_base_url, MODEL_ID
+from llm import OpenAICompatibleClient
 
 
 def get_weather(city: str) -> str:

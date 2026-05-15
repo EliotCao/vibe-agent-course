@@ -2,9 +2,9 @@
 
 import re
 
-from hello_agent.llm import OpenAICompatibleClient
-from hello_agent.prompt import AGENT_SYSTEM_PROMPT
-from hello_agent.tools import AVAILABLE_TOOLS
+from llm import OpenAICompatibleClient
+from prompt import AGENT_SYSTEM_PROMPT
+from tools import AVAILABLE_TOOLS
 
 MAX_LOOPS = 5
 

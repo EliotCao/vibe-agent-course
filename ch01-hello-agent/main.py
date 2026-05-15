@@ -1,8 +1,8 @@
 """智能旅行助手 - 入口。"""
 
-from hello_agent.agent import run_agent
-from hello_agent.config import MODEL_ID, get_api_key, get_base_url
-from hello_agent.llm import OpenAICompatibleClient
+from agent import run_agent
+from config import MODEL_ID, get_api_key, get_base_url
+from llm import OpenAICompatibleClient
 
 
 def main():
