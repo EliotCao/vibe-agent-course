@@ -1,11 +1,11 @@
-# Hello Agent
+# Hello ReAct
 
-基于 **Thought-Action-Observation** 循环的智能旅行助手示例，参考 [Datawhale Hello-Agents 第一章](https://hello-agents.datawhale.cc/#/./chapter1/第一章%20初识智能体)。
+基于 **ReAct（Thought-Action-Observation）** 循环的智能旅行助手示例，参考 [Datawhale Hello-Agents 第一章](https://hello-agents.datawhale.cc/#/./chapter1/第一章%20初识智能体)。
 
 ## 项目结构
 
 ```
-ch01-hello-agent/
+ch01-hello-react/
 ├── pyproject.toml  # 依赖声明
 ├── config.py       # 配置管理（环境变量）
 ├── prompt.py       # 系统提示词模板

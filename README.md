@@ -9,16 +9,18 @@
 ├── docs/                  # 全局教学文档
 │   └── vibe-guide.md      # 用 CodeBuddy vibe 出 Agent 的逐步指南
 │
-├── ch01-hello-agent/      # 第 1 章：智能旅行助手（Thought-Action-Observation 循环）
-└── ch02-hello-llm/        # 第 2 章：Hello LLM —— 最小可用的流式 LLM 客户端
+├── ch01-hello-react/      # 第 1 章：智能旅行助手（ReAct：Thought-Action-Observation 循环）
+├── ch02-hello-llm/        # 第 2 章：Hello LLM —— 最小可用的流式 LLM 客户端
+└── ch03-hello-agents/     # 第 3 章：用 hello-agents 框架快速搭建 Agent
 ```
 
 ## 章节索引
 
 | 章节 | 标题 | 核心概念 |
 |------|------|---------|
-| [ch01](./ch01-hello-agent/) | Hello Agent —— 智能旅行助手 | LLM 客户端 / System Prompt / Tools / Agent Loop |
+| [ch01](./ch01-hello-react/) | Hello ReAct —— 智能旅行助手 | LLM 客户端 / System Prompt / Tools / ReAct Loop |
 | [ch02](./ch02-hello-llm/) | Hello LLM —— 流式 LLM 客户端 | OpenAI 兼容接口 / 流式响应 / messages 协议 |
+| [ch03](./ch03-hello-agents/) | Hello Agents 框架快速上手 | SimpleAgent / ReActAgent / ToolRegistry |
 
 > 更多章节陆续添加中。
 
@@ -40,7 +42,7 @@ uv sync --all-packages
 进入章节目录直接用 `python` 即可——CNB 云端 IDE 已为终端预激活根 `.venv`：
 
 ```bash
-cd ch01-hello-agent
+cd ch01-hello-react
 python main.py
 ```
 

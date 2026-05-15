@@ -1,11 +1,10 @@
 [project]
-name = "hello-agent"
+name = "hello-agents-demo"
 version = "0.1.0"
-description = "智能旅行助手 - 基于 Thought-Action-Observation 循环的智能体示例"
+description = "第 3 章：使用 hello-agents 框架快速搭建 SimpleAgent / ReActAgent 的 demo"
 requires-python = ">=3.10"
 dependencies = [
-    "openai>=1.0.0",
-    "requests>=2.31.0",
+    "hello-agents==0.1.1",
     "python-dotenv>=1.0.0",
 ]
 

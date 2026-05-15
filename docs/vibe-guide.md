@@ -115,7 +115,7 @@ LLM 本身只能生成文本，它无法真正查天气、搜景点。**工具�
 
 ### 这一步之后你会得到
 
-两个可以独立调用的工具函数。你可以直接在终端测试：`python3 -c "from hello_agent.tools import get_weather; print(get_weather('北京'))"`
+两个可以独立调用的工具函数。你可以直接在终端测试：`python3 -c "from hello_react.tools import get_weather; print(get_weather('北京'))"`
 
 ---
 
