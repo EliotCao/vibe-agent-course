@@ -1,0 +1,19 @@
+[project]
+name = "hello-agents-course"
+version = "0.1.0"
+description = "Hello Agents 教学课程 —— 多章节 uv workspace"
+requires-python = ">=3.10"
+# 根项目自身不需要任何运行依赖
+dependencies = []
+
+# 根项目本身不构建为包，仅作为 workspace 容器
+[tool.uv]
+package = false
+
+# uv workspace：每章是一个独立的成员（非包，仅作为依赖容器）。
+# 共享同一个根 .venv，IDE 只需选一次解释器即可跨章跳转。
+[tool.uv.workspace]
+members = [
+    "ch01-hello-agent",
+    "ch02-hello-llm",
+]

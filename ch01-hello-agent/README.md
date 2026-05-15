@@ -17,15 +17,14 @@ ch01-hello-agent/
 
 ## 快速开始
 
-本项目使用 [uv](https://docs.astral.sh/uv/) 管理依赖（环境中已内置）。
+本课程整体使用 [uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/) 组织，所有章节共享仓库根目录的 `.venv`。
 
-### 1. 安装依赖
+### 1. 安装依赖（在仓库根目录执行一次）
 
 ```bash
-uv sync
+cd ..                     # 回到仓库根目录
+uv sync --all-packages    # 安装所有章节的依赖到共享 .venv
 ```
-
-`uv sync` 会读取 `pyproject.toml`，自动创建 `.venv` 并安装所有依赖。
 
 ### 2. 配置环境变量
 
@@ -39,11 +38,14 @@ cp .env.example .env
 
 ### 3. 运行
 
+CNB 云端 IDE 的终端已预激活根 `.venv`，直接：
+
 ```bash
-uv run python main.py
+python main.py
 ```
 
-> `uv run` 会自动使用项目的虚拟环境，无需手动 `source .venv/bin/activate`。
+> 在本地或 CI 环境不确定是否激活时，推荐用 `uv run python main.py`，
+> 它会自动使用根 `.venv` 并在依赖缺失时先 `uv sync`。
 
 ## 配置项
 

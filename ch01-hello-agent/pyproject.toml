@@ -8,3 +8,8 @@ dependencies = [
     "requests>=2.31.0",
     "python-dotenv>=1.0.0",
 ]
+
+# 本章是脚本集合而非可分发包，告诉 uv 不要构建/安装它本身，
+# 仅把 dependencies 作为虚拟环境依赖来解析。
+[tool.uv]
+package = false

@@ -2,6 +2,13 @@ version = 1
 revision = 3
 requires-python = ">=3.10"
 
+[manifest]
+members = [
+    "hello-agent",
+    "hello-agents-course",
+    "hello-llm",
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -181,7 +188,7 @@ wheels = [
 [[package]]
 name = "hello-agent"
 version = "0.1.0"
-source = { virtual = "." }
+source = { virtual = "ch01-hello-agent" }
 dependencies = [
     { name = "openai" },
     { name = "python-dotenv" },
@@ -193,6 +200,26 @@ requires-dist = [
     { name = "openai", specifier = ">=1.0.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "requests", specifier = ">=2.31.0" },
+]
+
+[[package]]
+name = "hello-agents-course"
+version = "0.1.0"
+source = { virtual = "." }
+
+[[package]]
+name = "hello-llm"
+version = "0.1.0"
+source = { virtual = "ch02-hello-llm" }
+dependencies = [
+    { name = "openai" },
+    { name = "python-dotenv" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "openai", specifier = ">=1.0.0" },
+    { name = "python-dotenv", specifier = ">=1.0.0" },
 ]
 
 [[package]]

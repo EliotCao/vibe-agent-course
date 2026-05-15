@@ -9,6 +9,12 @@ __pycache__/
 dist/
 build/
 
+# 虚拟环境（uv / venv / virtualenv 等）
+.venv/
+venv/
+env/
+ENV/
+
 # IDE
 .idea/
 .vscode/*
