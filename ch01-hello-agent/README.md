@@ -17,11 +17,7 @@ ch01-hello-agent/
 
 ## 快速开始
 
-本项目使用 [uv](https://docs.astral.sh/uv/) 管理依赖。如未安装：
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+本项目使用 [uv](https://docs.astral.sh/uv/) 管理依赖（环境中已内置）。
 
 ### 1. 安装依赖
 

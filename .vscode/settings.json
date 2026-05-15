@@ -1,0 +1,17 @@
+{
+  // 让 Pylance / Pyright 把 ch01-hello-agent 当作源码根，
+  // 这样 main.py 里的 `from agent import ...` 等同级导入才能被解析、跳转。
+  "python.analysis.extraPaths": [
+    "ch01-hello-agent"
+  ],
+
+  // 指定子目录里的虚拟环境作为解释器（uv 会在子目录创建 .venv）
+  "python.defaultInterpreterPath": "${workspaceFolder}/ch01-hello-agent/.venv/bin/python",
+
+  // 运行/调试时的工作目录，确保相对路径、.env 加载正常
+  "python.terminal.activateEnvironment": true,
+
+  // 让 Pylance 启用更完整的索引
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.diagnosticMode": "workspace"
+}

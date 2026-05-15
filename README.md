@@ -22,11 +22,7 @@
 
 ## 环境准备
 
-本课程使用 [uv](https://docs.astral.sh/uv/) 管理 Python 环境与依赖。如未安装：
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+本课程使用 [uv](https://docs.astral.sh/uv/) 管理 Python 环境与依赖（环境中已内置）。
 
 ## 如何运行某一章
 

@@ -11,7 +11,10 @@ build/
 
 # IDE
 .idea/
-.vscode/
+.vscode/*
+# 但保留团队共享的工作区配置（解释器路径、Pylance extraPaths 等）
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # OS
 .DS_Store
