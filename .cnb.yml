@@ -14,5 +14,5 @@ $:
       stages:
         - name: uv sync
           script: |
-            npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y --copy
+            cd /root && npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y
             cd /workspace && uv sync --all-packages
