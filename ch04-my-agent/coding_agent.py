@@ -28,6 +28,11 @@ SYSTEM_PROMPT = """你是一个专业的编程助手（Coding Agent），可以�
 2. 最小改动：只修改必要的部分，避免重写整个文件
 3. 解释清楚：告诉用户你做了什么、为什么这么做
 4. 安全优先：危险操作前说明风险
+
+## 思考过程
+每次调用工具前，你必须在 content 中简短说明你的思考：
+- 你在做什么、为什么这么做（一两句话即可）
+这样用户可以跟随你的推理过程。
 """
 
 
@@ -87,6 +92,7 @@ class CodingAgent:
         self.context.append({"role": "user", "content": user_input})
 
         tools_schema = self.tools.to_openai_schema()
+        tool_actions = []  # 记录本轮执行的工具动作
 
         for _ in range(self.max_tool_rounds):
             # 从 context 获取消息（自动处理压缩）
@@ -99,6 +105,10 @@ class CodingAgent:
 
             # 检查是否有工具调用
             if response.tool_calls:
+                # 显示 LLM 的思考过程（如果有）
+                if response.content:
+                    ui.print_thinking(response.content)
+
                 # assistant 消息（含 tool_calls）追加到 context
                 self.context.append(self._message_to_dict(response))
 
@@ -116,6 +126,18 @@ class CodingAgent:
                     except (json.JSONDecodeError, TypeError):
                         args = {}
                     ui.print_tool_call(tool_call.function.name, result, args)
+                    # 记录动作摘要
+                    tool_actions.append((tool_call.function.name, args))
+
+                    # 写入/编辑后自动语法检查
+                    if tool_call.function.name in ("write", "edit"):
+                        lint_result = self._lint_file(args.get("path", ""))
+                        if lint_result:
+                            ui.print_lint_errors(lint_result)
+                            self.context.append({
+                                "role": "user",
+                                "content": f"⚠️ 语法检查发现错误，请修复:\n{lint_result}",
+                            })
 
                 continue  # 继续让 LLM 处理
 
@@ -135,6 +157,45 @@ class CodingAgent:
             return f"❌ 参数解析失败: {tool_call.function.arguments}"
 
         return self.tools.execute(name, **args)
+
+    @staticmethod
+    def _lint_file(path: str) -> str:
+        """对文件执行语法检查，返回错误信息（无错误返回空字符串）。"""
+        import subprocess
+        import os
+
+        if not path or not os.path.isfile(path):
+            return ""
+
+        ext = os.path.splitext(path)[1].lower()
+
+        # 根据文件类型选择 lint 命令
+        lint_cmd = None
+        if ext == ".py":
+            lint_cmd = ["python", "-m", "py_compile", path]
+        elif ext == ".js" or ext == ".mjs":
+            lint_cmd = ["node", "--check", path]
+        elif ext == ".json":
+            lint_cmd = ["python", "-c", f"import json; json.load(open('{path}'))"]
+        elif ext == ".yaml" or ext == ".yml":
+            lint_cmd = ["python", "-c", f"import yaml; yaml.safe_load(open('{path}'))"]
+
+        if not lint_cmd:
+            return ""  # 不支持的文件类型，跳过
+
+        try:
+            result = subprocess.run(
+                lint_cmd,
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            if result.returncode != 0:
+                error = result.stderr.strip() or result.stdout.strip()
+                return f"{path}: {error}"
+            return ""
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return ""
 
     @staticmethod
     def _message_to_dict(message) -> dict:
@@ -161,6 +222,7 @@ class CodingAgent:
 
 def main():
     """交互式 REPL 入口。"""
+    import os
     import sys
 
     try:
@@ -169,9 +231,10 @@ def main():
         pass
 
     workdir = sys.argv[1] if len(sys.argv) > 1 else "."
+    workdir = os.path.abspath(workdir)
     agent = CodingAgent(workdir=workdir)
 
-    ui.print_welcome(workdir, len(agent.tools.get_tool_names()))
+    ui.print_welcome(workdir, len(agent.tools.get_tool_names()), agent.llm.model)
 
     while True:
         try:

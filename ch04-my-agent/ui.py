@@ -21,11 +21,12 @@ from rich.rule import Rule
 console = Console()
 
 
-def print_welcome(workdir: str, tool_count: int):
+def print_welcome(workdir: str, tool_count: int, model: str = ""):
     """打印欢迎信息。"""
     console.print()
     console.print(Rule("[bold blue]Coding Agent[/bold blue]"))
     console.print(f"  📁 工作目录: [cyan]{workdir}[/cyan]")
+    console.print(f"  🤖 模型: [magenta]{model}[/magenta]")
     console.print(f"  🔧 已加载 [green]{tool_count}[/green] 个工具")
     console.print(f"  💡 输入 [bold]/quit[/bold] 退出, [bold]/reset[/bold] 重置对话")
     console.print(Rule())
@@ -84,9 +85,74 @@ def print_error(message: str):
     console.print(f"[bold red]{message}[/bold red]")
 
 
+def print_thinking(content: str):
+    """打印 LLM 的思考过程。"""
+    console.print(f"  [dim italic]💭 {content}[/dim italic]")
+    console.print()
+
+
+def print_lint_errors(errors: str):
+    """打印语法检查错误。"""
+    console.print(Panel(
+        Text(errors, style="red"),
+        title="⚠️ 语法检查失败",
+        title_align="left",
+        border_style="red",
+        padding=(0, 1),
+    ))
+
+
 def print_info(message: str):
     """打印提示信息。"""
     console.print(f"[dim]{message}[/dim]")
+
+
+def print_summary(tool_actions: list):
+    """打印本轮工具调用摘要。"""
+    # 按工具类型分组统计
+    action_descriptions = []
+    for name, args in tool_actions:
+        desc = _describe_action(name, args)
+        if desc:
+            action_descriptions.append(desc)
+
+    if not action_descriptions:
+        return
+
+    # 去重保留顺序
+    seen = set()
+    unique = []
+    for d in action_descriptions:
+        if d not in seen:
+            seen.add(d)
+            unique.append(d)
+
+    summary = " → ".join(unique)
+    console.print(f"\n[dim]📋 本轮操作: {summary}[/dim]")
+
+
+def _describe_action(tool_name: str, args: dict) -> str:
+    """将工具调用转为人类可读的动作描述。"""
+    if tool_name == "read":
+        return f"读取 {args.get('path', '?')}"
+    elif tool_name == "write":
+        return f"写入 {args.get('path', '?')}"
+    elif tool_name == "edit":
+        return f"编辑 {args.get('path', '?')}"
+    elif tool_name == "list":
+        return f"列出 {args.get('path', '?')}"
+    elif tool_name == "glob":
+        return f"搜索文件 {args.get('pattern', '?')}"
+    elif tool_name == "grep":
+        return f"搜索内容 \"{args.get('pattern', '?')}\""
+    elif tool_name == "bash":
+        cmd = args.get("command", "?")
+        return f"执行 `{cmd[:30]}{'...' if len(cmd) > 30 else ''}`"
+    elif tool_name == "todo":
+        return f"任务列表 {args.get('action', '?')}"
+    elif tool_name == "webfetch":
+        return f"抓取 {args.get('url', '?')[:30]}"
+    return tool_name
 
 
 def print_reset():
