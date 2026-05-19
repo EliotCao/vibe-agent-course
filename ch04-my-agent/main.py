@@ -16,9 +16,9 @@ from agent import SimpleAgent, ReActAgent
 def main():
     """综合演示：SimpleAgent + 工具 + 上下文。"""
     llm = LLM()
-    registry = ToolRegistry()
+    tools = ToolRegistry()
 
-    @registry.register(
+    @tools.register(
         "get_weather",
         "获取指定城市的天气信息",
         params=[ToolParameter(name="city", type="string", description="城市名称")],
@@ -31,7 +31,7 @@ def main():
         name="小助手",
         llm=llm,
         system_prompt="你是一个天气助手，可以帮用户查询天气。",
-        tools=registry,
+        tools=tools,
     )
 
     answer = agent.run("北京今天天气怎么样？")

@@ -8,9 +8,9 @@ from agent import SimpleAgent, ReActAgent
 def test_simple_agent():
     """SimpleAgent：对话 + 工具调用。"""
     llm = LLM()
-    registry = ToolRegistry()
+    tools = ToolRegistry()
 
-    @registry.register(
+    @tools.register(
         "get_weather",
         "获取指定城市的天气信息",
         params=[ToolParameter(name="city", type="string", description="城市名称")],
@@ -23,7 +23,7 @@ def test_simple_agent():
         name="小助手",
         llm=llm,
         system_prompt="你是一个天气助手，可以帮用户查询天气。",
-        tools=registry,
+        tools=tools,
     )
 
     print("--- SimpleAgent 运行 ---")
@@ -34,9 +34,9 @@ def test_simple_agent():
 def test_react_agent():
     """ReActAgent：推理-行动循环。"""
     llm = LLM()
-    registry = ToolRegistry()
+    tools = ToolRegistry()
 
-    @registry.register(
+    @tools.register(
         "calculate",
         "数学计算，参数为数学表达式",
         params=[ToolParameter(name="input", type="string", description="数学表达式")],
@@ -51,7 +51,7 @@ def test_react_agent():
     agent = ReActAgent(
         name="推理助手",
         llm=llm,
-        tools=registry,
+        tools=tools,
         max_steps=5,
     )
 

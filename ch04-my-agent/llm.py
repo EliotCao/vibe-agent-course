@@ -62,21 +62,33 @@ class LLM:
         messages: List[Dict[str, str]],
         temperature: float = 0,
         stream: bool = True,
+        tools: Optional[List[Dict]] = None,
     ) -> Union[Optional[str], Generator[str, None, None]]:
         """调用大语言模型。
 
-        - stream=False: 返回完整响应字符串
+        - stream=False: 返回完整响应字符串（无 tools）或完整 message 对象（有 tools）
         - stream=True:  返回一个生成器，逐块 yield 文本片段
+        - tools: OpenAI function calling schema 列表
         """
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=temperature,
-                stream=stream,
-            )
+            kwargs = {
+                "model": self.model,
+                "messages": messages,
+                "temperature": temperature,
+                "stream": stream,
+            }
+            if tools:
+                kwargs["tools"] = tools
+                kwargs["stream"] = False  # function calling 不用流式
+
+            response = self.client.chat.completions.create(**kwargs)
+
+            if tools:
+                # 有 tools 时返回完整 message 对象（含 tool_calls）
+                return response.choices[0].message
 
             if not stream:
+                # 无 tools，非流式：返回字符串
                 return response.choices[0].message.content
 
             return self._iter_stream(response)
