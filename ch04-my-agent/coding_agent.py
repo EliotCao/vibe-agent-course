@@ -13,6 +13,7 @@ from tools import ToolRegistry
 from tools_impl import ALL_TOOLS
 from context_builder import ContextBuilder, ContextConfig
 from memory import Memory
+from skills import Skills
 import ui
 
 SYSTEM_PROMPT = """你是一个专业的编程助手（Coding Agent），可以帮助用户阅读、编写和修改代码。
@@ -60,6 +61,9 @@ class CodingAgent:
         self.system_prompt = system_prompt
         self.max_tool_rounds = max_tool_rounds
 
+        # Skills（从 .codebuddy/skills/ 加载）
+        self.skills = Skills()
+
         # 记忆系统（持久化到 workdir/.memory/）
         memory_dir = os.path.join(workdir, ".memory")
         self.memory = Memory(storage_dir=memory_dir)
@@ -75,12 +79,19 @@ class CodingAgent:
         )
 
     def _build_system_prompt(self) -> str:
-        """构建 system prompt，注入相关记忆。"""
+        """构建 system prompt，注入 skills 和记忆。"""
         prompt = self.system_prompt
+
+        # 注入 skills
+        skills_prompt = self.skills.to_prompt()
+        if skills_prompt:
+            prompt += f"\n{skills_prompt}"
+
         # 注入持久化记忆摘要
         memory_context = self.memory.get_context(limit=8)
         if memory_context:
             prompt += f"\n\n{memory_context}"
+
         return prompt
 
     @staticmethod
@@ -232,6 +243,39 @@ class CodingAgent:
         )
 
 
+def _handle_skill_command(agent: CodingAgent, command: str):
+    """处理 /skill 命令。"""
+    parts = command.split(maxsplit=2)
+    sub = parts[1] if len(parts) > 1 else ""
+
+    if sub == "list" or not sub:
+        loaded = agent.skills.list()
+        available = agent.skills.list_available()
+        if available:
+            ui.console.print("[bold]可用 Skills:[/bold]")
+            for name in available:
+                status = "[green]已加载[/green]" if name in loaded else "[dim]未加载[/dim]"
+                ui.console.print(f"  • {name}  {status}")
+        else:
+            ui.print_info(f"无可用 skills（目录: {agent.skills.skills_dir}）")
+    elif sub == "load" and len(parts) > 2:
+        result = agent.skills.load(parts[2])
+        ui.console.print(result)
+    elif sub == "unload" and len(parts) > 2:
+        result = agent.skills.unload(parts[2])
+        ui.console.print(result)
+    elif sub == "show" and len(parts) > 2:
+        content = agent.skills.get(parts[2])
+        if content:
+            ui.console.print(f"[bold]{parts[2]}:[/bold]\n{content}")
+        else:
+            ui.print_info(f"Skill 未加载: {parts[2]}")
+    else:
+        ui.console.print("[dim]用法: /skill [list|load|unload|show] [name][/dim]")
+
+    ui.console.print()
+
+
 def main():
     """交互式 REPL 入口。"""
     import os
@@ -247,7 +291,11 @@ def main():
     agent = CodingAgent(workdir=workdir)
 
     memory_stats = agent.memory.stats()
-    ui.print_welcome(workdir, len(agent.tools.get_tool_names()), agent.llm.model, memory_stats["total"])
+    skills_loaded = agent.skills.list()
+    ui.print_welcome(
+        workdir, len(agent.tools.get_tool_names()), agent.llm.model,
+        memory_stats["total"], len(skills_loaded),
+    )
 
     while True:
         try:
@@ -268,6 +316,9 @@ def main():
         if user_input == "/reset":
             agent.reset()
             ui.print_reset()
+            continue
+        if user_input.startswith("/skill"):
+            _handle_skill_command(agent, user_input)
             continue
 
         # 执行任务，Ctrl+C 可中断当前任务
