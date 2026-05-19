@@ -30,6 +30,7 @@ SYSTEM_PROMPT = """你是一个专业的编程助手（Coding Agent），可以�
 2. 最小改动：只修改必要的部分，避免重写整个文件
 3. 解释清楚：告诉用户你做了什么、为什么这么做
 4. 安全优先：危险操作前说明风险
+5. 语法验证：写入或编辑文件后，务必用 bash 工具执行对应语言的语法检查（如 python -m py_compile、node --check 等），确认无语法错误。如果有错误，立即修复。
 
 ## 思考过程
 每次调用工具前，你必须在 content 中简短说明你的思考：
@@ -144,16 +145,6 @@ class CodingAgent:
                     # 记录动作摘要
                     tool_actions.append((tool_call.function.name, args))
 
-                    # 写入/编辑后自动语法检查
-                    if tool_call.function.name in ("write", "edit"):
-                        lint_result = self._lint_file(args.get("path", ""))
-                        if lint_result:
-                            ui.print_lint_errors(lint_result)
-                            self.context.append({
-                                "role": "user",
-                                "content": f"⚠️ 语法检查发现错误，请修复:\n{lint_result}",
-                            })
-
                 continue  # 继续让 LLM 处理
 
             # 无工具调用，LLM 给出了最终回答
@@ -213,45 +204,6 @@ class CodingAgent:
             return f"❌ 参数解析失败: {tool_call.function.arguments}"
 
         return self.tools.execute(name, **args)
-
-    @staticmethod
-    def _lint_file(path: str) -> str:
-        """对文件执行语法检查，返回错误信息（无错误返回空字符串）。"""
-        import subprocess
-        import os
-
-        if not path or not os.path.isfile(path):
-            return ""
-
-        ext = os.path.splitext(path)[1].lower()
-
-        # 根据文件类型选择 lint 命令
-        lint_cmd = None
-        if ext == ".py":
-            lint_cmd = ["python", "-m", "py_compile", path]
-        elif ext == ".js" or ext == ".mjs":
-            lint_cmd = ["node", "--check", path]
-        elif ext == ".json":
-            lint_cmd = ["python", "-c", f"import json; json.load(open('{path}'))"]
-        elif ext == ".yaml" or ext == ".yml":
-            lint_cmd = ["python", "-c", f"import yaml; yaml.safe_load(open('{path}'))"]
-
-        if not lint_cmd:
-            return ""  # 不支持的文件类型，跳过
-
-        try:
-            result = subprocess.run(
-                lint_cmd,
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
-            if result.returncode != 0:
-                error = result.stderr.strip() or result.stdout.strip()
-                return f"{path}: {error}"
-            return ""
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            return ""
 
     @staticmethod
     def _message_to_dict(message) -> dict:
