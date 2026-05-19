@@ -21,13 +21,14 @@ from rich.rule import Rule
 console = Console()
 
 
-def print_welcome(workdir: str, tool_count: int, model: str = ""):
+def print_welcome(workdir: str, tool_count: int, model: str = "", memory_count: int = 0):
     """打印欢迎信息。"""
     console.print()
     console.print(Rule("[bold blue]Coding Agent[/bold blue]"))
     console.print(f"  📁 工作目录: [cyan]{workdir}[/cyan]")
     console.print(f"  🤖 模型: [magenta]{model}[/magenta]")
     console.print(f"  🔧 已加载 [green]{tool_count}[/green] 个工具")
+    console.print(f"  🧠 记忆: [yellow]{memory_count}[/yellow] 条")
     console.print(f"  💡 输入 [bold]/quit[/bold] 退出, [bold]/reset[/bold] 重置对话")
     console.print(Rule())
     console.print()

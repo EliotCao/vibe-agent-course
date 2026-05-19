@@ -1,0 +1,16 @@
+{
+  "episodic": [
+    {
+      "id": "fe714297",
+      "content": "修改了文件 main.py",
+      "memory_type": "episodic",
+      "importance": 0.7,
+      "timestamp": "2026-05-19T16:56:43.379304",
+      "tags": [
+        "main.py",
+        "edit"
+      ]
+    }
+  ],
+  "semantic": []
+}

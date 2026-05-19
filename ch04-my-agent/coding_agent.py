@@ -5,12 +5,14 @@
 """
 
 import json
+import os
 from typing import List, Optional
 
 from llm import LLM
 from tools import ToolRegistry
 from tools_impl import ALL_TOOLS
 from context_builder import ContextBuilder, ContextConfig
+from memory import Memory
 import ui
 
 SYSTEM_PROMPT = """你是一个专业的编程助手（Coding Agent），可以帮助用户阅读、编写和修改代码。
@@ -57,15 +59,28 @@ class CodingAgent:
         self.system_prompt = system_prompt
         self.max_tool_rounds = max_tool_rounds
 
+        # 记忆系统（持久化到 workdir/.memory/）
+        memory_dir = os.path.join(workdir, ".memory")
+        self.memory = Memory(storage_dir=memory_dir)
+
         # ContextBuilder 统一管理所有消息（模式 B）
         self.context = ContextBuilder(
-            system_prompt=system_prompt,
+            system_prompt=self._build_system_prompt(),
             config=ContextConfig(
                 max_tokens=max_context_tokens,
                 reserve_ratio=0.1,
                 keep_recent=10,
             ),
         )
+
+    def _build_system_prompt(self) -> str:
+        """构建 system prompt，注入相关记忆。"""
+        prompt = self.system_prompt
+        # 注入持久化记忆摘要
+        memory_context = self.memory.get_context(limit=8)
+        if memory_context:
+            prompt += f"\n\n{memory_context}"
+        return prompt
 
     @staticmethod
     def _create_registry(workdir: str) -> ToolRegistry:
@@ -144,9 +159,50 @@ class CodingAgent:
             # 无工具调用，LLM 给出了最终回答
             content = response.content or ""
             self.context.append({"role": "assistant", "content": content})
+
+            # 将本轮操作自动记录到记忆
+            self._remember_actions(user_input, tool_actions)
+
             return content
 
         return "⚠️ 达到最大工具调用轮次，已停止。"
+
+    def _remember_actions(self, user_input: str, tool_actions: list):
+        """将本轮重要操作记录到记忆系统。"""
+        ui.print_info(f"[记忆] 本轮工具调用 {len(tool_actions)} 次: {[a[0] for a in tool_actions]}")
+
+        if not tool_actions:
+            ui.print_info("[记忆] 无工具调用，跳过记忆写入")
+            return
+
+        # 记录用户意图（工作记忆）
+        self.memory.add(
+            f"用户请求: {user_input[:100]}",
+            memory_type="working",
+            importance=0.5,
+        )
+        ui.print_info(f"[记忆] 已写入工作记忆: 用户请求")
+
+        # 记录文件修改操作（情景记忆，持久化）
+        for name, args in tool_actions:
+            if name in ("write", "edit"):
+                path = args.get("path", "?")
+                self.memory.add(
+                    f"修改了文件 {path}",
+                    memory_type="episodic",
+                    importance=0.7,
+                    tags=[path, name],
+                )
+                ui.print_info(f"[记忆] 已写入情景记忆: 修改了 {path}")
+            elif name == "bash":
+                cmd = args.get("command", "")
+                if any(kw in cmd for kw in ("install", "pip", "npm", "apt")):
+                    self.memory.add(
+                        f"执行了安装命令: {cmd[:80]}",
+                        memory_type="episodic",
+                        importance=0.6,
+                        tags=["install"],
+                    )
 
     def _execute_tool_call(self, tool_call) -> str:
         """执行单个工具调用。"""
@@ -216,8 +272,12 @@ class CodingAgent:
         return msg
 
     def reset(self):
-        """重置对话历史和上下文。"""
-        self.context.clear()
+        """重置对话历史和上下文（保留持久化记忆）。"""
+        self.memory.forget(strategy="working")  # 只清工作记忆
+        self.context = ContextBuilder(
+            system_prompt=self._build_system_prompt(),
+            config=self.context.config,
+        )
 
 
 def main():
@@ -234,14 +294,19 @@ def main():
     workdir = os.path.abspath(workdir)
     agent = CodingAgent(workdir=workdir)
 
-    ui.print_welcome(workdir, len(agent.tools.get_tool_names()), agent.llm.model)
+    memory_stats = agent.memory.stats()
+    ui.print_welcome(workdir, len(agent.tools.get_tool_names()), agent.llm.model, memory_stats["total"])
 
     while True:
         try:
             user_input = input("▶ ").strip()
-        except (EOFError, KeyboardInterrupt):
+        except EOFError:
             ui.print_bye()
             break
+        except KeyboardInterrupt:
+            # 输入时按 Ctrl+C，换行继续
+            print()
+            continue
 
         if not user_input:
             continue
@@ -253,12 +318,14 @@ def main():
             ui.print_reset()
             continue
 
-        # 显示 thinking spinner
-        with ui.console.status("[dim]思考中...[/dim]", spinner="dots"):
-            answer = agent.chat(user_input)
-
-        if answer:
-            ui.print_response(answer)
+        # 执行任务，Ctrl+C 可中断当前任务
+        try:
+            with ui.console.status("[dim]思考中...[/dim]", spinner="dots"):
+                answer = agent.chat(user_input)
+            if answer:
+                ui.print_response(answer)
+        except KeyboardInterrupt:
+            ui.print_info("\n⏹ 任务已中断，回到待输入状态。\n")
 
 
 if __name__ == "__main__":
