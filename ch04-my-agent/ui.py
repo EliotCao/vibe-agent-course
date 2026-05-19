@@ -30,7 +30,8 @@ def print_welcome(workdir: str, tool_count: int, model: str = "", memory_count: 
     console.print(f"  🔧 工具: [green]{tool_count}[/green] 个")
     console.print(f"  🧠 记忆: [yellow]{memory_count}[/yellow] 条")
     console.print(f"  📚 Skills: [blue]{skills_count}[/blue] 个")
-    console.print(f"  💡 输入 [bold]/quit[/bold] 退出, [bold]/reset[/bold] 重置, [bold]/skill[/bold] 管理技能")
+    console.print(f"  💡 [bold]/quit[/bold] 退出, [bold]/reset[/bold] 重置, [bold]/skill[/bold] 管理技能")
+    console.print(f"  ⌨️  [dim]Ctrl+C 终止任务, Ctrl+D 退出[/dim]")
     console.print(Rule())
     console.print()
 
