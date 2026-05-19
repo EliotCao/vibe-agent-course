@@ -11,6 +11,7 @@ from llm import LLM
 from tools import ToolRegistry
 from tools_impl import ALL_TOOLS
 from context_builder import ContextBuilder, ContextConfig
+import ui
 
 SYSTEM_PROMPT = """你是一个专业的编程助手（Coding Agent），可以帮助用户阅读、编写和修改代码。
 
@@ -109,7 +110,12 @@ class CodingAgent:
                         "tool_call_id": tool_call.id,
                         "content": result,
                     })
-                    print(f"  🔧 {tool_call.function.name} → {result[:100]}{'...' if len(result) > 100 else ''}")
+                    # 用 UI 面板展示工具调用
+                    try:
+                        args = json.loads(tool_call.function.arguments)
+                    except (json.JSONDecodeError, TypeError):
+                        args = {}
+                    ui.print_tool_call(tool_call.function.name, result, args)
 
                 continue  # 继续让 LLM 处理
 
@@ -158,38 +164,38 @@ def main():
     import sys
 
     try:
-        import readline  # noqa: F401 — 导入即可启用行编辑，修复中文删除问题
+        import readline  # noqa: F401 — 启用行编辑，修复中文删除问题
     except ImportError:
         pass
 
     workdir = sys.argv[1] if len(sys.argv) > 1 else "."
     agent = CodingAgent(workdir=workdir)
 
-    print("🤖 Coding Agent 已启动")
-    print(f"📁 工作目录: {workdir}")
-    print(f"🔧 已加载 {len(agent.tools.get_tool_names())} 个工具")
-    print("输入 /quit 退出, /reset 重置对话\n")
+    ui.print_welcome(workdir, len(agent.tools.get_tool_names()))
 
     while True:
         try:
-            user_input = input("👤 > ").strip()
+            user_input = input("▶ ").strip()
         except (EOFError, KeyboardInterrupt):
-            print("\n👋 再见！")
+            ui.print_bye()
             break
 
         if not user_input:
             continue
         if user_input == "/quit":
-            print("👋 再见！")
+            ui.print_bye()
             break
         if user_input == "/reset":
             agent.reset()
-            print("🔄 对话已重置\n")
+            ui.print_reset()
             continue
 
-        print()
-        answer = agent.chat(user_input)
-        print(f"\n🤖 {answer}\n")
+        # 显示 thinking spinner
+        with ui.console.status("[dim]思考中...[/dim]", spinner="dots"):
+            answer = agent.chat(user_input)
+
+        if answer:
+            ui.print_response(answer)
 
 
 if __name__ == "__main__":
