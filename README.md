@@ -11,7 +11,8 @@
 │
 ├── ch01-hello-react/      # 第 1 章：智能旅行助手（ReAct：Thought-Action-Observation 循环）
 ├── ch02-hello-llm/        # 第 2 章：Hello LLM —— 最小可用的流式 LLM 客户端
-└── ch03-hello-agents/     # 第 3 章：用 hello-agents 框架快速搭建 Agent
+├── ch03-hello-agents/     # 第 3 章：用 hello-agents 框架快速搭建 Agent
+└── ch04-my-agent/         # 第 4 章：从零搭建自己的 Agent（无框架依赖）
 ```
 
 ## 章节索引
@@ -21,6 +22,7 @@
 | [ch01](./ch01-hello-react/) | Hello ReAct —— 智能旅行助手 | LLM 客户端 / System Prompt / Tools / ReAct Loop |
 | [ch02](./ch02-hello-llm/) | Hello LLM —— 流式 LLM 客户端 | OpenAI 兼容接口 / 流式响应 / messages 协议 |
 | [ch03](./ch03-hello-agents/) | Hello Agents 框架快速上手 | SimpleAgent / ReActAgent / ToolRegistry |
+| [ch04](./ch04-my-agent/) | 从零搭建自己的 Agent | 独立 LLM 客户端 / 上下文工程 / GSSC 流水线 |
 
 > 更多章节陆续添加中。
 

@@ -101,10 +101,8 @@ class ContextBuilder:
         """计算综合分数 = 相关性权重×相关性 + 新近性权重×新近性。"""
         cfg = self.config
 
-        # 相关性：使用简单的关键词重叠（Jaccard）
-        relevance = self._keyword_relevance(packet.content, query)
-        # 与预设的 relevance 取较高值
-        relevance = max(relevance, packet.relevance)
+        # 相关性：直接使用调用方 add() 时指定的值
+        relevance = packet.relevance
 
         # 新近性：指数衰减，24h 内保持高分
         age_hours = (datetime.now() - packet.timestamp).total_seconds() / 3600
@@ -112,33 +110,38 @@ class ContextBuilder:
 
         return cfg.relevance_weight * relevance + cfg.recency_weight * recency
 
-    @staticmethod
-    def _keyword_relevance(text: str, query: str) -> float:
-        """基于关键词重叠的简易相关性（Jaccard 相似度）。"""
-        text_tokens = set(text.lower().split())
-        query_tokens = set(query.lower().split())
-        if not query_tokens:
-            return 0.0
-        intersection = text_tokens & query_tokens
-        union = text_tokens | query_tokens
-        return len(intersection) / len(union) if union else 0.0
-
     def _select(
         self, packets: List[ContextPacket], query: str
     ) -> List[ContextPacket]:
-        """贪心选择：按分数降序，直到填满 token 预算。"""
+        """贪心选择：在 token 预算内挑选价值最高的信息包。
+
+        算法思路（贪心背包）：
+        1. 计算可用预算 = 总 token 上限 × (1 - 系统预留比例)
+           例如: 3000 × 0.8 = 2400 tokens 留给候选内容
+        2. 对每个信息包打综合分 = 相关性权重×相关性 + 新近性权重×新近性
+        3. 按分数从高到低排序
+        4. 依次尝试放入：
+           - 分数太低（< min_relevance）→ 丢弃，信息价值不够
+           - 放不下（超预算）→ 跳过，尝试下一个更小的包
+           - 否则 → 选入，累加已用 token
+        """
         cfg = self.config
+
+        # 可用 token 预算（扣除系统指令的预留空间）
         budget = int(cfg.max_tokens * (1 - cfg.reserve_ratio))
 
-        # 计算分数并排序
+        # 为每个候选包计算综合分数，并按分数降序排列
         scored = [(p, self._score(p, query)) for p in packets]
         scored.sort(key=lambda x: x[1], reverse=True)
 
+        # 贪心填充：优先选高分包，直到预算用完
         selected: List[ContextPacket] = []
         used_tokens = 0
         for packet, score in scored:
+            # 过滤掉相关性过低的噪声信息
             if score < cfg.min_relevance:
                 continue
+            # 预算不够放这个包，跳过（但后面可能有更小的包能放进来）
             if used_tokens + packet.token_count > budget:
                 continue
             selected.append(packet)
