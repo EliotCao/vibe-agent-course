@@ -298,18 +298,85 @@ def _handle_skill_command(agent: CodingAgent, command: str):
     ui.console.print()
 
 
-def main():
-    """交互式 REPL 入口。"""
-    import os
-    import sys
+def _parse_args():
+    """解析命令行参数。"""
+    import argparse
 
+    parser = argparse.ArgumentParser(
+        description="CodingAgent —— 极简版 Claude Code 编程助手",
+    )
+    parser.add_argument(
+        "--workdir", "-w",
+        default=".",
+        help="工作目录（默认当前目录）",
+    )
+
+    subparsers = parser.add_subparsers(dest="command")
+
+    # solo 模式：一次性执行任务
+    solo_parser = subparsers.add_parser("--solo", help="Solo 模式")
+    # 为兼容 `python coding_agent.py --solo exec "query"` 的调用方式
+    # 也支持直接 `python coding_agent.py solo exec "query"`
+    solo_sub = solo_parser.add_subparsers(dest="solo_action")
+    exec_parser = solo_sub.add_parser("exec", help="执行一次性任务")
+    exec_parser.add_argument("query", help="要执行的任务描述")
+
+    return parser
+
+
+def _run_solo_exec(workdir: str, query: str, output_file: Optional[str] = None):
+    """Solo 模式：执行一次性任务后退出。
+
+    不进入 REPL 循环，适合脚本化调用或 CI/CD 集成。
+
+    思考过程和工具调用始终打印到 stderr（Rich 渲染），
+    最终结果通过以下方式获取：
+      - --output <file>: 结果写入指定文件
+      - --output -:     结果写入 stdout（纯文本，无 Rich 格式）
+      - 不指定:         结果通过 Rich 渲染输出（与 REPL 一致）
+    """
+    import sys
+    from rich.console import Console
+
+    # 如果需要将结果输出到 stdout，则 UI 过程信息走 stderr，避免污染
+    if output_file == "-":
+        ui.console = Console(stderr=True)
+
+    agent = CodingAgent(workdir=workdir)
+
+    ui.console.print(f"[bold cyan]🚀 Solo 模式[/bold cyan] | 工作目录: {workdir}")
+    ui.console.print(f"[dim]任务: {query}[/dim]\n")
+
+    try:
+        with ui.console.status("[dim]思考中...[/dim]", spinner="dots"):
+            answer = agent.chat(query)
+
+        if answer:
+            # 始终在终端渲染完整过程输出（走 stderr 或 stdout 取决于上面的设置）
+            ui.print_response(answer)
+
+            # 如果指定了 --output，额外将纯文本结果写到目标
+            if output_file == "-":
+                # 输出到 stdout（纯文本，方便管道/CI 捕获）
+                sys.stdout.write(answer)
+                if not answer.endswith("\n"):
+                    sys.stdout.write("\n")
+            elif output_file:
+                with open(output_file, "w", encoding="utf-8") as f:
+                    f.write(answer)
+                ui.print_info(f"✅ 结果已写入: {output_file}")
+    except KeyboardInterrupt:
+        ui.print_info("\n⏹ 任务已中断。")
+        raise SystemExit(1)
+
+
+def _run_repl(workdir: str):
+    """交互式 REPL 模式。"""
     try:
         import readline  # noqa: F401 — 启用行编辑，修复中文删除问题
     except ImportError:
         pass
 
-    workdir = sys.argv[1] if len(sys.argv) > 1 else "."
-    workdir = os.path.abspath(workdir)
     agent = CodingAgent(workdir=workdir)
 
     memory_stats = agent.memory.stats()
@@ -351,6 +418,65 @@ def main():
                 ui.print_response(answer)
         except KeyboardInterrupt:
             ui.print_info("\n⏹ 任务已中断，回到待输入状态。\n")
+
+
+def main():
+    """主入口：根据命令行参数分发到不同模式。
+
+    用法:
+      交互模式:  python coding_agent.py [workdir]
+      Solo 模式: python coding_agent.py --solo exec "任务描述" [--output FILE]
+
+    --output 选项（仅 solo 模式）:
+      --output result.txt   将最终结果写入文件
+      --output -            将最终结果写入 stdout（纯文本，CI/CD 友好）
+    """
+    import sys
+
+    workdir = "."
+    query = None
+    output_file = None
+    is_solo = False
+
+    # 手动解析参数以兼容 `--solo exec "query"` 的调用形式
+    args = sys.argv[1:]
+
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        if arg in ("--workdir", "-w") and i + 1 < len(args):
+            workdir = args[i + 1]
+            i += 2
+        elif arg in ("--output", "-o") and i + 1 < len(args):
+            output_file = args[i + 1]
+            i += 2
+        elif arg == "--solo":
+            is_solo = True
+            i += 1
+        elif arg == "exec" and is_solo:
+            if i + 1 < len(args):
+                query = args[i + 1]
+                i += 2
+            else:
+                ui.console.print("[red]错误: exec 后需要提供任务描述[/red]")
+                ui.console.print("用法: python coding_agent.py --solo exec \"你的任务\"")
+                raise SystemExit(1)
+        else:
+            # 向后兼容：第一个位置参数作为 workdir
+            if not is_solo and workdir == ".":
+                workdir = arg
+            i += 1
+
+    workdir = os.path.abspath(workdir)
+
+    if is_solo:
+        if not query:
+            ui.console.print("[red]错误: solo 模式需要 exec 子命令和任务描述[/red]")
+            ui.console.print("用法: python coding_agent.py --solo exec \"你的任务\"")
+            raise SystemExit(1)
+        _run_solo_exec(workdir, query, output_file=output_file)
+    else:
+        _run_repl(workdir)
 
 
 if __name__ == "__main__":
