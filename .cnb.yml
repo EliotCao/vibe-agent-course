@@ -13,4 +13,6 @@ $:
       # 这样 IDE 一打开就能跳转到第三方库源码，不需要手动选解释器。
       stages:
         - name: uv sync
-          script: cd /workspace && uv sync --all-packages
+          script: |
+            npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y --copy
+            cd /workspace && uv sync --all-packages

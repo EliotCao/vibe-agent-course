@@ -79,13 +79,18 @@ class CodingAgent:
         )
 
     def _build_system_prompt(self) -> str:
-        """构建 system prompt，注入 skills 和记忆。"""
+        """构建 system prompt，注入 skills 索引和记忆。"""
         prompt = self.system_prompt
 
-        # 注入 skills
-        skills_prompt = self.skills.to_prompt()
-        if skills_prompt:
-            prompt += f"\n{skills_prompt}"
+        # Level 1: 注入 skill 索引（name + description）
+        index_prompt = self.skills.to_index_prompt()
+        if index_prompt:
+            prompt += f"\n{index_prompt}"
+
+        # Level 2: 注入已激活的 skill 完整内容
+        active_prompt = self.skills.to_active_prompt()
+        if active_prompt:
+            prompt += f"\n{active_prompt}"
 
         # 注入持久化记忆摘要
         memory_context = self.memory.get_context(limit=8)
@@ -109,12 +114,27 @@ class CodingAgent:
         """处理一轮用户输入，返回最终回答。
 
         流程:
-        1. 用户消息追加到 context
-        2. context.get_messages() 获取消息列表（自动压缩如果超预算）
-        3. 调用 LLM（带 tools schema）
-        4. 如果 LLM 要求调用工具 → 执行 → 结果追加到 context → 再次调用
-        5. 循环直到 LLM 给出文本回答
+        1. 根据用户问题匹配并按需加载相关 skill
+        2. 用户消息追加到 context
+        3. context.get_messages() 获取消息列表（自动压缩如果超预算）
+        4. 调用 LLM（带 tools schema）
+        5. 如果 LLM 要求调用工具 → 执行 → 结果追加到 context → 再次调用
+        6. 循环直到 LLM 给出文本回答
         """
+        # 自动匹配最相关的 skill 并加载（只取最佳匹配的 1 个）
+        matched = self.skills.match(user_input)
+        if matched:
+            best = matched[0]  # 取最相关的
+            meta = self.skills.get_meta(best)
+            if meta and not meta.loaded:
+                self.skills.load(best)
+                ui.print_info(f"📚 已激活 skill: {best}")
+                # 更新 system prompt，让 LLM 看到 skill 内容
+                self.context._messages[0] = {
+                    "role": "system",
+                    "content": self._build_system_prompt(),
+                }
+
         # 用户消息追加到 context
         self.context.append({"role": "user", "content": user_input})
 
@@ -249,13 +269,15 @@ def _handle_skill_command(agent: CodingAgent, command: str):
     sub = parts[1] if len(parts) > 1 else ""
 
     if sub == "list" or not sub:
-        loaded = agent.skills.list()
-        available = agent.skills.list_available()
-        if available:
-            ui.console.print("[bold]可用 Skills:[/bold]")
-            for name in available:
-                status = "[green]已加载[/green]" if name in loaded else "[dim]未加载[/dim]"
-                ui.console.print(f"  • {name}  {status}")
+        all_skills = agent.skills.list()
+        loaded = agent.skills.list_loaded()
+        if all_skills:
+            ui.console.print(f"[bold]Skills（{len(all_skills)} 个）:[/bold]")
+            for name in all_skills:
+                meta = agent.skills.get_meta(name)
+                desc = f" — {meta.description}" if meta and meta.description else ""
+                status = "[green]●[/green]" if name in loaded else "[dim]○[/dim]"
+                ui.console.print(f"  {status} {name}{desc}")
         else:
             ui.print_info(f"无可用 skills（目录: {agent.skills.skills_dir}）")
     elif sub == "load" and len(parts) > 2:
