@@ -1,7 +1,7 @@
 """CodingAgent —— 极简版 Claude Code。
 
 基于 Function Calling + 对话循环 + 多工具，实现一个交互式编程助手。
-通过 ContextBuilder 管理上下文预算，对话过长时自动压缩。
+通过 ContextBuilder 统一管理所有消息（含 tool_calls），自动压缩长对话。
 """
 
 import json
@@ -34,8 +34,9 @@ class CodingAgent:
     """交互式编程助手，基于 Function Calling 驱动工具调用。
 
     核心循环:
-        用户输入 → ContextBuilder 管理上下文 → LLM 推理
-        → [工具调用 → 结果注入 → LLM 再推理]* → 输出回答
+        用户输入 → context.append → context.get_messages（自动压缩）
+        → LLM 推理 → [工具调用 → 结果注入 context → LLM 再推理]*
+        → 输出回答
     """
 
     def __init__(
@@ -50,23 +51,21 @@ class CodingAgent:
         self.system_prompt = system_prompt
         self.max_tool_rounds = max_tool_rounds
 
-        # ContextBuilder 负责上下文预算管理
+        # ContextBuilder 统一管理所有消息（模式 B）
         self.context = ContextBuilder(
             system_prompt=system_prompt,
-            config=ContextConfig(max_tokens=max_context_tokens, reserve_ratio=0.1),
+            config=ContextConfig(
+                max_tokens=max_context_tokens,
+                reserve_ratio=0.1,
+                keep_recent=10,
+            ),
         )
-
-        # 完整 messages 历史（含 tool_calls 等特殊结构）
-        self.messages: List[dict] = [
-            {"role": "system", "content": system_prompt}
-        ]
 
     @staticmethod
     def _create_registry(workdir: str) -> ToolRegistry:
         """注册所有工具。"""
         registry = ToolRegistry()
         for ToolClass in ALL_TOOLS:
-            # BashTool 需要 workdir 参数
             if ToolClass.__name__ == "BashTool":
                 registry.register_tool(ToolClass(workdir=workdir))
             else:
@@ -77,94 +76,49 @@ class CodingAgent:
         """处理一轮用户输入，返回最终回答。
 
         流程:
-        1. 用户消息加入 messages + context
-        2. 如果对话过长，通过 ContextBuilder 压缩历史
+        1. 用户消息追加到 context
+        2. context.get_messages() 获取消息列表（自动压缩如果超预算）
         3. 调用 LLM（带 tools schema）
-        4. 如果 LLM 要求调用工具 → 执行工具 → 结果注入 → 再次调用 LLM
-        5. 循环直到 LLM 给出文本回答（或达到最大轮次）
+        4. 如果 LLM 要求调用工具 → 执行 → 结果追加到 context → 再次调用
+        5. 循环直到 LLM 给出文本回答
         """
-        self.messages.append({"role": "user", "content": user_input})
-        # 记录到 context 中，用于长对话时的相关性评估
-        self.context.add(user_input, source="user", relevance=0.6)
-
-        # 压缩过长的对话历史
-        self._compress_if_needed()
+        # 用户消息追加到 context
+        self.context.append({"role": "user", "content": user_input})
 
         tools_schema = self.tools.to_openai_schema()
 
         for _ in range(self.max_tool_rounds):
-            response = self.llm.chat(
-                self.messages,
-                tools=tools_schema,
-            )
+            # 从 context 获取消息（自动处理压缩）
+            messages = self.context.get_messages()
+
+            response = self.llm.chat(messages, tools=tools_schema)
 
             if response is None:
                 return "❌ 调用 LLM 失败"
 
             # 检查是否有工具调用
             if response.tool_calls:
-                # 将 assistant 消息（含 tool_calls）加入历史
-                self.messages.append(self._message_to_dict(response))
+                # assistant 消息（含 tool_calls）追加到 context
+                self.context.append(self._message_to_dict(response))
 
-                # 逐个执行工具
+                # 逐个执行工具，结果追加到 context
                 for tool_call in response.tool_calls:
                     result = self._execute_tool_call(tool_call)
-                    # 工具结果加入历史
-                    self.messages.append({
+                    self.context.append({
                         "role": "tool",
                         "tool_call_id": tool_call.id,
                         "content": result,
                     })
-                    # 工具结果也记录到 context（高相关性）
-                    self.context.add(
-                        f"[{tool_call.function.name}] {result[:200]}",
-                        source="tool",
-                        relevance=0.8,
-                    )
                     print(f"  🔧 {tool_call.function.name} → {result[:100]}{'...' if len(result) > 100 else ''}")
 
                 continue  # 继续让 LLM 处理
 
             # 无工具调用，LLM 给出了最终回答
             content = response.content or ""
-            self.messages.append({"role": "assistant", "content": content})
-            self.context.add(content, source="assistant", relevance=0.5)
+            self.context.append({"role": "assistant", "content": content})
             return content
 
         return "⚠️ 达到最大工具调用轮次，已停止。"
-
-    def _compress_if_needed(self):
-        """对话历史过长时，压缩中间部分，保留 system + 最近 N 轮。"""
-        total_chars = sum(len(m.get("content", "")) for m in self.messages)
-        # 粗略估算：1 字符 ≈ 1 token（中文），超过预算的 80% 时压缩
-        budget = self.context.config.max_tokens
-        if total_chars < budget * 0.8:
-            return
-
-        # 保留 system（第一条）和最近的消息
-        keep_recent = 10  # 保留最近 10 条
-        if len(self.messages) <= keep_recent + 1:
-            return
-
-        # 将被压缩的中间部分生成摘要
-        middle = self.messages[1:-keep_recent]
-        summary_parts = []
-        for m in middle:
-            role = m.get("role", "")
-            content = m.get("content", "")
-            if role == "user":
-                summary_parts.append(f"用户: {content[:50]}")
-            elif role == "assistant" and content:
-                summary_parts.append(f"助手: {content[:50]}")
-
-        summary = "[对话历史摘要]\n" + "\n".join(summary_parts[-5:])  # 只保留最近 5 条摘要
-
-        # 重建 messages：system + 摘要 + 最近消息
-        self.messages = (
-            [self.messages[0]]  # system
-            + [{"role": "user", "content": summary}, {"role": "assistant", "content": "好的，我已了解之前的对话内容。"}]
-            + self.messages[-keep_recent:]  # 最近消息
-        )
 
     def _execute_tool_call(self, tool_call) -> str:
         """执行单个工具调用。"""
@@ -196,13 +150,17 @@ class CodingAgent:
 
     def reset(self):
         """重置对话历史和上下文。"""
-        self.messages = [{"role": "system", "content": self.system_prompt}]
         self.context.clear()
 
 
 def main():
     """交互式 REPL 入口。"""
     import sys
+
+    try:
+        import readline  # noqa: F401 — 导入即可启用行编辑，修复中文删除问题
+    except ImportError:
+        pass
 
     workdir = sys.argv[1] if len(sys.argv) > 1 else "."
     agent = CodingAgent(workdir=workdir)

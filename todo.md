@@ -10,3 +10,8 @@ function call 的概念
 
 上下文
 先手动来拼接 message， 然后引出为什么要做上下文管理。
+
+
+工具
+
+原生 tools 参数， 放在 prompt 里， 两种方式的对比
