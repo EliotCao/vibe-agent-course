@@ -10,8 +10,8 @@ from typing import List, Optional
 
 from llm import LLM
 from tools import ToolRegistry
-from tools_impl import ALL_TOOLS
-from context_builder import ContextBuilder, ContextConfig
+from tools.impl import ALL_TOOLS
+from context import ContextBuilder, ContextConfig
 from memory import Memory
 from skills import Skills
 import ui

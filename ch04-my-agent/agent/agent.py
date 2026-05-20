@@ -13,7 +13,7 @@ from typing import Dict, List, Optional
 
 from llm import LLM
 from tools import ToolRegistry
-from context_builder import ContextBuilder
+from context import ContextBuilder
 
 
 class Agent(ABC):

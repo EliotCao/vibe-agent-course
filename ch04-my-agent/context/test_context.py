@@ -1,7 +1,7 @@
 """测试上下文构建器。"""
 
 from llm import LLM
-from context_builder import ContextBuilder
+from context import ContextBuilder
 
 
 def main():

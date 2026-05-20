@@ -6,7 +6,7 @@ ch04-my-agent 入口模块
 """
 
 from llm import LLM
-from context_builder import ContextBuilder
+from context import ContextBuilder
 from tools import ToolRegistry, ToolParameter
 from agent import SimpleAgent, ReActAgent
 
@@ -30,6 +30,18 @@ def main():
         }
         return weather_data.get(city, f"未找到 {city} 的天气数据")
 
+    # --- 演示 1: 流式输出（直接使用 LLM）---
+    print("=== 流式输出演示 ===")
+    messages = [
+        {"role": "system", "content": "你是一个有帮助的助手，请简洁回答。"},
+        {"role": "user", "content": "用一句话解释什么是 Agent"},
+    ]
+    stream = llm.chat(messages, stream=True)
+    if stream:
+        LLM.stream_print(stream)
+
+    # --- 演示 2: SimpleAgent + 工具调用 ---
+    print("\n=== SimpleAgent 演示 ===")
     agent = SimpleAgent(
         name="小助手",
         llm=llm,

@@ -80,7 +80,9 @@ class LLM:
             }
             if tools:
                 kwargs["tools"] = tools
-                kwargs["stream"] = True  # 强制流式（兼容只支持流式的接口）
+
+            # 强制使用流式（兼容只支持流式的接口）
+            kwargs["stream"] = True
 
             response = self.client.chat.completions.create(**kwargs)
 
@@ -89,7 +91,8 @@ class LLM:
                 return self._collect_tool_stream(response)
 
             if not stream:
-                return response.choices[0].message.content
+                # 流式收集后返回完整字符串
+                return "".join(self._iter_stream(response))
 
             return self._iter_stream(response)
 
