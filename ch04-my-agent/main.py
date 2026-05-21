@@ -298,30 +298,50 @@ def _handle_skill_command(agent: CodingAgent, command: str):
     ui.console.print()
 
 
-def _parse_args():
-    """解析命令行参数。"""
-    import argparse
+def _print_help():
+    """打印命令行帮助信息（Rich 渲染）。"""
+    # 用原始字符串，方便写 Rich 的 \[ 转义（字面方括号）
+    help_text = r"""[bold cyan]CodingAgent[/bold cyan] —— 极简版 Claude Code 编程助手
 
-    parser = argparse.ArgumentParser(
-        description="CodingAgent —— 极简版 Claude Code 编程助手",
-    )
-    parser.add_argument(
-        "--workdir", "-w",
-        default=".",
-        help="工作目录（默认当前目录）",
-    )
+[bold]用法:[/bold]
+  [green]python main.py[/green] [dim]\[选项] \[WORKDIR][/dim]
+      启动交互式 REPL 模式
 
-    subparsers = parser.add_subparsers(dest="command")
+  [green]python main.py --solo exec[/green] [yellow]"任务描述"[/yellow] [dim]\[选项][/dim]
+      Solo 模式：执行一次性任务后退出（适合脚本/CI/CD）
 
-    # solo 模式：一次性执行任务
-    solo_parser = subparsers.add_parser("--solo", help="Solo 模式")
-    # 为兼容 `python coding_agent.py --solo exec "query"` 的调用方式
-    # 也支持直接 `python coding_agent.py solo exec "query"`
-    solo_sub = solo_parser.add_subparsers(dest="solo_action")
-    exec_parser = solo_sub.add_parser("exec", help="执行一次性任务")
-    exec_parser.add_argument("query", help="要执行的任务描述")
+[bold]通用选项:[/bold]
+  [cyan]-h, --help[/cyan]               显示本帮助信息并退出
+  [cyan]-w, --workdir DIR[/cyan]        工作目录（默认当前目录）
 
-    return parser
+[bold]Solo 模式选项:[/bold]
+  [cyan]-o, --output FILE[/cyan]        将最终结果写入文件
+  [cyan]-o, --output -[/cyan]           将最终结果写入 stdout（纯文本，CI/CD 友好）
+                           过程信息（思考、工具调用）走 stderr，避免污染
+
+[bold]REPL 内置命令:[/bold]
+  [magenta]/quit[/magenta]                    退出
+  [magenta]/reset[/magenta]                   重置对话与工作记忆
+  [magenta]/skill[/magenta] \[list|load|unload|show] \[name]
+                           管理 skills
+
+[bold]示例:[/bold]
+  [dim]# 在当前目录启动 REPL[/dim]
+  python main.py
+
+  [dim]# 指定工作目录启动 REPL[/dim]
+  python main.py -w ~/projects/foo
+
+  [dim]# Solo 模式：执行一次任务[/dim]
+  python main.py --solo exec "在 src/ 下找出所有 TODO 注释"
+
+  [dim]# Solo 模式：结果写入文件[/dim]
+  python main.py --solo exec "总结 README" -o summary.md
+
+  [dim]# Solo 模式：通过管道捕获结果[/dim]
+  python main.py --solo exec "列出依赖" -o - | tee deps.txt
+"""
+    ui.console.print(help_text)
 
 
 def _run_solo_exec(workdir: str, query: str, output_file: Optional[str] = None):
@@ -424,14 +444,20 @@ def main():
     """主入口：根据命令行参数分发到不同模式。
 
     用法:
-      交互模式:  python coding_agent.py [workdir]
-      Solo 模式: python coding_agent.py --solo exec "任务描述" [--output FILE]
+      查看帮助:  python main.py --help
+      交互模式:  python main.py [-w WORKDIR] [WORKDIR]
+      Solo 模式: python main.py --solo exec "任务描述" [-o FILE]
 
     --output 选项（仅 solo 模式）:
       --output result.txt   将最终结果写入文件
       --output -            将最终结果写入 stdout（纯文本，CI/CD 友好）
     """
     import sys
+
+    # 优先处理 --help / -h，无论出现在哪个位置
+    if any(a in ("-h", "--help") for a in sys.argv[1:]):
+        _print_help()
+        return
 
     workdir = "."
     query = None
@@ -459,7 +485,7 @@ def main():
                 i += 2
             else:
                 ui.console.print("[red]错误: exec 后需要提供任务描述[/red]")
-                ui.console.print("用法: python coding_agent.py --solo exec \"你的任务\"")
+                ui.console.print("用法: python main.py --solo exec \"你的任务\"")
                 raise SystemExit(1)
         else:
             # 向后兼容：第一个位置参数作为 workdir
@@ -472,7 +498,7 @@ def main():
     if is_solo:
         if not query:
             ui.console.print("[red]错误: solo 模式需要 exec 子命令和任务描述[/red]")
-            ui.console.print("用法: python coding_agent.py --solo exec \"你的任务\"")
+            ui.console.print("用法: python main.py --solo exec \"你的任务\"")
             raise SystemExit(1)
         _run_solo_exec(workdir, query, output_file=output_file)
     else:

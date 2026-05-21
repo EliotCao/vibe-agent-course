@@ -15,3 +15,6 @@ function call 的概念
 工具
 
 原生 tools 参数， 放在 prompt 里， 两种方式的对比
+
+
+自定义人设

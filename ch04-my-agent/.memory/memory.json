@@ -10,6 +10,17 @@
         "main.py",
         "edit"
       ]
+    },
+    {
+      "id": "8ca88e5a",
+      "content": "修改了文件 docs/context_builder.md",
+      "memory_type": "episodic",
+      "importance": 0.7,
+      "timestamp": "2026-05-21T14:26:35.729379",
+      "tags": [
+        "docs/context_builder.md",
+        "edit"
+      ]
     }
   ],
   "semantic": []
