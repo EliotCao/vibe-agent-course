@@ -13,7 +13,8 @@
 ├── .cnb.yml                  # 流水线：构建/推送镜像 + NPC 事件
 ├── .cnb/settings.yml         # NPC 角色定义（小光）
 ├── ch04-my-agent/
-│   ├── Dockerfile            # PyInstaller 打 my-agent + 内置 git-cnb
+│   ├── Dockerfile            # PyInstaller 打 my-agent + 内置 git-cnb + npc-entrypoint
+│   ├── npc-entrypoint.sh     # NPC 真正的执行脚本（被 .cnb.yml 一行调用）
 │   ├── .dockerignore
 │   └── main.py               # 入口，--solo exec "task" -o file
 └── docs/cnb-npc-setup.md     # 本文
@@ -31,13 +32,21 @@ CNB 触发 issue.comment@npc / pull_request.comment@npc
 拉镜像 ${CNB_DOCKER_REGISTRY}/${CNB_NPC_SLUG_LOWERCASE}:latest
         │
         ▼
-容器：
-  ① my-agent --solo exec "<去 @mention 的评论>" -o /tmp/answer.md
-       （读 CNB_API_ENDPOINT/CNB_REPO_SLUG/CNB_TOKEN 走 CNB AI 网关）
-  ② git-cnb issues comment-create -n $num -c "$(cat ans)" --workmode
-     git-cnb pull   comment-create -n $num -b "$(cat ans)" --workmode
-       （--workmode 让评论以 NPC 身份发出）
+插件任务直接跑容器 ENTRYPOINT = /usr/local/bin/npc-entrypoint
+  ① 取 CNB_EVENT_COMMENT_BODY，去掉 @mention → task
+  ② my-agent --solo exec "$task" -o /tmp/answer.md
+  ③ git-cnb {issues|pull} comment-create ... --workmode
+     （--workmode 让评论以 NPC 身份发出）
 ```
+
+`.cnb.yml` 里的 NPC stage 用的是 CNB 的「插件任务」写法——
+**只声明 `image`，不写 `script`**，CNB 会直接跑镜像 ENTRYPOINT。
+所有真正逻辑都在 `ch04-my-agent/npc-entrypoint.sh`，改它重新 build 镜像即可。
+
+> 插件任务的限制：`env:` 自定义环境变量不会传给容器，但 `CNB_*` 系统变量
+> （含 `CNB_API_ENDPOINT` / `CNB_TOKEN` / `CNB_EVENT_*` 等）会自动注入，
+> 我们恰好只用这些，所以无副作用。如果以后要传自定义变量，改用 `settings:`
+> 字段（会带 `PLUGIN_` 前缀注入）。
 
 ## 镜像组装
 

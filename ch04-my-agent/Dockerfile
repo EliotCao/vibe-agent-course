@@ -45,20 +45,16 @@ RUN pyinstaller \
     && /build/dist/my-agent --help >/dev/null
 
 # ============== Stage 2: runtime ==============
-# 直接用 git-cnb 官方镜像作为底，自带 git-cnb / git / curl / jq / bash
-# 镜像基础是 alpine + glibc-free，PyInstaller 单文件二进制能跑
-# 但需要确认 my-agent 能在 musl 环境运行 —— python:3.11-slim 是 glibc，
-# 打出来的二进制依赖 glibc，所以 runtime 必须也是 glibc 系。
-#
-# 解决方案：runtime 用 git-cnb 镜像，从中拷出 git-cnb 二进制；
-#          自身仍基于 debian-slim（glibc）以兼容 my-agent。
+# runtime 必须是 glibc 系（builder 是 python:3.11-slim-bookworm），
+# 所以选 debian:bookworm-slim；git-cnb 是纯静态二进制（CGO_ENABLED=0），
+# 从其官方镜像 (alpine) 拷过来到 debian 也能跑。
 FROM docker.cnb.cool/looc/git-cnb:latest AS gitcnb
 
 FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates git git-lfs curl jq \
+        ca-certificates git git-lfs curl jq bash \
     && rm -rf /var/lib/apt/lists/* \
     && git lfs install
 
@@ -70,9 +66,13 @@ RUN chmod +x /usr/local/bin/git-cnb
 COPY --from=builder /build/dist/my-agent /usr/local/bin/my-agent
 RUN chmod +x /usr/local/bin/my-agent
 
+# 3) 拷入 NPC entrypoint 脚本
+#    源码: ch04-my-agent/npc-entrypoint.sh
+COPY npc-entrypoint.sh /usr/local/bin/npc-entrypoint
+RUN chmod +x /usr/local/bin/npc-entrypoint
+
 ENV PYTHONUNBUFFERED=1 \
     TERM=xterm-256color
 
-# 默认入口：以 solo 模式接收任务
-ENTRYPOINT ["/usr/local/bin/my-agent"]
-CMD ["--help"]
+# 镜像专用于 CNB NPC 事件流水线
+ENTRYPOINT ["/usr/local/bin/npc-entrypoint"]

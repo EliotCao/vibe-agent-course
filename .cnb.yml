@@ -13,62 +13,13 @@
 # =====================================================================
 
 # ---- NPC 事件流水线锚点（issue / pull_request 评论触发） ----
+# 插件任务写法：stage 只写 image，不写 script，CNB 直接跑镜像 ENTRYPOINT。
+# ENTRYPOINT 是 /usr/local/bin/npc-entrypoint（见 Dockerfile），逻辑见
+# ch04-my-agent/npc-entrypoint.sh。
 .npc: &npc
-  - docker:
-      image: ${CNB_DOCKER_REGISTRY}/${CNB_NPC_SLUG_LOWERCASE}:latest
-    # my-agent 通过 CNB_API_ENDPOINT + CNB_REPO_SLUG + CNB_TOKEN 走 CNB AI 网关
-    # git-cnb 通过 CNB_TOKEN + --repo 调 OpenAPI
-    env:
-      MODEL_ID: ${MODEL_ID:-glm-5.0}
-    stages:
+  - stages:
       - name: run my-agent and reply
-        # 流程:
-        #   1) 取出评论原文，去掉 @mention，得到任务文本
-        #   2) my-agent --solo exec "$task" -o /tmp/answer.md
-        #   3) 用 git-cnb 把 answer.md 以 --workmode 回写到对应评论
-        #      --workmode 让评论以 NPC 身份提交（评论提交者=NPC 角色名）
-        script: |
-          set -euo pipefail
-
-          # ---- 1. 取任务文本 ----
-          raw="${CNB_EVENT_COMMENT_BODY:-}"
-          # 去掉首个 @xxx 或 @owner/repo(角色)
-          task="$(printf '%s' "$raw" | sed -E 's/@[A-Za-z0-9_./-]+(\([^)]*\))?//g' | sed -E 's/^[[:space:]]+//')"
-
-          if [ -z "$task" ]; then
-            task="请总结当前仓库的 README，并指出可改进的点。"
-          fi
-
-          echo "[npc] task: $task" >&2
-
-          # ---- 2. 跑 my-agent，结果写到 /tmp/answer.md ----
-          my-agent --solo exec "$task" -w "$CNB_WORKSPACE" -o /tmp/answer.md
-
-          # ---- 3. 用 git-cnb 回写评论 ----
-          number="${CNB_EVENT_ISSUE_NUMBER:-${CNB_EVENT_PULL_REQUEST_NUMBER:-}}"
-          kind="${CNB_EVENT:-issue.comment@npc}"
-
-          if [ -z "$number" ]; then
-            echo "[npc] no issue/pr number, skip comment" >&2
-            exit 0
-          fi
-
-          # 注意 flag 不一致：
-          #   issues comment-create  用 --comment / -c
-          #   pull   comment-create  用 --body    / -b
-          # 都支持 --workmode，让评论以 NPC 身份提交
-          case "$kind" in
-            pull_request.comment@npc)
-              git-cnb --repo "$CNB_REPO_SLUG" pull comment-create \
-                -n "$number" -b "$(cat /tmp/answer.md)" --workmode
-              ;;
-            *)
-              git-cnb --repo "$CNB_REPO_SLUG" issues comment-create \
-                -n "$number" -c "$(cat /tmp/answer.md)" --workmode
-              ;;
-          esac
-
-          echo "[npc] comment posted as NPC" >&2
+        image: ${CNB_DOCKER_REGISTRY}/${CNB_NPC_SLUG_LOWERCASE}:latest
 
 # ---- NPC 角色 -> 事件 映射 ----
 # 角色名需与 .cnb/settings.yml 里 npc.roles[].name 对应
@@ -98,5 +49,13 @@ main:
             docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
         - name: smoke test
           script: |
-            docker run --rm ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest --help
-            docker run --rm --entrypoint git-cnb ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest --help
+            # ENTRYPOINT 是 npc-entrypoint，没 CNB_EVENT 直接跑会进 NPC 流程并报错；
+            # 所以这里只验证关键文件都在镜像里、可执行。
+            docker run --rm --entrypoint bash ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest -c '
+              set -e
+              test -x /usr/local/bin/my-agent       && echo "my-agent OK"
+              test -x /usr/local/bin/git-cnb        && echo "git-cnb OK"
+              test -x /usr/local/bin/npc-entrypoint && echo "npc-entrypoint OK"
+              /usr/local/bin/my-agent --help >/dev/null
+              /usr/local/bin/git-cnb  --help >/dev/null
+            '
