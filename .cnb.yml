@@ -1,18 +1,102 @@
+# =====================================================================
+# CNB 流水线配置
+#
+# 1) main.push:   构建并推送 NPC 运行时镜像（ch04-my-agent/Dockerfile）
+# 2) NPC 事件:    @当前仓库(角色名) 时触发，跑 my-agent --solo exec
+#                 然后用 git-cnb 把回答以"工作模式"回写到 Issue/PR 评论
+#                 → 评论提交者会显示为 NPC 角色名
+#
+# 镜像地址约定：
+#   - main.push 用 ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
+#   - NPC 事件用 ${CNB_DOCKER_REGISTRY}/${CNB_NPC_SLUG_LOWERCASE}:latest
+#   两者在本仓库下取值一致。
+# =====================================================================
+
+# ---- NPC 事件流水线锚点（issue / pull_request 评论触发） ----
+.npc: &npc
+  - docker:
+      image: ${CNB_DOCKER_REGISTRY}/${CNB_NPC_SLUG_LOWERCASE}:latest
+    # my-agent 通过 CNB_API_ENDPOINT + CNB_REPO_SLUG + CNB_TOKEN 走 CNB AI 网关
+    # git-cnb 通过 CNB_TOKEN + --repo 调 OpenAPI
+    env:
+      MODEL_ID: ${MODEL_ID:-glm-5.0}
+    stages:
+      - name: run my-agent and reply
+        # 流程:
+        #   1) 取出评论原文，去掉 @mention，得到任务文本
+        #   2) my-agent --solo exec "$task" -o /tmp/answer.md
+        #   3) 用 git-cnb 把 answer.md 以 --workmode 回写到对应评论
+        #      --workmode 让评论以 NPC 身份提交（评论提交者=NPC 角色名）
+        script: |
+          set -euo pipefail
+
+          # ---- 1. 取任务文本 ----
+          raw="${CNB_EVENT_COMMENT_BODY:-}"
+          # 去掉首个 @xxx 或 @owner/repo(角色)
+          task="$(printf '%s' "$raw" | sed -E 's/@[A-Za-z0-9_./-]+(\([^)]*\))?//g' | sed -E 's/^[[:space:]]+//')"
+
+          if [ -z "$task" ]; then
+            task="请总结当前仓库的 README，并指出可改进的点。"
+          fi
+
+          echo "[npc] task: $task" >&2
+
+          # ---- 2. 跑 my-agent，结果写到 /tmp/answer.md ----
+          my-agent --solo exec "$task" -w "$CNB_WORKSPACE" -o /tmp/answer.md
+
+          # ---- 3. 用 git-cnb 回写评论 ----
+          number="${CNB_EVENT_ISSUE_NUMBER:-${CNB_EVENT_PULL_REQUEST_NUMBER:-}}"
+          kind="${CNB_EVENT:-issue.comment@npc}"
+
+          if [ -z "$number" ]; then
+            echo "[npc] no issue/pr number, skip comment" >&2
+            exit 0
+          fi
+
+          # 注意 flag 不一致：
+          #   issues comment-create  用 --comment / -c
+          #   pull   comment-create  用 --body    / -b
+          # 都支持 --workmode，让评论以 NPC 身份提交
+          case "$kind" in
+            pull_request.comment@npc)
+              git-cnb --repo "$CNB_REPO_SLUG" pull comment-create \
+                -n "$number" -b "$(cat /tmp/answer.md)" --workmode
+              ;;
+            *)
+              git-cnb --repo "$CNB_REPO_SLUG" issues comment-create \
+                -n "$number" -c "$(cat /tmp/answer.md)" --workmode
+              ;;
+          esac
+
+          echo "[npc] comment posted as NPC" >&2
+
+# ---- NPC 角色 -> 事件 映射 ----
+# 角色名需与 .cnb/settings.yml 里 npc.roles[].name 对应
+小光:
+  issue.comment@npc: *npc
+  pull_request.comment@npc: *npc
+
+# 角色未匹配时的默认事件
 $:
-  vscode:
-    - runner:
-        cpus: 16
-      docker:
-        image: docker.cnb.cool/looc/default-dev-env:latest
-      env:
-        VIRTUAL_ENV_DISABLE_PROMPT: "1"
-      services:
-        - vscode
+  issue.comment@npc: *npc
+  pull_request.comment@npc: *npc
+
+# ---- 默认分支推送：构建并推送镜像 ----
+main:
+  push:
+    - services:
         - docker
-      # 开发环境启动后自动执行：把所有章节依赖同步到根 .venv，
-      # 这样 IDE 一打开就能跳转到第三方库源码，不需要手动选解释器。
       stages:
-        - name: uv sync
+        - name: docker build
           script: |
-            cd /root && npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y
-            cd /workspace && uv sync --all-packages
+            cd ch04-my-agent
+            docker build \
+              -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest \
+              -f Dockerfile .
+        - name: docker push
+          script: |
+            docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
+        - name: smoke test
+          script: |
+            docker run --rm ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest --help
+            docker run --rm --entrypoint git-cnb ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest --help
