@@ -6,6 +6,9 @@ requires-python = ">=3.10"
 # 根项目自身不需要任何运行依赖
 dependencies = [
     "rich>=15.0.0",
+    "openai>=1.0.0",
+    "python-dotenv>=1.0.0",
+    "tiktoken>=0.7.0",
 ]
 
 # 根项目本身不构建为包，仅作为 workspace 容器
@@ -16,8 +19,8 @@ package = false
 # 共享同一个根 .venv，IDE 只需选一次解释器即可跨章跳转。
 [tool.uv.workspace]
 members = [
-    "ch01-hello-react",
-    "ch02-hello-llm",
-    "ch03-hello-agents",
-    "course",
+    "examples/ch01-hello-react",
+    "examples/ch02-hello-llm",
+    "examples/ch03-hello-agents",
+    "examples/ch04-my-agent",
 ]
