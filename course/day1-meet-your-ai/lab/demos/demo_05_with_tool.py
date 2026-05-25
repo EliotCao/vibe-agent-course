@@ -17,14 +17,11 @@ Demo 05 · LLM + 外部支持：从"不知道"到"知道"
 from __future__ import annotations
 
 import datetime
-import os
-from openai import OpenAI
 
-client = OpenAI(
-    base_url=os.environ["BASE_URL"],
-    api_key=os.environ["API_KEY"],
-)
-MODEL = os.environ["MODEL_ID"]
+from _env import get_model_id, make_client
+
+client = make_client()
+MODEL = get_model_id()
 
 
 # ---------- 一个"工具"：返回当前时间 ----------

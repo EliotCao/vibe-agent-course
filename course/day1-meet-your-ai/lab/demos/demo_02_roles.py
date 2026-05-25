@@ -13,14 +13,10 @@ Demo 02 · 三种 system prompt，三种"人格"
 
 from __future__ import annotations
 
-import os
-from openai import OpenAI
+from _env import get_model_id, make_client
 
-client = OpenAI(
-    base_url=os.environ["BASE_URL"],
-    api_key=os.environ["API_KEY"],
-)
-MODEL = os.environ["MODEL_ID"]
+client = make_client()
+MODEL = get_model_id()
 
 
 def chat(system: str, user: str) -> str:

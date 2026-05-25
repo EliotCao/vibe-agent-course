@@ -16,18 +16,15 @@ Demo 03 · Token 计算与上下文窗口
 
 from __future__ import annotations
 
-import os
 import tiktoken
-from openai import OpenAI
+
+from _env import get_model_id, make_client
 
 # tiktoken 支持的编码器；不同模型用不同 BPE，cl100k_base 适用于 GPT-3.5/4
 ENC = tiktoken.get_encoding("cl100k_base")
 
-client = OpenAI(
-    base_url=os.environ["BASE_URL"],
-    api_key=os.environ["API_KEY"],
-)
-MODEL = os.environ["MODEL_ID"]
+client = make_client()
+MODEL = get_model_id()
 
 
 def show_tokens(text: str, label: str = "") -> None:
