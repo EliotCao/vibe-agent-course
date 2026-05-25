@@ -2,6 +2,8 @@
 
 ## 什么是 Token
 
+![Token 不是字也不是词，而是介于两者之间的子词单位](./images/03-tokenization.png)
+
 **Token 不是字、不是词，是介于两者之间的"子词单位"（subword）。**
 
 LLM 不直接处理字符串——它先把文本切成 token 序列，再对每个 token 做概率预测。你可以把 token 理解为模型世界里的"原子"。
@@ -67,6 +69,8 @@ LLM API 的定价单位是 token，不是字符。典型价格（2025 年水平�
 
 ## 上下文窗口：LLM 的"工作内存"
 
+![输入和输出共享同一个上下文窗口，加起来不能超出容量](./images/03-context-window.png)
+
 模型一次推理能"看"到的最大 token 数，叫**上下文窗口（context window）**。
 
 | 模型 | 上下文窗口 |
@@ -97,6 +101,8 @@ However, your messages resulted in 134567 tokens.
 ChatGPT 之所以聊久了会"忘事"，是因为前端**主动裁掉了早期消息**来避免超限——模型本身不会自动处理。
 
 #### 3. 越长越笨（Lost in the Middle）
+
+![长上下文里中间最容易被忽略，注意力呈 U 形曲线](./images/03-lost-in-middle.png)
 
 研究表明，大部分模型在上下文超过 50% 容量后，对**中间位置**的内容关注度显著下降。
 
