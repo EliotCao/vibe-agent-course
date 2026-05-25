@@ -31,6 +31,23 @@
 $:
   issue.comment@npc: *npc
   pull_request.comment@npc: *npc
+  vscode:
+    - runner:
+        cpus: 16
+      docker:
+        image: docker.cnb.cool/looc/default-dev-env:latest
+      env:
+        VIRTUAL_ENV_DISABLE_PROMPT: "1"
+      services:
+        - vscode
+        - docker
+      # 开发环境启动后自动执行：把所有章节依赖同步到根 .venv，
+      # 这样 IDE 一打开就能跳转到第三方库源码，不需要手动选解释器。
+      stages:
+        - name: uv sync
+          script: |
+            cd /root && npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y
+            cd /workspace && uv sync --all-packages
 
 # ---- 默认分支推送：构建并推送镜像 ----
 main:
