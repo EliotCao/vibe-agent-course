@@ -15,10 +15,10 @@
 | 节 | 时长 | 类型 | 内容 | 讲义 |
 |----|------|------|------|------|
 | 39 | 40min | 理论 | 课程总复盘：从 token 到 NPC 的全链路 | [39-recap.md](./lecture/39-recap.md) |
-| 40 | 30min | 理论 | 行业图景：Cursor / Claude Code / Devin / 国产对比 | [40-industry-landscape.md](./lecture/40-industry-landscape.md) |
-| 41 | 60min | 实操 | 学生分享：每人 3 分钟讲自己的 Agent | — |
-| 42 | 20min | 理论 | 大作业布置 + 评分标准说明 | [42-final-assignment.md](./lecture/42-final-assignment.md) |
-| 43 | 60min | 实操 | 自由 Q&A + 个人后续路线建议 | — |
+| — | 30min | 互动 | 课堂提问（30 题随机抽） | [quiz-questions.md](./lecture/quiz-questions.md) |
+| 41 | 60min | 互动 | 学生分享：每人 3 分钟讲自己的 Agent | — |
+| 42 | 20min | 理论 | 大作业布置 + 评分标准说明 | [final-assignment.md](./exercises/final-assignment.md) |
+| 43 | 60min | 自由 | Q&A + 个人后续路线建议 | — |
 
 ## 课程总复盘要点
 
