@@ -69,3 +69,40 @@ my_coding_agent/                        # 沿用 Day6
 - 在 Issue 里 @ 试一下
 
 **不要让学生从零写 Dockerfile**，时间不够，也不是今天的重点。
+
+---
+
+## Demo 索引
+
+| Demo | 功能 | 文件 |
+|------|------|------|
+| `demo_33` | Skills 扫描/匹配/加载演示 | `lab/demos/demo_33_skills.py` |
+| 示例 Skills | add-docstring / commit-convention | `lab/demos/skills/` |
+
+---
+
+## 模板文件
+
+| 文件 | 作用 | 位置 |
+|------|------|------|
+| Dockerfile | 两阶段构建 NPC 镜像 | `lab/templates/Dockerfile` |
+| npc-entrypoint.sh | 容器入口脚本 | `lab/templates/npc-entrypoint.sh` |
+| cnb.yml | NPC 事件流水线定义 | `lab/templates/cnb.yml` |
+| settings.yml | NPC 角色定义 | `lab/templates/settings.yml` |
+
+---
+
+## 课后练习
+
+见 [exercises/README.md](./exercises/README.md)（3 必做 + 2 选做）
+
+---
+
+## 衔接关系
+
+| 来自哪天 | 今天用什么 |
+|----------|------------|
+| Day6 | my_coding_agent 完整 Agent（被打包进 Docker） |
+| Day5 | 5 个工具（Agent 在 NPC 模式下用它们干活） |
+| Day4 | Memory（NPC 跨次对话不保留，单次清空） |
+| → Day8 | 复盘 + 大作业（用完整 NPC 完成一个端到端项目）|

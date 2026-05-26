@@ -1,0 +1,33 @@
+# .cnb.yml 模板（学生用）
+# 把这个文件放到你的仓库根目录
+
+main:
+  push:
+    - docker:
+        image: docker.cnb.cool/${{ cnb.repo_slug }}/my-agent:latest
+        stages:
+          - name: build-npc-image
+            script: |
+              echo "构建 NPC 镜像..."
+              # CNB 会自动 docker build + push
+
+npc:
+  issue.comment@npc:
+    - docker:
+        image: docker.cnb.cool/${{ cnb.repo_slug }}/my-agent:latest
+        stages:
+          - name: npc-reply
+            env:
+              HUNYUAN_API_KEY: ${{ secrets.HUNYUAN_API_KEY }}
+              HUNYUAN_BASE_URL: ${{ secrets.HUNYUAN_BASE_URL }}
+            script: npc-entrypoint
+
+  pull_request.comment@npc:
+    - docker:
+        image: docker.cnb.cool/${{ cnb.repo_slug }}/my-agent:latest
+        stages:
+          - name: npc-reply
+            env:
+              HUNYUAN_API_KEY: ${{ secrets.HUNYUAN_API_KEY }}
+              HUNYUAN_BASE_URL: ${{ secrets.HUNYUAN_BASE_URL }}
+            script: npc-entrypoint
