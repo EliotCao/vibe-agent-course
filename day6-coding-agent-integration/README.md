@@ -1,68 +1,106 @@
-# Day 6 · 整合：完整 Coding Agent
+# Day6 · 整合：完整 Coding Agent
 
-> 今天是组装日。把 Day2-Day5 的零件拼成一个能干真活的 Coding Agent。
+> **今天是组装日。** 把 Day1-Day5 的 6 个零件拼成一个能干真活的 Coding Agent——不到 120 行主逻辑，因为重活全在零件里。
+
+---
 
 ## 学习目标
 
 - [ ] 能画出完整 Agent 的模块边界与数据流
 - [ ] 区分 Agent 的 3 种交互模式：REPL / 单次任务 / 流式输出
-- [ ] 能把 ToolRegistry / ContextManager / Memory / 工具集 / Agent Loop 全部装到一起
-- [ ] 能让自己的 Agent 完成 3 个真实任务
+- [ ] 能把 LLM / ToolRegistry / ContextManager / Memory / 工具集 / UI 全部装到一起
+- [ ] 能让自己的 Agent 完成 3 个真实任务（建项目跑测试 / 修 bug / 刁难题）
 - [ ] 能识别并修复整合期常见的接口对不上问题
 
-## 时间表（210 min）
+---
+
+## 内容结构
 
 | 节 | 时长 | 类型 | 内容 | 讲义 |
 |----|------|------|------|------|
-| 28 | 25min | 理论 | 整合架构：模块边界与数据流 | [28-integration-architecture.md](./lecture/28-integration-architecture.md) |
+| 28 | 25min | 理论 | 整合架构：6 个零件的模块边界与数据流 | [28-integration-architecture.md](./lecture/28-integration-architecture.md) |
 | 29 | 20min | 理论 | UI 与交互模式：REPL / 单次任务 / 流式输出 | [29-ui-and-modes.md](./lecture/29-ui-and-modes.md) |
-| 30 | 80min | 实操 | 把所有零件装到一个 Agent 类 | [lab/part1](./lab/README.md#part1) |
-| 31 | 70min | 实操 | 让你的 Agent 完成 3 个真实任务 | [lab/part2](./lab/README.md#part2) |
-| 32 | 15min | 实操 | 故障排查与调优 + 答疑 | — |
+| — | 130min | 实操 | 组装 + 跑任务 + 对比反思 | [lab/README.md](./lab/README.md) |
+
+---
+
+## Demo 索引
+
+| Demo | 功能 | 文件 |
+|------|------|------|
+| `demo_30` | 6 零件手动组装 walkthrough | `lab/demos/demo_30_integration_walkthrough.py` |
+| `demo_31` | 3 个真实任务端到端 | `lab/demos/demo_31_three_tasks.py` |
+| `my_coding_agent/` | 完整参考实现 | `lab/demos/my_coding_agent/main.py` |
+
+---
 
 ## 当日产物
 
 ```
 my_coding_agent/
-├── llm/                    # 来自 Day1
-├── tools/                  # ToolRegistry 来自 Day2，工具实现来自 Day5
-├── context/                # 来自 Day4
-├── memory/                 # 来自 Day4
+├── llm/                    # Day1 LLM 客户端
+├── tools/                  # Day2 ToolRegistry + Day5 工具实现
+├── context/                # Day4 ContextManager
+├── memory/                 # Day4 Memory（embedding + cosine）
 ├── agent/
-│   └── agent.py            # 整合主类
+│   └── agent.py            # ★ 整合主类（学生填 4 个 TODO）
 ├── ui/
 │   └── repl.py             # REPL 交互
-└── main.py                 # 入口（支持 REPL / 单次任务两种模式）
+└── main.py                 # 入口
 ```
 
-## 3 个真实任务（学生 vibe 自己的 Agent 完成）
+---
 
-### 任务 1：让 Agent 给 Day5 的工具集生成 README
-> "请阅读 coding_tools/ 目录，给每个工具生成一段说明，最后整合成 coding_tools/README.md"
+## 3 个真实任务
 
-考察：list_dir / read_file / write_file 协同。
+### 任务 1：建项目 + 跑测试
+> "请创建 calculator.py（含 add/subtract 函数），再创建 test_calculator.py（用 assert 写测试），最后跑 pytest -v"
 
-### 任务 2：补单测
-> "给 coding_tools/edit.py 补单测，确保测试通过且 coverage ≥ 80%"
+考察：write + bash 协同。
 
-考察：read / write / bash（跑测试）/ 多轮迭代。
+### 任务 2：修 bug
+> 给 Agent 一个有 bug 的 `buggy.py`，让它找 bug 并修复。
 
-### 任务 3：找 bug
-> （老师在某个工具里**故意埋一个 bug**，比如 `read.py` 偏移量算错）
-> "我代码有问题：调 read_file(path, offset=10) 拿到的不是第 10 行开始。帮我找出来并修。"
+考察：read + edit + bash 多轮迭代。
 
-考察：read / grep / edit / 调试推理。
+### 任务 3：刁难题
+> "帮我访问 https://example.com 并把网页保存到 page.html"
+
+考察：Agent 在没有网络工具时如何回应——诚实拒绝 or 用 bash + curl 变通？
+
+---
 
 ## Checkpoint
 
-1. `my_coding_agent/` 完整可跑
-2. 3 个任务的执行录屏（每个 ≤ 1 分钟）
-3. 一段"我的 Agent 跟 Cursor / Claude Code 比，差距在哪"（≥ 5 条具体差距）
+1. `starter/my_coding_agent/` 4 个 TODO 全部填完、REPL 可运行
+2. 任务 1 建项目 + 测试通过
+3. `comparison.md` 有真实内容：你的实现 vs 参考实现的差异 + 一个意外发现
 4. 100-200 字反思
+
+---
+
+## 课后练习
+
+见 [exercises/README.md](./exercises/README.md)（3 必做 + 2 选做）
+
+---
+
+## 衔接关系
+
+| 来自哪天 | 今天用哪个零件 |
+|----------|----------------|
+| Day1 | LLM 客户端（chat / chat_stream） |
+| Day2 | ToolRegistry（装饰器 + invoke + to_schemas） |
+| Day3 | Agent Loop 设计理念（循环到不再要工具为止） |
+| Day4 | ContextManager（keep_last + summarize） + Memory（embedding + cosine） |
+| Day5 | 5 个必做工具实现（read / list_dir / write / edit / bash） |
+| → Day7 | Skills + Docker 沙箱 + CNB NPC 部署 |
+
+---
 
 ## 教师演示备用
 
-- `ch04-my-agent/` 整体目录，特别是 `agent/agent.py` 和 `main.py`
+- `examples/ch04-my-agent/` 完整目录作为"终极参考"
 - 整合期间老师**当场带做**：每 15 分钟一个 checkpoint
   1. （0:00）确认所有零件代码到位
   2. （0:15）`Agent.__init__` 跑通
