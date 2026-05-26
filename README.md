@@ -60,7 +60,7 @@ Day5: Coding 工具集 × 9    ─┘
 │   ├── ch02-hello-llm/            # 最小流式 LLM 客户端
 │   ├── ch03-hello-agents/         # hello-agents 框架上手
 │   └── ch04-my-agent/            # 从零搭建完整 Agent
-└── docs/                          # 全局教学文档
+└── assets/                         # 课程封面与全局资源
 ```
 
 ## 与实践代码的对应关系
