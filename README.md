@@ -2,7 +2,7 @@
   <img src="./assets/banner.png" alt="从零亲手搭一个 Coding Agent —— 不调用任何框架，每一块零件你都看得见" width="100%">
 </p>
 
-# VibeCoding 课程（8 天 · Agent 主线）
+# Vibe Agent Course（8 天 · 从零搭建 Coding Agent）
 
 > 从"跟 AI 聊天"到"AI 在你仓库里干活"，亲手搭完每一块零件。
 

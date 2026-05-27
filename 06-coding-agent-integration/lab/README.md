@@ -98,7 +98,7 @@ python demo_31_three_tasks.py
 ## 阶段 E · 提交（20 分钟）
 
 ```bash
-cd ~/hello-agent
+cd ~/vibe-agent-course
 git add 06-coding-agent-integration/lab/starter/
 git add 06-coding-agent-integration/comparison.md
 git commit -m "day6: 完成 Coding Agent 整合"

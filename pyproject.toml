@@ -1,5 +1,5 @@
 [project]
-name = "hello-agents-course"
+name = "vibe-agent-course"
 version = "0.1.0"
 description = "Hello Agents 教学课程 —— 多章节 uv workspace"
 requires-python = ">=3.10"
