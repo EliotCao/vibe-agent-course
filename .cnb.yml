@@ -75,4 +75,11 @@ main:
               test -x /usr/local/bin/npc-entrypoint && echo "npc-entrypoint OK"
               /usr/local/bin/my-agent --help >/dev/null
               /usr/local/bin/git-cnb  --help >/dev/null
-            '
+              '
+        - name: build knowledge base
+          type: knowledge:update
+          options:
+            include: "**/**.md"
+            embeddingModel: hunyuan
+            chunkSize: 3000
+            issueSyncEnabled: true
