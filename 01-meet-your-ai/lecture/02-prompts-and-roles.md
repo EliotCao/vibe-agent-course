@@ -84,24 +84,6 @@ assistant: "📋➡️🔢✨"
 
 模型从中学会了一个规律：**system 里说什么，我就照做**。这不是什么魔法，是训练出来的行为模式。
 
-## 关键认知 3：Assistant 角色可以伪造（Few-Shot Prompting）
-
-你可以在 messages 里伪造几组"假的历史对话"作为示例，让模型照葫芦画瓢：
-
-```python
-messages = [
-    {"role": "system", "content": "把英文单词翻译成中文，只输出中文。"},
-    {"role": "user",      "content": "apple"},
-    {"role": "assistant", "content": "苹果"},      # ← 你伪造的示例
-    {"role": "user",      "content": "banana"},
-    {"role": "assistant", "content": "香蕉"},      # ← 你伪造的示例
-    {"role": "user",      "content": "cherry"},    # ← 真正要问的
-]
-# 模型输出："樱桃"
-```
-
-模型不会区分 assistant 消息是"真的历史"还是"你编的示例"——它只看模式。这就是 **few-shot prompting**，在很多任务上效果显著。
-
 ## 实际工程中的 System Prompt
 
 在真实的 Agent / Copilot 项目中，system prompt 通常很长（几百到几千 token），会包含：
@@ -147,9 +129,8 @@ system_prompt = """
 | Messages 协议 | LLM 的统一输入格式，由角色+内容组成 |
 | system | 定义 AI 的人格和规则 |
 | user | 用户的输入 |
-| assistant | AI 的历史回复（可伪造做 few-shot） |
+| assistant | AI 的历史回复 |
 | 模型无状态 | 每次调用必须全量传入历史 |
-| Few-shot | 伪造几组示例，让模型照葫芦画瓢 |
 
 ---
 

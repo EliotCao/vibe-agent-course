@@ -53,10 +53,3 @@ if __name__ == "__main__":
         answer = chat(sys_prompt, QUESTION)
         print(answer)
         print()
-
-    print("=" * 60)
-    print("👀 观察：")
-    print("  - 同样的问题，模型的行为完全由 system prompt 决定")
-    print("  - 这就是后面所有 Agent 的基础：")
-    print("    Agent = 一个特殊的 system prompt + 工具")
-    print("=" * 60)

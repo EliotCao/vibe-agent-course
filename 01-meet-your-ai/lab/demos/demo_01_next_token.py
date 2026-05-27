@@ -100,9 +100,9 @@ def show_top_candidates(
 
 
 PREFIXES = [
-    ("【实验 1】半句话补全：模型可能猜什么？", "今天的天气真"),
-    ("【实验 2】数学：1 + 1 等于", "一加一等于"),
-    ("【实验 3】常识：地球围绕", "地球围绕"),
+    # ("【实验 1】半句话补全：模型可能猜什么？", "今天的天气真"),
+    # ("【实验 2】数学：1 + 1 等于", "一加一等于"),
+    # ("【实验 3】常识：地球围绕", "地球围绕"),
     ("【实验 4】陷阱：故意问个不确定的", "2026 年世界杯冠军是"),
 ]
 
@@ -113,22 +113,3 @@ if __name__ == "__main__":
         # 同一个输入跑两种模式，对比下一个 token 分布
         show_top_candidates(prefix, mode="chat")
         show_top_candidates(prefix, mode="complete")
-
-    print("\n" + "=" * 60)
-    print("👀 观察：")
-    print("  - 同一个输入，chat 模式 vs complete 模式，第一个 token 完全不同")
-    print("    · chat：模型把输入当'对话'，会回应（'哈哈'/'是'/'我觉得'…）")
-    print("    · complete：模型把输入当'要续写的文本'，会接着写（'好'/'不错'…）")
-    print("  - 简单常识题，top1 概率接近 100%（模型很'确信'）")
-    print("  - 不确定的题，top-k 概率分布散开（模型在'猜'）")
-    print()
-    print("💡 理解：")
-    print("  LLM 的本质就是这个过程——")
-    print("  对每个位置算下一个 token 的概率分布，然后采样。")
-    print("  把这个过程做到 GPT-4 / Claude 那么大的规模时，")
-    print("  '智能'就涌现出来了。")
-    print()
-    print("  一个有趣的副产物：")
-    print("  仅仅一句 system prompt 就能彻底改变 token 分布——")
-    print("  这就是 demo_02 要讲的'system prompt 是改变 AI 行为最便宜的方式'。")
-    print("=" * 60)
