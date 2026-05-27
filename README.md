@@ -22,14 +22,14 @@
 
 | Day | 主题 | 核心产物 |
 |-----|------|---------|
-| 1 | [认识你的 AI](./day1-meet-your-ai/) | LLM 流式对话 + token 计算 |
-| 2 | [Function Calling 与最小 Agent](./day2-tools-and-agent-loop/) | `ToolRegistry` + Agent Loop |
-| 3 | [Agent 范式](./day3-agent-patterns/) | ReAct / Plan-and-Solve / Reflection |
-| 4 | [上下文与记忆](./day4-context-and-memory/) | `ContextManager` + `Memory` |
-| 5 | [Coding Agent 工具集](./day5-coding-agent-tools/) | 9 个工具实现 |
-| 6 | [整合：完整 Coding Agent](./day6-coding-agent-integration/) | Day2-5 零件拼装 |
-| 7 | [Skills 扩展 + NPC 上线](./day7-skills-and-npc/) | 自定义 Skills + 仓库 NPC |
-| 8 | [总结 + 大作业](./day8-recap-and-final/) | 复盘与结课 |
+| 1 | [认识你的 AI](./01-meet-your-ai/) | LLM 流式对话 + token 计算 |
+| 2 | [Function Calling 与最小 Agent](./02-tools-and-agent-loop/) | `ToolRegistry` + Agent Loop |
+| 3 | [Agent 范式](./03-agent-patterns/) | ReAct / Plan-and-Solve / Reflection |
+| 4 | [上下文与记忆](./04-context-and-memory/) | `ContextManager` + `Memory` |
+| 5 | [Coding Agent 工具集](./05-coding-agent-tools/) | 9 个工具实现 |
+| 6 | [整合：完整 Coding Agent](./06-coding-agent-integration/) | Day2-5 零件拼装 |
+| 7 | [Skills 扩展 + NPC 上线](./07-skills-and-npc/) | 自定义 Skills + 仓库 NPC |
+| 8 | [总结 + 大作业](./08-recap-and-final/) | 复盘与结课 |
 
 ## 零件建造路径
 
@@ -47,19 +47,19 @@ Day5: Coding 工具集 × 9    ─┘
 
 ```
 .
-├── day1-meet-your-ai/              # Day1：认识 AI
-├── day2-tools-and-agent-loop/      # Day2：Function Calling + 最小 Agent
-├── day3-agent-patterns/            # Day3：Agent 范式
-├── day4-context-and-memory/        # Day4：上下文与记忆
-├── day5-coding-agent-tools/        # Day5：Coding Agent 工具集
-├── day6-coding-agent-integration/  # Day6：整合
-├── day7-skills-and-npc/            # Day7：Skills + NPC
-├── day8-recap-and-final/           # Day8：总结
+├── 01-meet-your-ai/              # Day1：认识 AI
+├── 02-tools-and-agent-loop/      # Day2：Function Calling + 最小 Agent
+├── 03-agent-patterns/            # Day3：Agent 范式
+├── 04-context-and-memory/        # Day4：上下文与记忆
+├── 05-coding-agent-tools/        # Day5：Coding Agent 工具集
+├── 06-coding-agent-integration/  # Day6：整合
+├── 07-skills-and-npc/            # Day7：Skills + NPC
+├── 08-recap-and-final/           # Day8：总结
 ├── examples/                       # 实践代码示例
-│   ├── ch01-hello-react/           # ReAct 模式旅行助手
-│   ├── ch02-hello-llm/            # 最小流式 LLM 客户端
-│   ├── ch03-hello-agents/         # hello-agents 框架上手
-│   └── ch04-my-agent/            # 从零搭建完整 Agent
+│   ├── 01-hello-react/           # ReAct 模式旅行助手
+│   ├── 02-hello-llm/            # 最小流式 LLM 客户端
+│   ├── 03-hello-agents/         # hello-agents 框架上手
+│   └── 04-my-agent/            # 从零搭建完整 Agent
 └── assets/                         # 课程封面与全局资源
 ```
 
@@ -67,13 +67,13 @@ Day5: Coding 工具集 × 9    ─┘
 
 | 实践项目 | 课程映射 |
 |---------|---------|
-| `examples/ch02-hello-llm/` | Day1 |
-| `examples/ch01-hello-react/` | Day3 ReAct 范式 |
-| `examples/ch03-hello-agents/` | Day3 框架对照 |
-| `examples/ch04-my-agent/tools/` | Day2 + Day5 |
-| `examples/ch04-my-agent/context/` | Day4 |
-| `examples/ch04-my-agent/memory/` | Day4 |
-| `examples/ch04-my-agent/skills/` | Day7 |
+| `examples/02-hello-llm/` | Day1 |
+| `examples/01-hello-react/` | Day3 ReAct 范式 |
+| `examples/03-hello-agents/` | Day3 框架对照 |
+| `examples/04-my-agent/tools/` | Day2 + Day5 |
+| `examples/04-my-agent/context/` | Day4 |
+| `examples/04-my-agent/memory/` | Day4 |
+| `examples/04-my-agent/skills/` | Day7 |
 
 ## 环境准备
 

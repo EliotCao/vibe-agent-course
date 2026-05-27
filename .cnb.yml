@@ -1,7 +1,7 @@
 # =====================================================================
 # CNB 流水线配置
 #
-# 1) main.push:   构建并推送 NPC 运行时镜像（ch04-my-agent/Dockerfile）
+# 1) main.push:   构建并推送 NPC 运行时镜像（04-my-agent/Dockerfile）
 # 2) NPC 事件:    @当前仓库(角色名) 时触发，跑 my-agent --solo exec
 #                 然后用 git-cnb 把回答以"工作模式"回写到 Issue/PR 评论
 #                 → 评论提交者会显示为 NPC 角色名
@@ -15,7 +15,7 @@
 # ---- NPC 事件流水线锚点（issue / pull_request 评论触发） ----
 # 插件任务写法：stage 只写 image，不写 script，CNB 直接跑镜像 ENTRYPOINT。
 # ENTRYPOINT 是 /usr/local/bin/npc-entrypoint（见 Dockerfile），逻辑见
-# ch04-my-agent/npc-entrypoint.sh。
+# 04-my-agent/npc-entrypoint.sh。
 .npc: &npc
   - stages:
       - name: run my-agent and reply
@@ -57,7 +57,7 @@ main:
       stages:
         - name: docker build
           script: |
-            cd ch04-my-agent
+            cd examples/04-my-agent
             docker build \
               -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest \
               -f Dockerfile .

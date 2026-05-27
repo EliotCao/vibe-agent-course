@@ -19,8 +19,8 @@ package = false
 # 共享同一个根 .venv，IDE 只需选一次解释器即可跨章跳转。
 [tool.uv.workspace]
 members = [
-    "examples/ch01-hello-react",
-    "examples/ch02-hello-llm",
-    "examples/ch03-hello-agents",
-    "examples/ch04-my-agent",
+    "examples/01-hello-react",
+    "examples/02-hello-llm",
+    "examples/03-hello-agents",
+    "examples/04-my-agent",
 ]
