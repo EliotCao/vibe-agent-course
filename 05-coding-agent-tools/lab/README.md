@@ -4,7 +4,7 @@
 
 ## 前提
 
-学生已经看过 4 个 demo：
+已经看过 4 个 demo：
 - `demo_24_five_stages.py` —— 手动按 5 阶段调一遍 5 个工具
 - `demo_25_design_philosophy.py` —— edit 唯一性 / 行号偏移 / bash 拦截 三个对比
 - `demo_26_end_to_end.py` —— 让 LLM 用工具完成"建项目+跑测试"端到端
@@ -98,7 +98,7 @@ if os.path.isfile(path) and not overwrite:
     return f"❌ 文件已存在: {path}\n如需修改请用 edit；如需强制覆盖请传 overwrite=True"
 ```
 
-学生最容易遗漏：忘了 `mkdir -p`（父目录不存在时写不进去）。
+最容易遗漏：忘了 `mkdir -p`（父目录不存在时写不进去）。
 
 ### edit 的关键设计
 
@@ -116,7 +116,7 @@ if count > 1:
 
 ### bash 的四道闸门
 
-| 闸门 | 学生最常忘的 |
+| 闸门 | 最常忘的 |
 |---|---|
 | ① 超时 | `timeout=30` 传给 subprocess.run |
 | ② 输出截断 | `result.stdout[:max_output]` |
@@ -201,12 +201,12 @@ git push origin 05-tools
 
 ---
 
-## 参考资产（仅老师卡住时投屏）
+## 参考资产（卡住时参考）
 
-| 情况 | 投屏什么 |
+| 情况 | 参考什么 |
 |---|---|
-| 学生 read/list_dir/write/edit/bash 卡住 | `demos/coding_tools/<tool>.py` |
-| 学生想看工具被 LLM 真调用 | `demos/demo_26_end_to_end.py` |
+| read/list_dir/write/edit/bash 卡住 | `demos/coding_tools/<tool>.py` |
+| 想看工具被 LLM 真调用 | `demos/demo_26_end_to_end.py` |
 | 想看工程级实现 | [`examples/04-my-agent/tools/impl/`](../../examples/04-my-agent/tools/impl/) |
 
-> 教师 tip：[`examples/04-my-agent/tools/impl/edit.py`](../../examples/04-my-agent/tools/impl/edit.py) 是基于 `Tool` 基类的 OOP 写法，**比今天教的函数式更工程化**——投屏给学生看一眼，让他们 Day6 整合时知道往哪个方向迭代。
+> tip：[`examples/04-my-agent/tools/impl/edit.py`](../../examples/04-my-agent/tools/impl/edit.py) 是基于 `Tool` 基类的 OOP 写法，**比今天的函数式更工程化**——看一眼，Day6 整合时知道往哪个方向迭代。

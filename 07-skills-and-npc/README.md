@@ -1,6 +1,6 @@
 # Day 7 · Skills 扩展 + NPC 上线
 
-> 今天结束时，每个学生的 Agent 学会"领域规范"（Skills），并且作为 NPC 挂在自己仓库里，能在 Issue 评论里 @ 它得到回复。
+> 今天结束时，你的 Agent 学会"领域规范"（Skills），并且作为 NPC 挂在自己仓库里，能在 Issue 评论里 @ 它得到回复。
 
 ## 学习目标
 
@@ -46,29 +46,29 @@ my_coding_agent/                        # 沿用 Day6
 4. 一段"加 Skill 前 vs 后"的对比（用同一任务跑两次，输出差异）
 5. 100-200 字反思
 
-## 教师演示备用
+## 参考资产
 
 - `04-my-agent/skills/` —— Skill 加载机制
-- `04-my-agent/Dockerfile` —— **直接发给学生当模板**
-- `04-my-agent/npc-entrypoint.sh` —— **直接发给学生当模板**
-- `docs/cnb-npc-setup.md` —— **直接发给学生当操作手册**
+- `04-my-agent/Dockerfile` —— **直接当模板用**
+- `04-my-agent/npc-entrypoint.sh` —— **直接当模板用**
+- `docs/cnb-npc-setup.md` —— **操作手册**
 
-## 教师准备（关键）
+## 准备（关键）
 
-> 今天链路最长，老师**必须提前发 4 份模板**给学生：
+> 今天链路最长，**必须提前准备好 4 份模板**：
 
 1. `Dockerfile` 模板（基于 04-my-agent 的版本）
 2. `npc-entrypoint.sh` 模板
 3. `.cnb.yml` 模板（含 NPC 事件流水线）
 4. `.cnb/settings.yml` 模板
 
-学生只需要：
+实际需要做的：
 - 改 NPC 名字（`.cnb/settings.yml`）
 - 改 Dockerfile 里 `COPY` 的路径（如果项目结构不同）
 - 自己仓库 push 一次触发构建
 - 在 Issue 里 @ 试一下
 
-**不要让学生从零写 Dockerfile**，时间不够，也不是今天的重点。
+**不要从零写 Dockerfile**，时间不够，也不是今天的重点。
 
 ---
 

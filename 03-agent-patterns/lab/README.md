@@ -4,7 +4,7 @@
 
 ## 前提
 
-学生已经在前 3 节看过 3 个 demo：
+已经在前 3 节看过 3 个 demo：
 - `demo_12_react.py` —— ReAct（prompt + 正则）
 - `demo_13_plan_and_solve.py` —— Plan-and-Solve（Planner + Executor + Aggregator）
 - `demo_14_reflection.py` —— Reflection（包装在 Plan-and-Solve 外面）
@@ -66,9 +66,9 @@ ls -la
 | ② 写 `parse_react_output` | 中 | 正则抠 Thought 和 Action |
 | ③ 写 `parse_action` | 中 | 解析两种格式：`tool(...)` / `Finish[...]` |
 
-### 学生 vibe（30min）
+### 动手 vibe（30min）
 
-让学生先**不要看 demo_12**，直接给 AI 这个 prompt：
+让你先**不要看 demo_12**，直接给 AI 这个 prompt：
 
 ```
 帮我写一个 ReAct 风格的 prompt 模板和解析函数：
@@ -88,16 +88,16 @@ ls -la
 
 让他们跑一遍 5 个任务，**故意先不做容错**——看哪个任务挂了，再回头加 fallback。
 
-### 教师演示（10min）
+### 参考演示（10min）
 
-老师投屏 [`demos/demo_12_react.py`](./demos/demo_12_react.py) 的 `parse_react_output` 和 `parse_action`，重点对比：
-- 学生的 Thought 正则有没有处理 `Action:` 之后还有内容的情况
-- 学生的 Action 有没有截断（用 `(?=...)` 前瞻）
+参考实现 [`demos/demo_12_react.py`](./demos/demo_12_react.py) 的 `parse_react_output` 和 `parse_action`，重点对比：
+- 你的 Thought 正则有没有处理 `Action:` 之后还有内容的情况
+- 你的 Action 有没有截断（用 `(?=...)` 前瞻）
 - `Finish[...]` 里的 `]` 转义了吗？
 
 ### 当堂改造（10min）
 
-让学生在自己的 ReAct 上加：
+让你在自己的 ReAct 上加：
 
 1. **截断兜底**：模型一次输出 2 对 Thought-Action 时，只保留第一对（参考 ch01 的做法）
 2. **空 Action 兜底**：解析失败时不要崩，写一条 Observation 让模型下一轮看到错误并重试
@@ -221,14 +221,14 @@ ls -la
 
 ---
 
-## 参考资产（仅老师卡住时投屏）
+## 参考资产（仅卡住时参考）
 
 | 情况 | 投屏什么 |
 |---|---|
-| 学生 ReAct 解析卡住 | `demos/demo_12_react.py` 的 `parse_react_output` |
-| 学生 Plan 输出 JSON 失败 | `demos/demo_13_plan_and_solve.py` 的 `make_plan` 容错 |
-| 学生 Reflection 评审员从不挑刺 | `demos/demo_14_reflection.py` 的 `REVIEW_PROMPT` 检查清单 |
+| ReAct 解析卡住 | `demos/demo_12_react.py` 的 `parse_react_output` |
+| Plan 输出 JSON 失败 | `demos/demo_13_plan_and_solve.py` 的 `make_plan` 容错 |
+| Reflection 评审员从不挑刺 | `demos/demo_14_reflection.py` 的 `REVIEW_PROMPT` 检查清单 |
 | 想看工程级 ReAct | [`examples/01-hello-react/agent.py`](../../examples/01-hello-react/agent.py) 的 truncate 逻辑 |
 | 想看 hello-agents 框架对照 | [`examples/03-hello-agents/main.py`](../../examples/03-hello-agents/main.py) |
 
-> 教师 tip：[`examples/03-hello-agents/main.py`](../../examples/03-hello-agents/main.py) 里有一段 `patch_react_agent_logging_and_parser` ——这就是工业框架为了应对"模型不规矩"打的补丁。投屏给学生看，**让他们感受工业版做了多少 fallback**。
+> tip：[`examples/03-hello-agents/main.py`](../../examples/03-hello-agents/main.py) 里有一段 `patch_react_agent_logging_and_parser` ——这就是工业框架为了应对"模型不规矩"打的补丁。投屏看一下，**让他们感受工业版做了多少 fallback**。

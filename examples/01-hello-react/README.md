@@ -17,7 +17,7 @@
 
 ## 快速开始
 
-本课程整体使用 [uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/) 组织，所有章节共享仓库根目录的 `.venv`。
+本项目整体使用 [uv workspace](https://docs.astral.sh/uv/concepts/projects/workspaces/) 组织，所有章节共享仓库根目录的 `.venv`。
 
 ### 1. 安装依赖（在仓库根目录执行一次）
 

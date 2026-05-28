@@ -6,7 +6,7 @@
 
 > 从"跟 AI 聊天"到"AI 在你仓库里干活"，亲手搭完每一块零件。
 
-## 课程目标
+## 项目目标
 
 学完之后你能做到：
 
@@ -18,7 +18,7 @@
 6. 搭建完整的 Coding Agent（9 个工具）
 7. 整合所有模块，部署为 CNB 仓库 NPC
 
-## 课程总览
+## 内容总览
 
 | Day | 主题 | 核心产物 |
 |-----|------|---------|
@@ -60,12 +60,12 @@ Day5: Coding 工具集 × 9    ─┘
 │   ├── 02-hello-llm/            # 最小流式 LLM 客户端
 │   ├── 03-hello-agents/         # hello-agents 框架上手
 │   └── 04-my-agent/            # 从零搭建完整 Agent
-└── assets/                         # 课程封面与全局资源
+└── assets/                         # 封面与全局资源
 ```
 
 ## 与实践代码的对应关系
 
-| 实践项目 | 课程映射 |
+| 实践项目 | 章节映射 |
 |---------|---------|
 | `examples/02-hello-llm/` | Day1 |
 | `examples/01-hello-react/` | Day3 ReAct 范式 |
@@ -77,7 +77,7 @@ Day5: Coding 工具集 × 9    ─┘
 
 ## 环境准备
 
-本课程使用 [uv](https://docs.astral.sh/uv/) 管理 Python 环境与依赖。
+本项目使用 [uv](https://docs.astral.sh/uv/) 管理 Python 环境与依赖。
 
 ```bash
 # 在仓库根目录执行一次，安装所有依赖
@@ -90,4 +90,4 @@ uv sync --all-packages
 - 命令行基本使用（`cd` / `ls` / `cat` / 环境变量）
 - 一台能联网的电脑
 
-不需要提前会：Git、Docker、Agent、提示词工程——这些都是课程内容。
+不需要提前会：Git、Docker、Agent、提示词工程——这些都会从零讲起。

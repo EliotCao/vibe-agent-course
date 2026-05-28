@@ -4,7 +4,7 @@
 
 ## 前提
 
-学生已经在前 4 节里**当堂跑过 4 个 demo**，分别看到：
+已经跑过 4 个 demo**，分别看到：
 - demo_06：Chatbot vs Agent 同一道题的差别
 - demo_07：手写一次完整的 4 角色 function calling 消息流
 - demo_08：ToolRegistry 自动从函数签名生成 schema
@@ -52,9 +52,9 @@ uv sync --all-packages
 ### A.3 准备 .env（同 Day1）
 
 ```bash
-BASE_URL=<老师下发>
-API_KEY=<老师下发>
-MODEL_ID=<老师指定>
+BASE_URL=<你的 API 地址>
+API_KEY=<你的 API 地址>
+MODEL_ID=<使用的模型 ID>
 ```
 
 ### A.4 验证 function calling 能跑
@@ -81,7 +81,7 @@ python demo_07_function_calling_protocol.py
 3. **统一调度**：`registry.invoke(name, args)` 按工具名分发
 4. **异常兜底**：工具内部抛错不会让 Agent 崩，转成字符串返回
 
-### 让学生先 vibe（25min）
+### 让你先 vibe（25min）
 
 让他们打开 IDE，先**不要看 demo_08**，直接给 AI 这个 prompt：
 
@@ -102,18 +102,18 @@ python demo_07_function_calling_protocol.py
 
 让他们先跑出来。**不完美没关系**——常见漏掉的点是异常兜底。
 
-### 老师投屏参考（10min）
+### 参考实现参考（10min）
 
-老师给一份"参考代码"对照（**不要在课前发**）：详见 [`demos/demo_08_tool_registry.py`](./demos/demo_08_tool_registry.py)。
+给一份"参考代码"对照（**不要在课前发**）：详见 [`demos/demo_08_tool_registry.py`](./demos/demo_08_tool_registry.py)。
 
 投屏时重点对比：
-- 学生写的 description 是从哪里读的？（docstring vs 装饰器参数）
-- 学生处理"参数没有类型注解"了吗？应该 fallback 成 `"string"`
-- 学生 invoke 里有 try/except 吗？
+- 你写的 description 是从哪里读的？（docstring vs 装饰器参数）
+- 你处理"参数没有类型注解"了吗？应该 fallback 成 `"string"`
+- invoke 里有 try/except 吗？
 
 ### 当堂改造（15min）
 
-让学生在自己的 ToolRegistry 上加：
+让你在自己的 ToolRegistry 上加：
 
 1. **支持默认值**：`def fn(x: int, y: int = 10)` → `y` 不在 required 里
 2. **加一个 `list_tools()` 方法**返回工具名列表，便于调试
@@ -214,13 +214,13 @@ python mini_agent.py > run_log.txt 2>&1
 
 ## 助教检查重点
 
-- [ ] tool_registry.py 是学生自己写的，不是 demo_08 直接拷贝（看变量命名 / 注释）
+- [ ] tool_registry.py 是自己写的，不是 demo_08 直接拷贝（看变量命名 / 注释）
 - [ ] tool_registry 里 invoke 有异常兜底
 - [ ] mini_agent.py 真的在 messages 里追加了 assistant 消息（带 tool_calls 字段）
 - [ ] 跑 4 个任务，前 3 个都能跑通；第 4 个能看到"承认不知道 / 硬调失败"两种反应之一
 - [ ] reflection.md 不是水文，至少有一个具体观察
 
-## 参考资产（仅老师卡住时投屏）
+## 参考资产（仅卡住时参考）
 
 - [`demos/demo_08_tool_registry.py`](./demos/demo_08_tool_registry.py) —— ToolRegistry 参考实现
 - [`demos/demo_09_mini_agent.py`](./demos/demo_09_mini_agent.py) —— 完整 Agent Loop

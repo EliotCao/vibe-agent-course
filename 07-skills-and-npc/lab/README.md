@@ -99,7 +99,7 @@ git push
 
 ---
 
-## 老师发的 4 份模板
+## 4 份模板
 
 都在 `lab/templates/` 下：
 

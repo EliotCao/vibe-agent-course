@@ -54,8 +54,8 @@ uv run python main.py
 ## 为什么要再造一个 `config.py`？
 
 `hello-agents` 框架自身约定的环境变量是 `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL_ID`，
-与课程前两章用的 `BASE_URL` / `API_KEY` / `MODEL_ID` 不一致。本章 `config.py` 仍按
-课程约定解析变量，再**显式**作为参数传给 `HelloAgentsLLM(...)`，这样读者不用再
+与前两章用的 `BASE_URL` / `API_KEY` / `MODEL_ID` 不一致。本章 `config.py` 仍按
+项目约定解析变量，再**显式**作为参数传给 `HelloAgentsLLM(...)`，这样读者不用再
 维护第二份 `.env`。
 
 ```python

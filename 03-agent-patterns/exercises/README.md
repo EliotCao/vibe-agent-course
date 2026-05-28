@@ -149,14 +149,14 @@ client.chat.completions.create(
 
 ---
 
-## 答案要点（仅老师参考）
+## 答案要点（参考）
 
-> ⚠️ **学生版本应该把这部分删掉**，可以拷到 `exercises/teacher-notes.md`。
+> ⚠️ **先独立完成再看此部分**，可以拷到 `exercises/teacher-notes.md`。
 
 ### 3.1
 - 模型多说一句话最常挂在 `re.search(r"Thought:...")` 前面就有内容这一步
 - 健壮做法：先用 `re.search(r"^Thought:", multiline)` 找到 Thought 起始
-- 加分项：学生意识到"光改正则永远修不完"，提议要么强 prompt 约束要么切 Function Calling
+- 加分项：意识到"光改正则永远修不完"，提议要么强 prompt 约束要么切 Function Calling
 
 ### 3.2
 - Replan 死循环防御：限制 max_replan_count（一般 2-3 次）

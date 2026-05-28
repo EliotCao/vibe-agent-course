@@ -75,7 +75,7 @@ docker run --rm -it --entrypoint bash my-agent:latest
 
 ## 动手试试
 
-1. 用老师发的 Dockerfile 模板，改一下 `COPY . /build` 路径（如果你的目录结构不同）
+1. 用提供的 Dockerfile 模板，改一下 `COPY . /build` 路径（如果你的目录结构不同）
 2. 本地 `docker build -t my-agent:latest .` 构建一次
 3. `docker run --rm my-agent:latest --help` 确认二进制能跑
 

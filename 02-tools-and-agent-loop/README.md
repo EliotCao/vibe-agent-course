@@ -1,6 +1,6 @@
 # Day 2 · Function Calling 与最小 Agent
 
-> 今天结束时，每个学生亲手实现一个工具注册系统，搭出 ~50 行的最小 Agent Loop，理解 Function Calling 协议。
+> 今天结束时，每个人亲手实现一个工具注册系统，搭出 ~50 行的最小 Agent Loop，理解 Function Calling 协议。
 
 ## 你将学到
 
@@ -34,7 +34,7 @@ python demo_09_mini_agent.py              # 完整 Agent Loop，跑 4 个任务
 
 ## 当日产物
 
-学生 lab 提交的目录结构：
+lab 提交的目录结构：
 
 ```
 02-checkpoint/
@@ -84,13 +84,13 @@ python demo_09_mini_agent.py              # 完整 Agent Loop，跑 4 个任务
 - 必做 3 题：Schema 反向工程 / 并行工具调用 / 错误处理压测
 - 选做 2 题：enum 支持 / "先想再做" 范式预热
 
-## 教师演示备用
+## 参考资产
 
-老师卡住时投屏：
+卡住时参考：
 
 | 情况 | 投屏什么 |
 |---|---|
-| 学生 ToolRegistry 卡住 | `demos/demo_08_tool_registry.py` |
-| 学生 messages 拼错（漏了 assistant.tool_calls） | `demos/demo_07_function_calling_protocol.py` 最后那段完整 messages 历史 |
-| 学生 Agent Loop 跑飞了 | `demos/demo_09_mini_agent.py` 主循环 |
+| ToolRegistry 卡住 | `demos/demo_08_tool_registry.py` |
+| messages 拼错（漏了 assistant.tool_calls） | `demos/demo_07_function_calling_protocol.py` 最后那段完整 messages 历史 |
+| Agent Loop 跑飞了 | `demos/demo_09_mini_agent.py` 主循环 |
 | 想看工程级长什么样 | `examples/04-my-agent/agent/agent.py` 的 `SimpleAgent` |

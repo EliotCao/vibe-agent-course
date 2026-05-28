@@ -4,7 +4,7 @@
 
 ## 前提
 
-学生已经在前 5 节里**当堂跑过 5 个 demo**，分别看到：
+前 5 节里已经**跑过 5 个 demo**，分别看到：
 - LLM 在猜下一个词（demo_01）
 - 三种 system prompt 三种人格（demo_02）
 - 不同语言的 tokenization + 撑爆窗口（demo_03）
@@ -48,9 +48,9 @@ pip install openai python-dotenv tiktoken
 
 ```bash
 # .env
-BASE_URL=<老师下发>
-API_KEY=<老师下发>
-MODEL_ID=<老师指定>
+BASE_URL=<你的 API 地址>
+API_KEY=<你的 API Key>
+MODEL_ID=<使用的模型 ID>
 ```
 
 > ⚠️ `.env` **绝对不能提交到 Git**。Day5 会展开讲。
@@ -88,9 +88,9 @@ print(resp.choices[0].message.content)
 4. **看 token 消耗**：每次回答后打印本轮和累计 token
 5. **退出**：`exit` / `quit` / Ctrl-C
 
-### 让学生先 vibe（10min）
+### 先 vibe 出来（10min）
 
-让他们打开 IDE，给 AI 这个 prompt：
+打开 IDE，给 AI 这个 prompt：
 
 ```
 帮我写一个 Python 脚本 01_llm.py：
@@ -103,11 +103,11 @@ print(resp.choices[0].message.content)
 - exit 退出
 ```
 
-让他们先跑出来，**不完美没关系**。
+先跑出来，**不完美没关系**。
 
-### 老师投屏参考实现（10min）
+### 参考实现（10min）
 
-老师给一份"参考代码"对照（**不要在课前发**）：
+对照一份"参考代码"（**不要提前看**）：
 
 ```python
 # 01_llm.py
@@ -187,9 +187,9 @@ if __name__ == "__main__":
     main()
 ```
 
-### 学生当堂改造（5min）
+### 动手改造（5min）
 
-让学生加一个 `/save <文件名>` 命令，把当前对话存为 JSON。
+加一个 `/save <文件名>` 命令，把当前对话存为 JSON。
 
 ---
 
@@ -249,15 +249,15 @@ if __name__ == "__main__":
     main()
 ```
 
-### 当堂练习
+### 动手练习
 
-让学生统计一下**自己昨天写的某个文件**的 token 数和成本，**跟同桌对比**。
+统计一下**自己写的某个文件**的 token 数和成本，感受不同文件之间的差异。
 
 ---
 
 ## 阶段 D · Step 3：幻觉实验日志（15min）
 
-回到 `demo_04_hallucinate.py`，让学生：
+回到 `demo_04_hallucinate.py`：
 
 1. 跑一遍 4 个内置案例
 2. **自己设计 2 个新案例**：
@@ -321,14 +321,14 @@ if __name__ == "__main__":
 
 ---
 
-## 助教检查重点
+## 检查重点
 
 - [ ] `01_llm.py` 真的流式（逐字出现，不是整段才出）
 - [ ] `count_tokens.py` 既能接文件也能接字符串
 - [ ] `hallucination_log.md` 有自己设计的案例（不是只跑内置 4 个）
 - [ ] reflection 不是水文，至少有一个具体观察
 
-## 参考资产（仅老师卡住时投屏）
+## 参考资产（卡住时参考）
 
 - `02-hello-llm/main.py` —— 流式调用最简版
 - `04-my-agent/llm/llm.py` —— 工程级 LLM 客户端

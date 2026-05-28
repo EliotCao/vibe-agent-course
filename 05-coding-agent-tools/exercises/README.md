@@ -116,7 +116,7 @@ from coding_tools import build_registry
 agent = ReActAgent(tools=build_registry())
 ```
 
-跑一个真任务："读 README.md 的前 20 行，告诉我课程 Day1-Day5 各讲了什么"。
+跑一个真任务："读 README.md 的前 20 行，告诉我 Day1-Day5 各讲了什么"。
 
 观察：
 - ReAct Agent 用 5 个工具时表现如何？
@@ -139,13 +139,13 @@ agent = ReActAgent(tools=build_registry())
 
 ---
 
-## 答案要点（仅老师参考）
+## 答案要点（参考）
 
-> ⚠️ **学生版本应删除此部分**。
+> ⚠️ **先独立完成，再看此部分**。
 
 ### 5.1
 - 基础版本就是参考实现的样子
-- 加分项：学生意识到 grep 在 Windows / macOS / Linux 都能跑，bash + grep 在 Windows PowerShell 上得换 Select-String
+- 加分项：意识到 grep 在 Windows / macOS / Linux 都能跑，bash + grep 在 Windows PowerShell 上得换 Select-String
 
 ### 5.2
 - 常见的绕过：
@@ -154,17 +154,17 @@ agent = ReActAgent(tools=build_registry())
   3. base64 编码再 `base64 -d | sh`
   4. `git config core.hooksPath /evil`（用 git hooks 间接执行）
 - 改进黑名单很快就跟不上——这正是反思的目标
-- 加分项：学生提议"白名单 + 容器"
+- 加分项：能提议"白名单 + 容器"
 
 ### 5.3
 - 一般 5-8 步能跑通
-- 学生最常翻车：
+- 最常翻车：
   - 忘了 mkdir -p（write 失败）
   - edit 的 old_content 写错（字符没对齐 / 空格不一致）
   - bash 跑 pip install 时 timeout=30 不够（要传更长的）
 
 ### 5.4
-- 加分项：学生意识到 HTML 转纯文本是大坑（最低限度去标签 / 用 BeautifulSoup / 用 readability）
+- 加分项：意识到 HTML 转纯文本是大坑（最低限度去标签 / 用 BeautifulSoup / 用 readability）
 - 黑名单要拦内网（`localhost / 127.0.0.1 / 10.x / 192.168.x / 169.254.x` —— SSRF 防御）
 
 ### 5.5

@@ -171,19 +171,19 @@ tool_calls: [current_time()]
 
 ---
 
-## 答案要点（仅老师参考）
+## 答案要点（参考）
 
-> ⚠️ **学生版本应该把这部分删掉**，可以拷一份到 `exercises/teacher-notes.md`。
+> ⚠️ **先独立完成再看此部分**，可以拷一份到 `exercises/teacher-notes.md`。
 
 ### 2.1
 - `keyword: str` 必填 / `case_sensitive: bool` 可选 / `limit: int` 可选
-- 学生通常会忘了：description 字段必须**主动写**，inspect 推不出来
+- 通常会忘了：description 字段必须**主动写**，inspect 推不出来
 - 加分项：identifier 描述能"面向调用决策"，例如 "搜索包含某个 keyword 的文件，返回路径列表"
 
 ### 2.2
 - 模型对"同类型批量任务"会自然返回多个并行 tool_call
 - ThreadPoolExecutor 是最简单的并行方案；asyncio + httpx 更工业级
-- 学生最容易翻车：**并行执行后追加 tool 消息时顺序错了**——必须按 tc.id 对应，不能按 future 完成顺序
+- 最容易翻车：**并行执行后追加 tool 消息时顺序错了**——必须按 tc.id 对应，不能按 future 完成顺序
 
 ### 2.3
 - 改造前：模型常见反应是"再调一次"或"编一个数字"，几乎不会主动承认失败

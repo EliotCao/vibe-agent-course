@@ -76,12 +76,12 @@ import readline  # 导入即生效（Linux/macOS）
 
 ---
 
-## 答案要点（教师参考）
+## 答案要点（参考）
 
 | 题号 | 关键点 |
 |------|--------|
 | 6.1 | 在 Agent Loop 里判断 `not resp.tool_calls` 时走 `llm.chat_stream(..., on_text=print_chunk)`，其他轮次照旧 |
-| 6.2 | 学生只需要用自己的 Agent 发一句话；如果 Agent 写的测试不对，让学生重试/修改 prompt |
+| 6.2 | 只需要用自己的 Agent 发一句话；如果 Agent 写的测试不对，重试/修改 prompt |
 | 6.3 | `import readline` + `readline.read_history_file` / `readline.write_history_file` |
 | 6.4 | 关键：Agent 需要**先读 3 个文件确认内容相同**，再写 utils.py，再 edit 三个文件 |
 | 6.5 | 开放题；常见优化：加更好的错误提示 / 在 verbose 里打印 token 用量 |

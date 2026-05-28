@@ -87,7 +87,7 @@ npc:
 
 ## 动手试试
 
-1. 把老师发的 `.cnb.yml` 和 `.cnb/settings.yml` 模板复制到你的仓库根
+1. 把提供的 `.cnb.yml` 和 `.cnb/settings.yml` 模板复制到你的仓库根
 2. 改 NPC 名字为你想要的（比如 "coding-buddy"）
 3. 在仓库 Settings → Secrets 里加两个：`HUNYUAN_API_KEY` + `HUNYUAN_BASE_URL`
 4. git push 一次让流水线构建镜像
@@ -108,4 +108,4 @@ npc:
 - `.cnb/settings.yml` 定义 NPC 角色（name + description）
 - `.cnb.yml` 定义 NPC 事件流水线（什么事件 → 跑什么镜像 → 跑什么脚本）
 - `npc-entrypoint.sh` 是容器内的粘合脚本（读事件 → 调 Agent → 回写评论）
-- 学生只需要：改名字 + 加 Secrets + push + 在 Issue 里 @ 就完成了
+- 只需要：改名字 + 加 Secrets + push + 在 Issue 里 @ 就完成了

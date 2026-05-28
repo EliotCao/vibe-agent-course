@@ -137,16 +137,16 @@ def evaluate_summary(original: list[dict], summary: str) -> float:
 
 ---
 
-## 答案要点（仅老师参考）
+## 答案要点（参考）
 
-> ⚠️ **学生版本应删除此部分**，可以拷一份到 `exercises/teacher-notes.md`。
+> ⚠️ **先独立完成再看此部分**，可以拷一份到 `exercises/teacher-notes.md`。
 
 ### 4.1
 - 大白话约束在生产里非常多（"我妈年纪大""我家有小孩""不太能吃辣"）
 - 关键词法兜不住，工业方案：
   - 让 LLM 在每轮对话末尾做"事实抽取"
   - 不依赖关键词，靠语义判断
-- 加分项：学生意识到"事实抽取本身就是一个独立的 NLP 任务"
+- 加分项：意识到"事实抽取本身就是一个独立的 NLP 任务"
 
 ### 4.2
 - 推荐 0.5 - 0.6 之间
@@ -156,14 +156,14 @@ def evaluate_summary(original: list[dict], summary: str) -> float:
 
 ### 4.3
 - save/load 是 demo_20 里现成的
-- 加分项：学生用 user_id 做命名空间隔离
+- 加分项：用 user_id 做命名空间隔离
 - 反思要点：跨会话记忆 = 真正的"个人 AI 助手"基础
 
 ### 4.4
 - 关键词法最简单但不准
 - LLM 当裁判最准但贵
 - 嵌入相似度是工程上的折中
-- 加分项：学生跑出来发现"详细 prompt 反而不一定最好"——LLM 太啰嗦时反而失真
+- 加分项：跑出来发现"详细 prompt 反而不一定最好"——LLM 太啰嗦时反而失真
 
 ### 4.5
 - sqlite-vec 比 numpy 内存版的两个收益：

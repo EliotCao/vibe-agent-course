@@ -34,7 +34,7 @@ python demo_14_reflection.py       # Reflection（套在 Plan-and-Solve 外）�
 
 ## 当日产物
 
-学生 lab 提交的目录：
+lab 提交的目录：
 
 ```
 03-checkpoint/
@@ -66,7 +66,7 @@ python demo_14_reflection.py       # Reflection（套在 Plan-and-Solve 外）�
 | Reflection 包装层 | Day5 给 Coding Agent 的写代码任务套上 Reflection 显著提质 |
 | `comparison.md` 的选型指南 | Day8 大作业里你要在自己的 Agent 里**自圆其说**为什么选某种范式 |
 
-## 参考实现（教师演示备用）
+## 参考实现（参考资产）
 
 | 资产 | 用途 |
 |---|---|
@@ -74,14 +74,14 @@ python demo_14_reflection.py       # Reflection（套在 Plan-and-Solve 外）�
 | [`examples/03-hello-agents/main.py`](../examples/03-hello-agents/main.py) | hello-agents 框架 ReAct 用法 + 一段 `patch_react_agent_logging_and_parser` 演示工业版的 fallback 之多 |
 | [`examples/04-my-agent/agent/agent.py`](../examples/04-my-agent/agent/agent.py) | 工程级 `SimpleAgent` + `ReActAgent` 双范式实现 |
 
-## 教师准备清单
+## 准备清单
 
 | 项 | 说明 |
 |---|---|
 | 课前 | 跑通三个 demo（demo_12 / 13 / 14），确认你的环境能跑 5 个任务全过 |
-| 阶段 B（ReAct 填空） | 准备一份"模型不规矩输出"的截图给学生看，引导他们感受脆弱性 |
-| 阶段 C（PS 填空） | 提醒学生**复用 Day2 的最小 Agent Loop**，不要重写 |
-| 阶段 D（Reflection + 对比） | 准备好 token 计数小工具（在 demo 里就能加 `usage.total_tokens` 累加），减少学生踩坑 |
+| 阶段 B（ReAct 填空） | 准备一份"模型不规矩输出"的截图看一下，引导他们感受脆弱性 |
+| 阶段 C（PS 填空） | 提醒**复用 Day2 的最小 Agent Loop**，不要重写 |
+| 阶段 D（Reflection + 对比） | 准备好 token 计数小工具（在 demo 里就能加 `usage.total_tokens` 累加），减少踩坑 |
 
 ## 课后练习题
 

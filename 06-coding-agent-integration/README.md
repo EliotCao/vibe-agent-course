@@ -43,7 +43,7 @@ my_coding_agent/
 ├── context/                # Day4 ContextManager
 ├── memory/                 # Day4 Memory（embedding + cosine）
 ├── agent/
-│   └── agent.py            # ★ 整合主类（学生填 4 个 TODO）
+│   └── agent.py            # ★ 整合主类（填 4 个 TODO）
 ├── ui/
 │   └── repl.py             # REPL 交互
 └── main.py                 # 入口
@@ -98,10 +98,10 @@ my_coding_agent/
 
 ---
 
-## 教师演示备用
+## 参考资产
 
 - `examples/04-my-agent/` 完整目录作为"终极参考"
-- 整合期间老师**当场带做**：每 15 分钟一个 checkpoint
+- 整合期间**每 15 分钟一个 checkpoint** 推进
   1. （0:00）确认所有零件代码到位
   2. （0:15）`Agent.__init__` 跑通
   3. （0:30）单工具调用跑通

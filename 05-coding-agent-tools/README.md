@@ -29,7 +29,7 @@ python demo_26_end_to_end.py         # 让 LLM 用 5 个工具完成"建项目+�
 ```
 
 > `lab/demos/coding_tools/` 是完整的参考实现（5 个必做 + 选做 grep）。
-> `lab/starter/coding_tools/` 是学生填空骨架。
+> `lab/starter/coding_tools/` 是填空骨架。
 
 ## 当日产物
 
@@ -87,7 +87,7 @@ python demo_26_end_to_end.py         # 让 LLM 用 5 个工具完成"建项目+�
 - 必做 3 题：实现 grep / bash 黑名单对抗赛 / 用 5 个工具手动跑一个真任务
 - 选做 2 题：webfetch / 把 5 个工具接到 Day3 ReAct Agent
 
-## 教师演示备用
+## 参考资产
 
 | 资产 | 用途 |
 |---|---|

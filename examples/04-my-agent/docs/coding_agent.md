@@ -4,7 +4,7 @@
 
 `coding_agent.py` 实现了一个极简版 Claude Code —— 基于 **Function Calling + 对话循环 + 多工具** 的交互式编程助手。
 
-## 与教学版 Agent 的区别
+## 与简化版 Agent 的区别
 
 | 维度 | SimpleAgent / ReActAgent | CodingAgent |
 |------|--------------------------|-------------|
