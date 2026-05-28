@@ -1,5 +1,5 @@
 """
-Day 5 Lab · list_dir 骨架 —— 学生填空
+Day 5 Lab · list_dir 骨架 —— 填空
 
 要求：
   ① 不是目录 → 友好报错

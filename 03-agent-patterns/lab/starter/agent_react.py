@@ -1,5 +1,5 @@
 """
-Day 3 Lab Part 1 · ReAct 范式骨架 —— 学生填空
+Day 3 Lab Part 1 · ReAct 范式骨架 —— 填空
 
 主循环和工具集都已写好；你只需要补上：
   - REACT_PROMPT_TEMPLATE 的具体内容

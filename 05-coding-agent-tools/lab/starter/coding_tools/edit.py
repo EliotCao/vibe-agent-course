@@ -1,5 +1,5 @@
 """
-Day 5 Lab Part 2 · edit 骨架 —— 学生填空
+Day 5 Lab Part 2 · edit 骨架 —— 填空
 
 精确替换：必须 old_content 唯一匹配。
 

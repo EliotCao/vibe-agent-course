@@ -1,7 +1,7 @@
 """Demo 30：整合 Walkthrough —— 把 6 个零件一步步组装起来。
 
 本 demo 不走 main.py 的快捷路径，而是**手动实例化每个零件**，
-让学生看到"组装过程"比"最终产物"更重要。
+展示"组装过程"比"最终产物"更重要。
 
 运行：python demo_30_integration_walkthrough.py
 """

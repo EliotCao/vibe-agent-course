@@ -1,7 +1,7 @@
 """
 Day 5 工具集 · 选做：grep（正则搜文本）
 
-只是一个 ripgrep / grep -rn 的简化版，方便老师课堂演示。
+只是一个 ripgrep / grep -rn 的简化版，方便快速演示。
 真生产里直接用 ripgrep 调 bash 工具更快、功能更全。
 """
 

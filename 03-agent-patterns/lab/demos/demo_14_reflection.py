@@ -124,7 +124,7 @@ def run_with_reflection(question: str, max_rounds: int = 2, verbose: bool = True
 
 
 if __name__ == "__main__":
-    # 故意只跑 3 个任务，避免把课堂时间烧光（Reflection 一道题 token 是其他范式的 2-3 倍）
+    # 故意只跑 3 个任务，避免时间太长（Reflection 一道题 token 是其他范式的 2-3 倍）
     SHORT_TASKS = TASKS[:3]
     for i, q in enumerate(SHORT_TASKS, 1):
         print("\n" + "=" * 60)

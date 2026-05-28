@@ -1,5 +1,5 @@
 """
-Day 5 Lab Part 2 · write 骨架 —— 学生填空
+Day 5 Lab Part 2 · write 骨架 —— 填空
 
 写新文件 / 覆盖文件。注意：默认拒绝覆盖已有文件！
 

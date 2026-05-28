@@ -1,8 +1,8 @@
 """第 3 章配置：复用前两章的 BASE_URL / API_KEY / MODEL_ID 约定。
 
 `hello-agents` 框架内部约定的环境变量是 `LLM_BASE_URL` / `LLM_API_KEY` /
-`LLM_MODEL_ID`，与课程其他章节使用的 `BASE_URL` / `API_KEY` / `MODEL_ID`
-不一致。为避免读者重新维护一份 `.env`，这里把课程惯用变量解析出来后，
+`LLM_MODEL_ID`，与项目其他章节使用的 `BASE_URL` / `API_KEY` / `MODEL_ID`
+不一致。为避免读者重新维护一份 `.env`，这里把项目惯用变量解析出来后，
 显式作为参数传给 `HelloAgentsLLM(...)`，框架就不会再去读它自己的环境变量。
 """
 

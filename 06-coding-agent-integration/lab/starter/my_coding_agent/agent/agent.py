@@ -1,7 +1,7 @@
-"""starter/my_coding_agent/agent/agent.py —— 学生填空版。
+"""starter/my_coding_agent/agent/agent.py —— 填空版。
 
 把 Day1-Day5 的零件组装成完整 CodingAgent。
-学生需要填写 4 个 TODO。
+需要填写 4 个 TODO。
 """
 
 from __future__ import annotations

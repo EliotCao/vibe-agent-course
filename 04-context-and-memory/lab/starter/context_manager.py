@@ -1,5 +1,5 @@
 """
-Day 4 Lab Part 1 · ContextManager 骨架 —— 学生填空
+Day 4 Lab Part 1 · ContextManager 骨架 —— 填空
 
 写一个 ContextManager 类，达到下面的能力：
   ① should_compress(messages): 判断是否需要压缩

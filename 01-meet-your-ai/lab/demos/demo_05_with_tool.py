@@ -8,7 +8,7 @@ Demo 05 · LLM + 外部支持：从"不知道"到"知道"
   ① 纯 LLM    →   答错或编造
   ② 给一个简单工具  →  答对
 
-让学生**亲眼看到**"为什么需要 Day2 的工具系统"。
+直观感受"为什么需要 Day2 的工具系统"。
 
 跑法：
     python demo_05_with_tool.py
@@ -29,11 +29,11 @@ def get_current_time() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-# ---------- 一个"工具"：查文件内容（mock 一个学生不知道答案的事实） ----------
+# ---------- 一个"工具"：查文件内容（mock 一个 LLM 不知道的事实） ----------
 SECRET_FILE = """\
 [内部公告]
-课程结业大作业截止时间：2026-06-30 23:59:59
-联系人：王老师
+项目交付截止时间：2026-06-30 23:59:59
+联系人：王经理
 紧急联系电话：13800138000
 """
 
@@ -83,10 +83,10 @@ def exp_current_time() -> None:
 # ---------- 实验 2：内部知识 ----------
 def exp_internal_knowledge() -> None:
     print("\n\n" + "=" * 60)
-    print("【实验 2：课程结业作业什么时候交？】")
+    print("【实验 2：项目截止时间是什么时候？】")
     print("=" * 60)
 
-    question = "Hello-Agents VibeCoding 课程的结业大作业截止时间是什么时候？联系人电话多少？"
+    question = "Hello-Agents 项目的交付截止时间是什么时候？联系人电话多少？"
 
     print("\n--- ① 纯 LLM 回答 ---")
     resp = client.chat.completions.create(

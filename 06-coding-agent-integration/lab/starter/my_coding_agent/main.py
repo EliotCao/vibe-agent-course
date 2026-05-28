@@ -4,7 +4,7 @@
     cd 06-coding-agent-integration/lab/demos/my_coding_agent
     python main.py [工作目录]
 
-默认工作目录 = 当前目录的上一级（即 demos/），方便直接操作 06 的课程文件。
+默认工作目录 = 当前目录的上一级（即 demos/），方便直接操作 06 的示例文件。
 """
 
 import os

@@ -1,5 +1,5 @@
 """
-Day 4 Lab Part 3 · Agent v2 骨架 —— 学生填空
+Day 4 Lab Part 3 · Agent v2 骨架 —— 填空
 
 把 Day3 的 Agent 升级成 v2：接上 ContextManager + Memory。
 

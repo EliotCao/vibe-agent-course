@@ -5,7 +5,7 @@ Demo 02 · 三种 system prompt，三种"人格"
 配套：第 2 节《提示词与角色：System / User / Assistant》
 
 效果：同一个 user 问题，挂三种不同 system prompt，输出风格天差地别。
-让学生体感"system prompt 是改变 AI 行为最便宜的方式"。
+体感"system prompt 是改变 AI 行为最便宜的方式"。
 
 跑法：
     python demo_02_roles.py

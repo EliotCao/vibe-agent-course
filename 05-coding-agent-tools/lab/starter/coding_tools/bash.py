@@ -1,5 +1,5 @@
 """
-Day 5 Lab Part 2 · bash 骨架 —— 学生填空
+Day 5 Lab Part 2 · bash 骨架 —— 填空
 
 四道闸门（讲义第 25 节）：
   ① 超时

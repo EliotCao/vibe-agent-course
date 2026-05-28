@@ -4,13 +4,13 @@ Demo 07 · Function Calling 协议：手工拼出完整消息流
 
 配套：第 7 节《Function Calling 协议：Tool Schema 与消息流》
 
-效果：让学生当堂看到——
+效果：直观展示——
   - 一个完整的 function calling 调用，到底有几条消息
   - 每条消息长什么样、role 字段为什么有 4 种
   - assistant 消息里的 tool_calls 是什么结构
   - tool 消息凭什么对应到上一条 tool_call（靠 tool_call_id）
 
-我们故意**不调用任何封装**，全部手写 messages 列表，让学生看到协议本身。
+我们故意**不调用任何封装**，全部手写 messages 列表，展示协议本身。
 
 跑法：
     python demo_07_function_calling_protocol.py
@@ -51,7 +51,7 @@ TOOLS_SCHEMA = [
 
 
 # ============================================================
-# Step 2：工具的"真实实现"（Mock，不依赖外部 API，方便课堂跑）
+# Step 2：工具的"真实实现"（Mock，不依赖外部 API，方便本地跑）
 # ============================================================
 def get_weather(city: str) -> str:
     fake_db = {
@@ -63,7 +63,7 @@ def get_weather(city: str) -> str:
 
 
 # ============================================================
-# Step 3：一次完整调用，把每条消息打印出来给学生看
+# Step 3：一次完整调用，把每条消息打印出来看全貌
 # ============================================================
 def main() -> None:
     print("=" * 60)

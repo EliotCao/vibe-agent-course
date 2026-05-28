@@ -122,7 +122,7 @@ def patch_invoke_to_streaming() -> None:
 
 
 def build_llm() -> HelloAgentsLLM:
-    """构造一个 `HelloAgentsLLM`，把课程统一的环境变量显式注入。
+    """构造一个 `HelloAgentsLLM`，把项目统一的环境变量显式注入。
 
     这样就不需要再额外维护一套 `LLM_BASE_URL` / `LLM_API_KEY` 环境变量。
     """

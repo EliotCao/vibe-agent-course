@@ -4,7 +4,7 @@ Demo 08 · ToolRegistry：从函数到 Schema 的自动化
 
 配套：第 8 节《ToolRegistry：让加工具像加函数一样简单》
 
-效果：让学生当堂看到——
+效果：直观展示——
   - 一个 80 行以内的 ToolRegistry，能做到：
     ① 装饰器注册：@registry.tool("xx") 一行搞定
     ② 自动从函数签名 + docstring 生成 OpenAI tool schema
@@ -25,7 +25,7 @@ from _env import get_model_id, make_client
 
 
 # ============================================================
-# 一份 80 行以内、可以教学的 ToolRegistry
+# 一份 80 行以内、简洁可读的 ToolRegistry
 # ============================================================
 class ToolRegistry:
     """极简工具注册表。

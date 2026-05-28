@@ -1,4 +1,4 @@
-"""Skills 加载器（简化版，适配课程本地 skills/ 目录）。
+"""Skills 加载器（简化版，适配本地 skills/ 目录）。
 
 跟 04-my-agent 的 skills.py 逻辑一致，但 skills_dir 改为传参。
 """

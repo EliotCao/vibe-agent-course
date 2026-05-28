@@ -4,12 +4,12 @@ Demo 06 · Chatbot vs Agent：同一道题，循环不循环差别有多大
 
 配套：第 6 节《Agent vs Chatbot：为什么需要循环》
 
-效果：让学生当堂看到——
+效果：直观对比——
   ① 朴素 Chatbot：单轮回答一个"需要外部信息 + 计算"的题，必然翻车
   ② 最小 Agent：同一道题，加一个 while 循环 + 工具，立刻能答对
 
 故意做得很糙，只用一个 while 循环和两个最简单的工具，
-让学生看清"Agent = LLM + Tools + Loop"这个等式具体是什么样子。
+看清"Agent = LLM + Tools + Loop"这个等式具体是什么样子。
 
 跑法：
     python demo_06_chatbot_vs_agent.py

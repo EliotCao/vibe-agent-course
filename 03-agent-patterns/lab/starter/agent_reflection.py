@@ -1,5 +1,5 @@
 """
-Day 3 Lab Part 3 · Reflection 包装层骨架 —— 学生填空
+Day 3 Lab Part 3 · Reflection 包装层骨架 —— 填空
 
 Reflection 是一个**包装层**，不改底层 Agent，只在外面套：
   起草 → 评审 → （有问题）修订 → 评审 → ... → 通过 / 达到上限

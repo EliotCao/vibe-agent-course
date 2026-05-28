@@ -1,5 +1,5 @@
 """
-Day 3 Lab Part 2 · Plan-and-Solve 骨架 —— 学生填空
+Day 3 Lab Part 2 · Plan-and-Solve 骨架 —— 填空
 
 要补的三件事：
   ① Planner 的 prompt（让模型输出 JSON 数组的步骤列表）

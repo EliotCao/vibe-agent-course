@@ -1,5 +1,5 @@
 """
-Day 4 Lab Part 2 · Memory 骨架 —— 学生填空
+Day 4 Lab Part 2 · Memory 骨架 —— 填空
 
 实现一个最小 Memory：
   - add(text)：调 embedding API 把文本变成向量存起来
