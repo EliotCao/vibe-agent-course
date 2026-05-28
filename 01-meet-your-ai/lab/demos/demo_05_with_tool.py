@@ -4,9 +4,9 @@ Demo 05 · LLM + 外部支持：从"不知道"到"知道"
 
 配套：第 5 节《LLM 智能 + 外部支持：为什么需要工具与上下文》
 
-效果：同一个问题，分两次问：
-  ① 纯 LLM    →   答错或编造
-  ② 给一个简单工具  →  答对
+效果：同一个问题，分两种方式：
+  ① 手动把外部知识塞进 prompt（最朴素的 RAG）
+  ② 真正的 Function Calling：让模型自己决定调工具
 
 直观感受"为什么需要 Day2 的工具系统"。
 
@@ -17,6 +17,7 @@ Demo 05 · LLM + 外部支持：从"不知道"到"知道"
 from __future__ import annotations
 
 import datetime
+import json
 
 from _env import get_model_id, make_client
 
@@ -41,49 +42,10 @@ def read_internal_doc() -> str:
     return SECRET_FILE
 
 
-# ---------- 实验 1：当前时间 ----------
-def exp_current_time() -> None:
-    print("=" * 60)
-    print("【实验 1：现在几点了？】")
-    print("=" * 60)
-
-    question = "现在是北京时间几点几分？请精确到分钟。"
-
-    print("\n--- ① 纯 LLM 回答 ---")
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": question}],
-        max_tokens=100,
-        temperature=0,
-    )
-    print(resp.choices[0].message.content)
-
-    print("\n--- ② 把工具结果塞进 prompt 再问 ---")
-    now = get_current_time()
-    enriched = f"""\
-我现在要回答用户的问题。我有一个外部工具的结果可以用：
-- 工具：get_current_time()
-- 结果：{now}
-
-用户问题：{question}
-
-请基于工具结果回答。
-"""
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": enriched}],
-        max_tokens=100,
-        temperature=0,
-    )
-    print(resp.choices[0].message.content)
-
-    print("\n💡 看：仅仅是把'工具结果'拼进 prompt，模型立刻能答对了。")
-
-
-# ---------- 实验 2：内部知识 ----------
+# ---------- 实验 1：手动注入外部知识 ----------
 def exp_internal_knowledge() -> None:
-    print("\n\n" + "=" * 60)
-    print("【实验 2：项目截止时间是什么时候？】")
+    print("=" * 60)
+    print("【实验 1：把外部知识塞进 prompt】")
     print("=" * 60)
 
     question = "Hello-Agents 项目的交付截止时间是什么时候？联系人电话多少？"
@@ -120,19 +82,69 @@ def exp_internal_knowledge() -> None:
     print("   这就是 RAG（Retrieval-Augmented Generation）的最朴素版本。")
 
 
-if __name__ == "__main__":
-    exp_current_time()
-    exp_internal_knowledge()
-
+# ---------- 实验 2：真正的 Function Calling（预告） ----------
+def exp_real_tool_call() -> None:
+    """最简 Function Calling：让模型自己决定调工具。Day2 会展开讲。"""
     print("\n\n" + "=" * 60)
-    print("🎯 今天的关键认识：")
-    print()
-    print("  LLM 本身 = 一个基于训练数据的'静态'函数")
-    print("            → 不知实时、不知私域、不知工具结果")
-    print()
-    print("  LLM + 上下文 + 工具 = Agent")
-    print("            → 可以查实时、可以读私域、可以执行动作")
-    print()
-    print("  今天的 demo 把'工具结果'手动拼进 prompt 就能起作用。")
-    print("  Day2 会把这个过程自动化：让 LLM 自己决定调哪个工具。")
+    print("【实验 2：真正的 Function Calling（Day2 预告）】")
     print("=" * 60)
+    print("上面是'人工拼 prompt'。下面让模型**自己决定**要不要调工具：\n")
+
+    # 声明一个工具 schema
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "get_current_time",
+                "description": "获取当前北京时间",
+                "parameters": {"type": "object", "properties": {}},
+            },
+        }
+    ]
+
+    question = "现在北京时间几点？"
+    messages = [{"role": "user", "content": question}]
+
+    # 第一轮：模型看到工具列表，自己决定是否调用
+    resp = client.chat.completions.create(
+        model=MODEL,
+        messages=messages,
+        tools=tools,
+        max_tokens=200,
+    )
+    msg = resp.choices[0].message
+
+    if msg.tool_calls:
+        print("msg.tool_calls:", msg.tool_calls)
+        tool_call = msg.tool_calls[0]
+        print(f"✅ 模型决定调用工具: {tool_call.function.name}()")
+        print(f"   tool_call_id: {tool_call.id}")
+
+        # 执行工具
+        result = get_current_time()
+        print(f"   工具返回: {result}")
+
+        # 第二轮：把工具结果回传，模型生成最终回答
+        messages.append(msg)
+        messages.append({
+            "role": "tool",
+            "tool_call_id": tool_call.id,
+            "content": result,
+        })
+        resp2 = client.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            tools=tools,
+            max_tokens=200,
+        )
+        print(f"\n🤖 最终回答: {resp2.choices[0].message.content}")
+    else:
+        print(f"模型直接回答（没调工具）: {msg.content}")
+
+    print("\n💡 区别：这次不是我们手动塞结果，而是模型自主决定'我需要调工具'。")
+    print("   Day2 会完整讲解这个协议的每一条消息。")
+
+
+if __name__ == "__main__":
+    exp_internal_knowledge()
+    exp_real_tool_call()

@@ -45,7 +45,7 @@ def estimate_cost(token_count: int, price_per_1m: float = 5.0) -> float:
 def trigger_context_overflow() -> None:
     """构造一个超长输入，看 API 怎么反应"""
     # 默认窗口算 32K token，发 100K 必爆
-    huge = "你好。" * 50_000
+    huge = "你好。" * 100_000_0
     print(f"\n构造超长输入：{len(huge)} 字符 ≈ {len(ENC.encode(huge)):,} token")
     print("尝试调用 API ...")
     try:
