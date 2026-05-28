@@ -34,7 +34,9 @@ python demo_04_hallucinate.py    # 主动诱发幻觉
 python demo_05_with_tool.py      # 加工具前后对比
 ```
 
+
+
 ## 参考实现
 
-- `02-hello-llm/main.py` —— 流式调用参考实现
-- `04-my-agent/llm/llm.py` —— 工程级 LLM 客户端
+- [`examples/02-hello-llm/main.py`](../examples/02-hello-llm/main.py) —— 流式调用参考实现
+- [`examples/04-my-agent/llm/llm.py`](../examples/04-my-agent/llm/llm.py) —— 工程级 LLM 客户端
