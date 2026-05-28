@@ -18,11 +18,11 @@
 | 7 | 理论 · 40min | Function Calling 协议：Tool Schema 与 4 角色消息流 | [07-function-calling.md](./lecture/07-function-calling.md) | `demo_07_function_calling_protocol.py` |
 | 8 | 理论 · 20min | ToolRegistry：从函数到 Schema 的自动化 | [08-tool-registry.md](./lecture/08-tool-registry.md) | `demo_08_tool_registry.py` |
 | 9 | 理论 · 20min | 最小 Agent Loop 的 5 个核心点 | [09-agent-loop.md](./lecture/09-agent-loop.md) | `demo_09_mini_agent.py` |
-| 10-11 | 实操 · 130min | 亲手搭出 ToolRegistry + Agent Loop + 跑 4 个任务 | [lab/README.md](./lab/README.md) | `lab/starter/mini_agent.py` |
+| 10-11 | 实操 · 130min | 亲手搭出 ToolRegistry + Agent Loop + 跑 4 个任务 | [lab/README.md](./lab/README.md) | 参考 `lab/demo_09_mini_agent.py` |
 
 ## 配套 Demo
 
-所有 demo 在 `lab/demos/` 目录下，运行前确保环境变量已配置（参见 `_env.py`）：
+所有 demo 在 `lab/` 目录下，运行前确保环境变量已配置（参见 `_env.py`）：
 
 ```bash
 cd lab/demos
@@ -39,7 +39,7 @@ lab 提交的目录结构：
 ```
 02-checkpoint/
 ├── tool_registry.py        # 自己写的 ToolRegistry（装饰器 + inspect + 异常兜底）
-├── mini_agent.py           # 从 starter 填空版的 Agent Loop
+├── mini_agent.py           # 最小 Agent Loop
 ├── run_log.md              # 4 个任务的执行日志
 └── reflection.md           # 100-200 字反思
 ```
@@ -79,7 +79,7 @@ lab 提交的目录结构：
 
 ## 课后练习题
 
-详见 [exercises/README.md](./exercises/README.md)：
+详见 [exercises/README.md](../exercises/02-tools-and-agent-loop/README.md)：
 
 - 必做 3 题：Schema 反向工程 / 并行工具调用 / 错误处理压测
 - 选做 2 题：enum 支持 / "先想再做" 范式预热
@@ -90,7 +90,7 @@ lab 提交的目录结构：
 
 | 情况 | 投屏什么 |
 |---|---|
-| ToolRegistry 卡住 | `demos/demo_08_tool_registry.py` |
-| messages 拼错（漏了 assistant.tool_calls） | `demos/demo_07_function_calling_protocol.py` 最后那段完整 messages 历史 |
-| Agent Loop 跑飞了 | `demos/demo_09_mini_agent.py` 主循环 |
+| ToolRegistry 卡住 | `demo_08_tool_registry.py` |
+| messages 拼错（漏了 assistant.tool_calls） | `demo_07_function_calling_protocol.py` 最后那段完整 messages 历史 |
+| Agent Loop 跑飞了 | `demo_09_mini_agent.py` 主循环 |
 | 想看工程级长什么样 | `examples/04-my-agent/agent/agent.py` 的 `SimpleAgent` |

@@ -17,7 +17,7 @@
 | 18 | 理论 · 25min | 上下文工程：为什么要管、什么时候爆 | [18-why-context-matters.md](./lecture/18-why-context-matters.md) | `demo_18_context_explosion.py` |
 | 19 | 理论 · 30min | 4 种上下文管理策略：截断 / 摘要 / 分层 / GSSC | [19-context-strategies.md](./lecture/19-context-strategies.md) | `demo_19_context_strategies.py` |
 | 20 | 理论 · 25min | 记忆系统：短期 / 长期 / 工作记忆 + 向量检索 | [20-memory-types.md](./lecture/20-memory-types.md) | `demo_20_memory.py` |
-| 21-23 | 实操 · 130min | 三件零件 + 拼成 v2 + 跑对比 | [lab/README.md](./lab/README.md) | `lab/starter/*.py` |
+| 21-23 | 实操 · 130min | 三件零件 + 拼成 v2 + 跑对比 | [lab/README.md](./lab/README.md) | 参考 `lab/` 下对应 demo |
 
 ## 配套 Demo
 
@@ -82,6 +82,6 @@ CNB 平台的 embedding 模型名是 `hunyuan-embedding`，跟 chat 端点共用
 
 ## 课后练习题
 
-详见 [exercises/README.md](./exercises/README.md)：
+详见 [exercises/README.md](../exercises/04-context-and-memory/README.md)：
 - 必做 3 题：关键事实漏抓的代价 / Memory 阈值调优 / 跨会话记忆验证
 - 选做 2 题：摘要质量评估 / SQLite + sqlite-vec 持久化升级

@@ -76,8 +76,8 @@ my_coding_agent/                        # 沿用 Day6
 
 | Demo | 功能 | 文件 |
 |------|------|------|
-| `demo_33` | Skills 扫描/匹配/加载演示 | `lab/demos/demo_33_skills.py` |
-| 示例 Skills | add-docstring / commit-convention | `lab/demos/skills/` |
+| `demo_33` | Skills 扫描/匹配/加载演示 | `lab/demo_33_skills.py` |
+| 示例 Skills | add-docstring / commit-convention | `lab/skills/` |
 
 ---
 
@@ -94,7 +94,7 @@ my_coding_agent/                        # 沿用 Day6
 
 ## 课后练习
 
-见 [exercises/README.md](./exercises/README.md)（3 必做 + 2 选做）
+见 [exercises/README.md](../exercises/07-skills-and-npc/README.md)（3 必做 + 2 选做）
 
 ---
 

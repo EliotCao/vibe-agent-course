@@ -8,7 +8,7 @@
 
 ![上下文管道越拼越长 直到爆窗](./images/18-context-overflow.png)
 
-跑一下 [`demo_18_context_explosion.py`](../lab/demos/demo_18_context_explosion.py)，让 Agent 反复回答"总结之前的讨论 + 再补充 3 条建议"。结果非常具体：
+跑一下 [`demo_18_context_explosion.py`](../lab/demo_18_context_explosion.py)，让 Agent 反复回答"总结之前的讨论 + 再补充 3 条建议"。结果非常具体：
 
 ```
 [第  1 轮] prompt=  256 tokens · total=  680 tokens

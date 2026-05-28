@@ -179,7 +179,7 @@ class CodingAgent:
 
 **整个 Agent 类不到 50 行**——因为重活全在 5 个零件里。
 
-> 完整版在 [`lab/demos/my_coding_agent/agent/agent.py`](../lab/demos/my_coding_agent/agent/agent.py)，今天 lab 你的目标就是**把骨架填成完整版**。
+> 完整版在 [`lab/my_coding_agent/agent/agent.py`](../lab/my_coding_agent/agent/agent.py)，今天 lab 你的目标就是**把骨架填成完整版**。
 
 ## 整合 ≠ 复制粘贴
 

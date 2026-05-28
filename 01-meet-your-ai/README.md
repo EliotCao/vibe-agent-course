@@ -22,7 +22,7 @@
 
 ## 配套 Demo
 
-所有 demo 在 `lab/demos/` 目录下，运行前确保环境变量已配置（参见 `_env.py`）：
+所有 demo 在 `lab/` 目录下，运行前确保环境变量已配置（参见 `_env.py`）：
 
 ```bash
 cd lab/demos

@@ -162,7 +162,7 @@ def extract_key_facts(messages):
 
 ## 一个真实数据
 
-我们 [`demo_19_context_strategies.py`](../lab/demos/demo_19_context_strategies.py) 里跑了一段 30 轮对话，**第 2 轮埋了"过敏"事实，第 28 轮埋了"预算"事实**：
+我们 [`demo_19_context_strategies.py`](../lab/demo_19_context_strategies.py) 里跑了一段 30 轮对话，**第 2 轮埋了"过敏"事实，第 28 轮埋了"预算"事实**：
 
 | 策略 | messages 条数 | 字符数 | "过敏" 保住？ | "预算" 保住？ |
 |---|---|---|---|---|

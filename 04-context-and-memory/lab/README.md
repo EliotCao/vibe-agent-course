@@ -16,7 +16,7 @@
 
 | 阶段 | 时长 | 内容 |
 |------|------|------|
-| A | 5min | 看 starter 骨架，确认环境（embedding 端点能跑） |
+| A | 5min | 看参考实现，确认环境（embedding 端点能跑） |
 | B | 50min | Part 1：填空 `context_manager.py`（分层策略） |
 | C | 50min | Part 2：填空 `memory.py`（embedding + 余弦） |
 | D | 25min | Part 3：填空 `agent_v2.py`，跑对比报告 |
@@ -62,7 +62,7 @@ python demo_18_context_explosion.py
 
 ## 阶段 B · Part 1：ContextManager（50min）<a id="part1"></a>
 
-打开 [`starter/context_manager.py`](./starter/context_manager.py)，4 个 TODO：
+打开 `demo_19_context_strategies.py`，4 个 TODO：
 
 | TODO | 难度 | 提示 |
 |---|---|---|
@@ -83,11 +83,11 @@ python demo_18_context_explosion.py
 - compress(messages): 输出 [system + 关键事实 + 摘要 + 最近 6 轮]
 ```
 
-跑自测脚本（starter 文件末尾就有），检查 **'过敏'** 这个早期事实在压缩后还在不在。
+跑自测脚本（参考实现末尾就有），检查 **'过敏'** 这个早期事实在压缩后还在不在。
 
 ### 参考演示（15min）
 
-参考实现 [`demos/demo_19_context_strategies.py`](./demos/demo_19_context_strategies.py)，重点对比：
+参考实现 [`demo_19_context_strategies.py`](./demo_19_context_strategies.py)，重点对比：
 - 你的 summarize prompt 有没有强调"保留偏好/约束"
 - 你的 compress 顺序对不对（system 必须在最前）
 - 关键事实抽取漏了没（关键词没覆盖的情况）
@@ -100,7 +100,7 @@ python demo_18_context_explosion.py
 
 ## 阶段 C · Part 2：Memory（50min）<a id="part2"></a>
 
-打开 [`starter/memory.py`](./starter/memory.py)，4 个 TODO：
+打开 `demo_20_memory.py`，4 个 TODO：
 
 | TODO | 难度 | 提示 |
 |---|---|---|
@@ -122,7 +122,7 @@ python demo_18_context_explosion.py
 
 ### 参考演示（15min）
 
-参考实现 [`demos/demo_20_memory.py`](./demos/demo_20_memory.py)，重点：
+参考实现 [`demo_20_memory.py`](./demo_20_memory.py)，重点：
 - embed() 的返回值类型（必须是 `np.ndarray` float32，否则后面计算慢）
 - cosine() 的边界情况（向量全零时分母会爆）
 
@@ -148,7 +148,7 @@ python demo_18_context_explosion.py
 
 ### Agent v2 填空（10min）
 
-[`starter/agent_v2.py`](./starter/agent_v2.py)，2 个 TODO：
+`demo_21_agent_v2.py`，2 个 TODO：
 
 | TODO | 提示 |
 |---|---|
@@ -228,8 +228,8 @@ ___（你跑出来的，最让你意外的一件事）___
 
 | 情况 | 投屏什么 |
 |---|---|
-| ContextManager 摘要 prompt 写得不好 | `demos/demo_19_context_strategies.py` 的 `strategy_summary` |
-| Memory 召回不准 | `demos/demo_20_memory.py` + 检查 EMBEDDING_MODEL 名字对不对 |
-| v2 没触发压缩 | `demos/demo_21_agent_v2.py` 的 `should_compress` |
+| ContextManager 摘要 prompt 写得不好 | `demo_19_context_strategies.py` 的 `strategy_summary` |
+| Memory 召回不准 | `demo_20_memory.py` + 检查 EMBEDDING_MODEL 名字对不对 |
+| v2 没触发压缩 | `demo_21_agent_v2.py` 的 `should_compress` |
 | 想看工程级 GSSC | [`examples/04-my-agent/context/context_builder.py`](../../examples/04-my-agent/context/context_builder.py) |
 | 想看工程级 Memory | [`examples/04-my-agent/memory/memory.py`](../../examples/04-my-agent/memory/memory.py) |

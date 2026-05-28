@@ -17,7 +17,7 @@
 | 39 | 40min | 理论 | 总复盘：从 token 到 NPC 的全链路 | [39-recap.md](./lecture/39-recap.md) |
 | — | 30min | 互动 | 提问（30 题随机抽） | [quiz-questions.md](./lecture/quiz-questions.md) |
 | 41 | 60min | 互动 | 分享：每人 3 分钟讲自己的 Agent | — |
-| 42 | 20min | 理论 | 大作业布置 + 评分标准说明 | [final-assignment.md](./exercises/final-assignment.md) |
+| 42 | 20min | 理论 | 大作业布置 + 评分标准说明 | [final-assignment.md](../exercises/08-recap-and-final/final-assignment.md) |
 | 43 | 60min | 自由 | Q&A + 个人后续路线建议 | — |
 
 ## 总复盘要点
@@ -68,7 +68,7 @@ Day8: 你下一步要做什么？（结课作业）
 
 ## 大作业布置
 
-详见 [`exercises/final-assignment.md`](./exercises/final-assignment.md)。
+详见 [`exercises/final-assignment.md`](../exercises/08-recap-and-final/final-assignment.md)。
 
 **核心要求**：
 - 选一个**真实场景**：自己仓库 / 同学项目 / 开源项目
@@ -80,7 +80,7 @@ Day8: 你下一步要做什么？（结课作业）
 - 直接复用 04-my-agent 的代码（必须是自己 Day1-7 写的版本）
 - 让 NPC 只回复"你好"这种水任务
 
-**评分**：30 分，详见 [`exercises/final-assignment.md`](./exercises/final-assignment.md)。
+**评分**：30 分，详见 [`exercises/final-assignment.md`](../exercises/08-recap-and-final/final-assignment.md)。
 
 ## 课后路线建议（43 节抛出）
 

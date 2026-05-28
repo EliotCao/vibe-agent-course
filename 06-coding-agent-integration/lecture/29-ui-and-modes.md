@@ -68,7 +68,7 @@ def run_repl(workdir):
 | `/reset` 命令 | 长对话跑久了 messages 太长，给用户一个清空按钮 |
 | 工具调用要打印出来 | 用户需要看见 Agent 正在做什么，不然像黑盒 |
 
-参考实现：[`lab/demos/my_coding_agent/ui/repl.py`](../lab/demos/my_coding_agent/ui/repl.py)。
+参考实现：[`lab/my_coding_agent/ui/repl.py`](../lab/my_coding_agent/ui/repl.py)。
 
 ## 模式 ②：Solo（一次性任务）
 
@@ -176,7 +176,7 @@ for chunk in stream:
 
 > 这段代码看着繁琐，但**不会改**——所有家用 / 工业 LLM 客户端都是这个模式。先跑通一次，以后忘了回来抄。
 
-完整可跑版本：[`lab/demos/demo_30_integration_walkthrough.py`](../lab/demos/demo_30_integration_walkthrough.py) 的 `_chat_streaming` 函数。
+完整可跑版本：[`lab/demo_30_integration_walkthrough.py`](../lab/demo_30_integration_walkthrough.py) 的 `_chat_streaming` 函数。
 
 ## 工具调用的"过程可视化"
 

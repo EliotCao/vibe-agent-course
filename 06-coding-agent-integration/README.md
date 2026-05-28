@@ -28,9 +28,9 @@
 
 | Demo | 功能 | 文件 |
 |------|------|------|
-| `demo_30` | 6 零件手动组装 walkthrough | `lab/demos/demo_30_integration_walkthrough.py` |
-| `demo_31` | 3 个真实任务端到端 | `lab/demos/demo_31_three_tasks.py` |
-| `my_coding_agent/` | 完整参考实现 | `lab/demos/my_coding_agent/main.py` |
+| `demo_30` | 6 零件手动组装 walkthrough | `lab/demo_30_integration_walkthrough.py` |
+| `demo_31` | 3 个真实任务端到端 | `lab/demo_31_three_tasks.py` |
+| `my_coding_agent/` | 完整参考实现 | `lab/my_coding_agent/main.py` |
 
 ---
 
@@ -72,7 +72,7 @@ my_coding_agent/
 
 ## Checkpoint
 
-1. `starter/my_coding_agent/` 4 个 TODO 全部填完、REPL 可运行
+1. `my_coding_agent/` 4 个 TODO 全部填完、REPL 可运行
 2. 任务 1 建项目 + 测试通过
 3. `comparison.md` 有真实内容：你的实现 vs 参考实现的差异 + 一个意外发现
 4. 100-200 字反思
@@ -81,7 +81,7 @@ my_coding_agent/
 
 ## 课后练习
 
-见 [exercises/README.md](./exercises/README.md)（3 必做 + 2 选做）
+见 [exercises/README.md](../exercises/06-coding-agent-integration/README.md)（3 必做 + 2 选做）
 
 ---
 

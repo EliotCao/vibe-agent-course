@@ -164,6 +164,6 @@ python demo_14_reflection.py
 ---
 
 理论部分到此结束。下面 lab：
-- Part 1（50min）：把 demo_12 的 ReAct 从 starter 骨架填空补完
+- Part 1（50min）：把 demo_12 的 ReAct 从参考实现填空补完
 - Part 2（50min）：把 demo_13 的 Plan-and-Solve 填空补完
 - Part 3（30min）：套上 Reflection 跑横向对比 + 写 comparison.md

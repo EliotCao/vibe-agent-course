@@ -17,11 +17,11 @@
 | 12 | 理论 · 30min | ReAct：Thought-Action-Observation | [12-react.md](./lecture/12-react.md) | `demo_12_react.py` |
 | 13 | 理论 · 25min | Plan-and-Solve：先规划再执行 | [13-plan-and-solve.md](./lecture/13-plan-and-solve.md) | `demo_13_plan_and_solve.py` |
 | 14 | 理论 · 25min | Reflection：自我反思与修正 | [14-reflection.md](./lecture/14-reflection.md) | `demo_14_reflection.py` |
-| 15-17 | 实操 · 130min | 填空补完三个范式 + 横向对比 | [lab/README.md](./lab/README.md) | `lab/starter/agent_*.py` |
+| 15-17 | 实操 · 130min | 填空补完三个范式 + 横向对比 | [lab/README.md](./lab/README.md) | 参考 `lab/demo_12/13/14` |
 
 ## 配套 Demo
 
-所有 demo 在 `lab/demos/` 目录下：
+所有 demo 在 `lab/` 目录下：
 
 ```bash
 cd lab/demos
@@ -85,7 +85,7 @@ lab 提交的目录：
 
 ## 课后练习题
 
-详见 [exercises/README.md](./exercises/README.md)：
+详见 [exercises/README.md](../exercises/03-agent-patterns/README.md)：
 
 - 必做 3 题：ReAct 健壮性压测 / Plan-and-Solve 加 Replan / 范式自动选择器
 - 选做 2 题：ReAct + Function Calling 混合（工业最常用） / 双模型 Reflection

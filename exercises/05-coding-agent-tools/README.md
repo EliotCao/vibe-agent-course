@@ -21,7 +21,7 @@ def grep(pattern: str, path: str = ".", file_glob: str = "*", max_matches: int =
 4. 路径不是目录 → 友好报错
 5. 正则非法 → 友好报错（不崩）
 
-参考 [`demos/coding_tools/grep.py`](../lab/demos/coding_tools/grep.py)。
+参考 [`coding_tools/grep.py`](../../05-coding-agent-tools/lab/coding_tools/grep.py)。
 
 提交：
 - `grep.py`

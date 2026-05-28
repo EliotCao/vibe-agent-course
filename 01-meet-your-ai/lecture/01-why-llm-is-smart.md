@@ -43,7 +43,7 @@
 - 同一个问题，每次回答可能不同——因为 `temperature > 0` 时它在**随机采样**
 - `temperature = 0` 时每次输出一样——因为它总是贪心选概率最高的那个
 
-你可以用 [`demo_01_next_token.py`](../lab/demos/demo_01_next_token.py) 亲眼看到这个过程。
+你可以用 [`demo_01_next_token.py`](../lab/demo_01_next_token.py) 亲眼看到这个过程。
 
 
 

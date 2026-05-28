@@ -9,7 +9,7 @@
 | 阶段 | 时间 | 内容 |
 |------|------|------|
 | A · 看参考 | 15 min | 跑 `demo_30` 理解组装过程 |
-| B · 填空实现 | 40 min | 在 `starter/my_coding_agent/agent/agent.py` 里填 4 个 TODO |
+| B · 填空实现 | 40 min | 在 `my_coding_agent/agent/agent.py` 里填 4 个 TODO |
 | C · 跑 3 个任务 | 30 min | 建项目+测试 / 修 bug / 刁难题 |
 | D · 对比&反思 | 25 min | 跑 `demo_31`，对比你的实现和参考实现 |
 | E · 提交 | 20 min | comparison.md + git push |
@@ -19,7 +19,7 @@
 ## 阶段 A · 看参考实现（15 分钟）
 
 ```bash
-cd 06-coding-agent-integration/lab/demos/my_coding_agent
+cd 06-coding-agent-integration/lab/my_coding_agent
 python main.py  # 跑一轮简单对话，确认环境 OK
 ```
 
@@ -36,7 +36,7 @@ python demo_30_integration_walkthrough.py
 
 ## 阶段 B · 填空实现（40 分钟）
 
-打开 `starter/my_coding_agent/agent/agent.py`，有 **4 个 TODO**：
+打开 `my_coding_agent/agent/agent.py`，有 **4 个 TODO**：
 
 | # | 要点 | 参考 |
 |---|------|------|
@@ -56,7 +56,7 @@ python demo_30_integration_walkthrough.py
 
 ## 阶段 C · 3 个真实任务（30 分钟）
 
-用你自己的 Agent（从 starter 启动）跑以下任务：
+用你自己的 Agent（启动）跑以下任务：
 
 ### 任务 1：建项目 + 跑测试
 > "请创建 calculator.py（含 add/subtract 函数），再创建 test_calculator.py（用 assert 写测试），最后跑 python -m pytest -v"
@@ -99,7 +99,7 @@ python demo_31_three_tasks.py
 
 ```bash
 cd ~/vibe-agent-course
-git add 06-coding-agent-integration/lab/starter/
+git add 06-coding-agent-integration/lab/my_coding_agent/
 git add 06-coding-agent-integration/comparison.md
 git commit -m "day6: 完成 Coding Agent 整合"
 git push
@@ -109,7 +109,7 @@ git push
 
 ## 助教检查重点
 
-1. `starter/my_coding_agent/agent/agent.py` 的 4 个 TODO 全部填完
+1. `my_coding_agent/agent/agent.py` 的 4 个 TODO 全部填完
 2. REPL 能正常运行
 3. 任务 1 建项目 + 测试通过
 4. comparison.md 有真实内容（不是空话）

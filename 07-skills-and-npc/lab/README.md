@@ -21,8 +21,8 @@
 ### 阶段 A · 实现 Skills 系统
 
 1. 在你的 `my_coding_agent/` 下建 `skills/` 目录
-2. 复制 `demos/skills/add-docstring/SKILL.md` 作为第一个 skill
-3. 把 `demos/skills_loader.py` 复制到你的项目里
+2. 复制 `skills/add-docstring/SKILL.md` 作为第一个 skill
+3. 把 `skills_loader.py` 复制到你的项目里
 4. 给 ToolRegistry 注册 2 个新工具：
 
 ```python

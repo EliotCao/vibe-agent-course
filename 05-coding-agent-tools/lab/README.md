@@ -14,7 +14,7 @@
 
 | 阶段 | 时长 | 内容 |
 |------|------|------|
-| A | 5min | 看 starter 骨架 + 跑通环境 |
+| A | 5min | 看参考实现 + 跑通环境 |
 | B | 60min | Part 1：实现读类工具 read / list_dir（+ 选做 grep）|
 | C | 60min | Part 2：实现写类工具 write / edit / bash |
 | D | 5min | Git 速通 5 个命令把代码 push 到 CNB |
@@ -42,11 +42,11 @@
 ## 阶段 A · 看骨架（5min）
 
 ```bash
-cd 05-coding-agent-tools/lab/starter
+cd 05-coding-agent-tools/lab
 python -m coding_tools   # 此时 self_test 会失败，因为骨架没填
 ```
 
-打开 [`coding_tools/`](./starter/coding_tools/) 目录下 5 个文件，每个文件顶部都有 TODO 标注。
+打开 `coding_tools/` 目录下 5 个文件，每个文件顶部都有 TODO 标注。
 
 ---
 
@@ -112,7 +112,7 @@ if count > 1:
     return f"❌ old_content 出现 {count} 次，请加更多上下文使其唯一"
 ```
 
-跑 starter 自带的自测，3 个用例（唯一匹配 / 0 次 / 多次）都要正确报错。
+跑 参考实现自带的自测，3 个用例（唯一匹配 / 0 次 / 多次）都要正确报错。
 
 ### bash 的四道闸门
 
@@ -205,8 +205,8 @@ git push origin 05-tools
 
 | 情况 | 参考什么 |
 |---|---|
-| read/list_dir/write/edit/bash 卡住 | `demos/coding_tools/<tool>.py` |
-| 想看工具被 LLM 真调用 | `demos/demo_26_end_to_end.py` |
+| read/list_dir/write/edit/bash 卡住 | `coding_tools/<tool>.py` |
+| 想看工具被 LLM 真调用 | `demo_26_end_to_end.py` |
 | 想看工程级实现 | [`examples/04-my-agent/tools/impl/`](../../examples/04-my-agent/tools/impl/) |
 
 > tip：[`examples/04-my-agent/tools/impl/edit.py`](../../examples/04-my-agent/tools/impl/edit.py) 是基于 `Tool` 基类的 OOP 写法，**比今天的函数式更工程化**——看一眼，Day6 整合时知道往哪个方向迭代。

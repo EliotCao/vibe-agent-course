@@ -55,6 +55,7 @@ Day5: Coding 工具集 × 9    ─┘
 ├── 06-coding-agent-integration/  # Day6：整合
 ├── 07-skills-and-npc/            # Day7：Skills + NPC
 ├── 08-recap-and-final/           # Day8：总结
+├── exercises/                      # 所有练习题（按天分目录）
 ├── examples/                       # 实践代码示例
 │   ├── 01-hello-react/           # ReAct 模式旅行助手
 │   ├── 02-hello-llm/            # 最小流式 LLM 客户端

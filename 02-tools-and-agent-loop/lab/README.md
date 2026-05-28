@@ -27,7 +27,7 @@
 |------|------|------|
 | A | 10min | 环境配置 + 验证 |
 | B | 50min | Part 1：实现 ToolRegistry（自己写一遍，不许直接抄 demo） |
-| C | 60min | Part 2：从 starter 骨架填空搭出 Agent Loop + 跑 4 个任务 |
+| C | 60min | Part 2：从参考实现填空搭出 Agent Loop + 跑 4 个任务 |
 | D | 10min | Q&A + Checkpoint 提交 |
 
 ---
@@ -104,7 +104,7 @@ python demo_07_function_calling_protocol.py
 
 ### 参考实现参考（10min）
 
-给一份"参考代码"对照（**不要在课前发**）：详见 [`demos/demo_08_tool_registry.py`](./demos/demo_08_tool_registry.py)。
+给一份"参考代码"对照（**不要在课前发**）：详见 [`demo_08_tool_registry.py`](./demo_08_tool_registry.py)。
 
 投屏时重点对比：
 - 你写的 description 是从哪里读的？（docstring vs 装饰器参数）
@@ -147,7 +147,7 @@ print(reg.invoke("nope", {}))                    # '未知工具: nope'
 
 ### 目标
 
-打开 [`starter/mini_agent.py`](./starter/mini_agent.py)（已经准备好的填空骨架），把里面 4 个 `TODO` 填上，让 4 个测试任务都能跑通。
+打开 `demo_09_mini_agent.py`（已经准备好的填空骨架），把里面 4 个 `TODO` 填上，让 4 个测试任务都能跑通。
 
 ### Step 1：填空骨架（30min）
 
@@ -222,8 +222,8 @@ python mini_agent.py > run_log.txt 2>&1
 
 ## 参考资产（仅卡住时参考）
 
-- [`demos/demo_08_tool_registry.py`](./demos/demo_08_tool_registry.py) —— ToolRegistry 参考实现
-- [`demos/demo_09_mini_agent.py`](./demos/demo_09_mini_agent.py) —— 完整 Agent Loop
+- [`demo_08_tool_registry.py`](./demo_08_tool_registry.py) —— ToolRegistry 参考实现
+- [`demo_09_mini_agent.py`](./demo_09_mini_agent.py) —— 完整 Agent Loop
 - [`examples/04-my-agent/tools/tools.py`](../../examples/04-my-agent/tools/tools.py) —— 工程级 ToolRegistry（含 Tool 基类、装饰器/类双注册）
 - [`examples/04-my-agent/agent/agent.py`](../../examples/04-my-agent/agent/agent.py) —— SimpleAgent / ReActAgent 主循环
 

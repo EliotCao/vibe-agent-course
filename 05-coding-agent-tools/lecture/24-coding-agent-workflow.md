@@ -64,7 +64,7 @@
 ⑤ bash("python main.py") → 看到 "=== 开场 === \\n hello"
 ```
 
-跑一遍 [`demo_24_five_stages.py`](../lab/demos/demo_24_five_stages.py)，**手动**走一遍这 5 步，你能直观感受到工具输出之间的依赖关系。
+跑一遍 [`demo_24_five_stages.py`](../lab/demo_24_five_stages.py)，**手动**走一遍这 5 步，你能直观感受到工具输出之间的依赖关系。
 
 ## 工具的"输入"通常依赖前一个工具的"输出"
 
