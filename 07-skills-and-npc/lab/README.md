@@ -1,4 +1,4 @@
-# Day7 · 实操指南
+# 第7章 · 实操指南
 
 > **核心任务**：Part1 给 Agent 加 Skills 扩展系统；Part2 把 Agent 打包成 Docker 镜像挂到仓库做 NPC。
 
@@ -83,7 +83,7 @@ docker run --rm my-agent:latest --help
 
 ```bash
 git add .
-git commit -m "day7: add skills + npc deployment"
+git commit -m "ch7: add skills + npc deployment"
 git push
 ```
 

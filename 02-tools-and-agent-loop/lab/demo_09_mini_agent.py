@@ -217,5 +217,5 @@ if __name__ == "__main__":
     print()
     print("  注意：整个 Loop 主体不到 50 行，但这就是 Cursor / Claude Code")
     print("        每次帮你写代码时跑的同一个循环。复杂的不是循环本身，")
-    print("        而是工具集（Day5）、上下文管理（Day4）、UI（Day6）。")
+    print("        而是工具集（第5章）、上下文管理（第4章）、UI（第6章）。")
     print("=" * 60)

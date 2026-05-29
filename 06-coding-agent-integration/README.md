@@ -1,6 +1,6 @@
-# Day 6 · 整合：完整 Coding Agent
+# 第 6 章 · 整合：完整 Coding Agent
 
-> 本章目标：把 Day1-Day5 的零件拼装成完整的 Coding Agent。
+> 本章目标：把第1章-第5章的零件拼装成完整的 Coding Agent。
 > 产出：`my-agent/main.py` — 一个能跑通真实任务的 Agent。
 
 ## 你将学到
@@ -24,7 +24,7 @@ python demo_30_integration_walkthrough.py
 python demo_31_three_tasks.py
 ```
 
-## 今日产出
+## 本章产出
 
 打开 [`my-agent/main.py`](../my-agent/main.py)，把所有模块接好，跑通：
 

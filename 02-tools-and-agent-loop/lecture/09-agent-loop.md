@@ -58,7 +58,7 @@ client.chat.completions.create(
 )
 ```
 
-LLM 是无状态的（Day1 第 2 节讲过）。每一轮你都要把**之前所有消息**都传回去：
+LLM 是无状态的（第1章第 2 节讲过）。每一轮你都要把**之前所有消息**都传回去：
 
 ```
 第 1 轮 messages: [system, user]
@@ -67,7 +67,7 @@ LLM 是无状态的（Day1 第 2 节讲过）。每一轮你都要把**之前所
 ...
 ```
 
-这就是为什么 **Day4 必须做上下文管理**——不然 messages 列表会无限膨胀。
+这就是为什么 **第4章必须做上下文管理**——不然 messages 列表会无限膨胀。
 
 ### 核心点 2：用 `tool_calls` 当循环的"红绿灯"
 
@@ -134,11 +134,11 @@ return "⚠️ 达到最大轮次"
 | 工具异常兜底 | `try/except` 把错误转成字符串塞回 messages |
 | 同一工具同样参数连续调用 N 次就停 | 进阶：基于历史去重 |
 
-第 1 / 2 个今天必须有，第 3 个 Day3 / Day6 再加。
+第 1 / 2 个本章必须有，第 3 个第3章 / 第6章再加。
 
 ## 跟 demo_06 的"hand-rolled 版"对比
 
-Day1 末尾的那种"让模型输出 JSON 再 parse"的写法（demo_06 也演示了），跟今天的 `tool_calls` 写法对比：
+第1章末尾的那种"让模型输出 JSON 再 parse"的写法（demo_06 也演示了），跟本章的 `tool_calls` 写法对比：
 
 | 维度 | hand-rolled JSON | OpenAI tool_calls |
 |---|---|---|
@@ -147,7 +147,7 @@ Day1 末尾的那种"让模型输出 JSON 再 parse"的写法（demo_06 也演�
 | 多工具并行 | 自己手写解析 | 协议原生支持 |
 | 工业标准 | 没有 | OpenAI / Anthropic / Google 都兼容 |
 
-> 但 hand-rolled 那种写法**不是没用**——Day3 ReAct 范式还是得这么写，演示给你看为什么"输出格式靠 prompt 约定"是 Function Calling 出来之前的老 paradigm。
+> 但 hand-rolled 那种写法**不是没用**——第3章 ReAct 范式还是得这么写，演示给你看为什么"输出格式靠 prompt 约定"是 Function Calling 出来之前的老 paradigm。
 
 ## 还有什么不在循环里？
 
@@ -155,12 +155,12 @@ Day1 末尾的那种"让模型输出 JSON 再 parse"的写法（demo_06 也演�
 
 | 不做的事 | 何时做 |
 |---|---|
-| 上下文压缩（messages 太长怎么办） | Day4 |
-| Memory（跨会话持久化） | Day4 |
-| 多 Agent 协作 / 思考范式 | Day3 |
-| Coding 专用工具集（read/write/edit/grep） | Day5 |
-| REPL / 流式输出 / 漂亮的终端 UI | Day6 |
-| Skills 系统 | Day7 |
+| 上下文压缩（messages 太长怎么办） | 第4章 |
+| Memory（跨会话持久化） | 第4章 |
+| 多 Agent 协作 / 思考范式 | 第3章 |
+| Coding 专用工具集（read/write/edit/grep） | 第5章 |
+| REPL / 流式输出 / 漂亮的终端 UI | 第6章 |
+| Skills 系统 | 第7章 |
 
 **今天只做循环。**这是 Agent 的骨架，先有骨架，剩下 6 天再往上长肉。
 

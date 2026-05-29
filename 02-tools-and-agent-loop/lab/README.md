@@ -1,4 +1,4 @@
-# Day 2 · 实操：从零搭出最小 Agent Loop
+# 第 2 章 · 实操：从零搭出最小 Agent Loop
 
 > 130 分钟 · 实操（第 10 节 + 第 11 节）
 
@@ -41,7 +41,7 @@ mkdir 02-checkpoint
 cd 02-checkpoint
 ```
 
-### A.2 复用 Day1 已经装好的环境
+### A.2 复用第1章已经装好的环境
 
 ```bash
 # 在仓库根目录
@@ -49,7 +49,7 @@ uv sync --all-packages
 # 或者用 01 那套独立 venv 也行
 ```
 
-### A.3 准备 .env（同 Day1）
+### A.3 准备 .env（同第1章）
 
 ```bash
 BASE_URL=<你的 API 地址>
@@ -186,7 +186,7 @@ python mini_agent.py > run_log.txt 2>&1
 - 模型连续调好几轮，每次都失败
 - 模型最后被 max_iters 截断
 
-**记录你的 Agent 在这个任务上的反应**，这是 Day2 Checkpoint 必交的内容。
+**记录你的 Agent 在这个任务上的反应**，这是第2章 Checkpoint 必交的内容。
 
 ---
 
@@ -208,7 +208,7 @@ python mini_agent.py > run_log.txt 2>&1
 - 你在写 ToolRegistry 时**最容易忘**的细节是什么？
 - 在 mini_agent.py 的 4 个 TODO 里，你**写错过的**是哪个？错在哪？
 - 任务 4 你的 Agent 是怎么反应的？合理吗？怎么让它更好？
-- 一个明天 Day3 你想看到的东西
+- 一个下一章（第3章）你想看到的东西
 
 ---
 
@@ -227,4 +227,4 @@ python mini_agent.py > run_log.txt 2>&1
 - [`examples/04-my-agent/tools/tools.py`](../../examples/04-my-agent/tools/tools.py) —— 工程级 ToolRegistry（含 Tool 基类、装饰器/类双注册）
 - [`examples/04-my-agent/agent/agent.py`](../../examples/04-my-agent/agent/agent.py) —— SimpleAgent / ReActAgent 主循环
 
-> 注意：ch04 的 ToolRegistry 比今天教的复杂得多（Tool 基类 / 双注册路径 / 工具描述自动注入 prompt）。**今天先掌握极简版，Day5 / Day6 会逐步迭代到 ch04 的复杂度。**
+> 注意：ch04 的 ToolRegistry 比本章教的复杂得多（Tool 基类 / 双注册路径 / 工具描述自动注入 prompt）。**本章先掌握极简版，第5章 / 第6章会逐步迭代到 ch04 的复杂度。**

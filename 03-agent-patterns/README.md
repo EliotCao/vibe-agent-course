@@ -1,4 +1,4 @@
-# Day 3 · Agent 范式
+# 第 3 章 · Agent 范式
 
 > 本章目标：理解三种主流 Agent 思考模式，实现 Agent 主循环。
 > 产出：`my-agent/agent.py` — 你的 Agent 类。
@@ -27,7 +27,7 @@ python demo_13_plan_and_solve.py
 python demo_14_reflection.py
 ```
 
-## 今日产出
+## 本章产出
 
 补全 [`my-agent/agent.py`](../my-agent/agent.py) 中的 `Agent` 类，让测试通过：
 

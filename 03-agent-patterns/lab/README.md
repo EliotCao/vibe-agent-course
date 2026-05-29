@@ -1,4 +1,4 @@
-# Day 3 · 实操：实现并对比三种 Agent 范式
+# 第 3 章 · 实操：实现并对比三种 Agent 范式
 
 > 130 分钟 · 实操（第 15-17 节）
 
@@ -9,7 +9,7 @@
 - `demo_13_plan_and_solve.py` —— Plan-and-Solve（Planner + Executor + Aggregator）
 - `demo_14_reflection.py` —— Reflection（包装在 Plan-and-Solve 外面）
 
-并且**复用 Day2 的 ToolRegistry**（已经在 `toy_agent_base.py` 内置了一份）。
+并且**复用第2章的 ToolRegistry**（已经在 `toy_agent_base.py` 内置了一份）。
 
 ## 时间分配
 
@@ -112,16 +112,16 @@ ls -la
 |---|---|---|
 | ① 写 `PLANNER_PROMPT` | 中 | 强约束 JSON 数组输出 |
 | ② 解析 Planner 输出 | 中 | 处理 ` ```json ``` ` 包裹 |
-| ③ 写 `execute_step` | 高 | **复用 Day2 的最小 Agent Loop**（你的代码） |
+| ③ 写 `execute_step` | 高 | **复用第2章的最小 Agent Loop**（你的代码） |
 | ④ 写 `aggregate` | 低 | 拼一段 prompt 让 LLM 汇总 |
 
 ### 关键提示
 
 **TODO ③ 是今天最大的"零件复用"点**：
 
-`execute_step()` 内部就是 Day2 你写的 `mini_agent.py` 的核心循环。把 Day2 那部分代码**搬过来**，加一个 system prompt 说"你正在执行子任务"，user prompt 把"前序结果 + 本步任务"拼上即可。
+`execute_step()` 内部就是第2章你写的 `mini_agent.py` 的核心循环。把第2章那部分代码**搬过来**，加一个 system prompt 说"你正在执行子任务"，user prompt 把"前序结果 + 本步任务"拼上即可。
 
-如果 Day2 的代码丢了，参考 [`demo_13_plan_and_solve.py`](./demo_13_plan_and_solve.py) 的 `execute_step` 函数（30 行内）。
+如果第2章的代码丢了，参考 [`demo_13_plan_and_solve.py`](./demo_13_plan_and_solve.py) 的 `execute_step` 函数（30 行内）。
 
 ### 跑通 5 个任务后观察
 
@@ -205,8 +205,8 @@ ls -la
 必须包含：
 - 你跑 5 个任务时，**哪个范式让你最意外**？为什么？
 - ReAct 的正则解析在哪个任务上崩了？怎么修的？
-- 如果让你重新设计 Day3 的"5 个测试任务"，你会换掉哪个，加什么？
-- 一个明天 Day4 你想看到的东西
+- 如果让你重新设计第3章的"5 个测试任务"，你会换掉哪个，加什么？
+- 一个下一章（第4章）你想看到的东西
 
 ---
 
@@ -215,7 +215,7 @@ ls -la
 - [ ] `agent_react.py` 的 prompt 有 Thought + Action 的明确格式约束
 - [ ] `agent_react.py` 的解析有处理 `Action:` 后面还有 Observation 的情况
 - [ ] `agent_plan_solve.py` 的 Planner 输出是真的 JSON 数组（不是字符串拼凑）
-- [ ] `agent_plan_solve.py` 的 Executor 真的复用了 Day2 那套 tool_calls 循环（不是 ReAct 字符串解析）
+- [ ] `agent_plan_solve.py` 的 Executor 真的复用了第2章那套 tool_calls 循环（不是 ReAct 字符串解析）
 - [ ] `agent_reflection.py` 至少跑一次 review 给出过 NEEDS_REVISION
 - [ ] `comparison.md` 含 5 个任务的三栏对比，**且写出了"一个意外发现"**
 

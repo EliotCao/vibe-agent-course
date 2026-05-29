@@ -8,7 +8,7 @@ Demo 05 · LLM + 外部支持：从"不知道"到"知道"
   ① 手动把外部知识塞进 prompt（最朴素的 RAG）
   ② 真正的 Function Calling：让模型自己决定调工具
 
-直观感受"为什么需要 Day2 的工具系统"。
+直观感受"为什么需要 第2章 的工具系统"。
 
 跑法：
     python demo_05_with_tool.py
@@ -84,9 +84,9 @@ def exp_internal_knowledge() -> None:
 
 # ---------- 实验 2：真正的 Function Calling（预告） ----------
 def exp_real_tool_call() -> None:
-    """最简 Function Calling：让模型自己决定调工具。Day2 会展开讲。"""
+    """最简 Function Calling：让模型自己决定调工具。第2章 会展开讲。"""
     print("\n\n" + "=" * 60)
-    print("【实验 2：真正的 Function Calling（Day2 预告）】")
+    print("【实验 2：真正的 Function Calling（第2章 预告）】")
     print("=" * 60)
     print("上面是'人工拼 prompt'。下面让模型**自己决定**要不要调工具：\n")
 
@@ -142,7 +142,7 @@ def exp_real_tool_call() -> None:
         print(f"模型直接回答（没调工具）: {msg.content}")
 
     print("\n💡 区别：这次不是我们手动塞结果，而是模型自主决定'我需要调工具'。")
-    print("   Day2 会完整讲解这个协议的每一条消息。")
+    print("   第2章 会完整讲解这个协议的每一条消息。")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-# Day 4 · 实操：ContextManager + Memory + Agent v2
+# 第 4 章 · 实操：ContextManager + Memory + Agent v2
 
 > 130 分钟 · 实操（第 21-23 节）
 
@@ -10,7 +10,7 @@
 - `demo_20_memory.py` —— Memory 实现 + 向量检索
 - `demo_21_agent_v2.py` —— 三件事拼起来
 
-并且复用 Day2 / Day3 的 ToolRegistry + Agent Loop（不用重写）。
+并且复用第2章 / 第3章的 ToolRegistry + Agent Loop（不用重写）。
 
 ## 时间分配
 
@@ -21,14 +21,14 @@
 | C | 50min | Part 2：填空 `memory.py`（embedding + 余弦） |
 | D | 25min | Part 3：填空 `agent_v2.py`，跑对比报告 |
 
-## 当日产物
+## 本章产物
 
 ```
 04-checkpoint/
 ├── context_manager.py     # 你填空补完的 ContextManager
 ├── memory.py              # 你填空补完的 Memory
 ├── agent_v2.py            # 把上面两个接到 Agent v2
-├── comparison.md          # Day3 vs Day4 同任务的 token 消耗对比
+├── comparison.md          # 第3章 vs 第4章同任务的 token 消耗对比
 └── reflection.md          # 100-200 字反思
 ```
 
@@ -143,7 +143,7 @@ python demo_18_context_explosion.py
 | 时间 | 干什么 |
 |---|---|
 | 0-10min | 填空 `agent_v2.py`（2 个 TODO） |
-| 10-20min | 跑对比测试：Day3 朴素 Agent vs Day4 v2 跑同 12 轮 |
+| 10-20min | 跑对比测试：第3章朴素 Agent vs 第4章 v2 跑同 12 轮 |
 | 20-25min | 写 `comparison.md` |
 
 ### Agent v2 填空（10min）
@@ -157,14 +157,14 @@ python demo_18_context_explosion.py
 
 ### 跑对比（10min）
 
-跑你的 `agent_v2.py`，记录每一轮的 prompt_tokens；同时跑 Day3 朴素 Agent 跑同样 12 轮。
+跑你的 `agent_v2.py`，记录每一轮的 prompt_tokens；同时跑第3章朴素 Agent 跑同样 12 轮。
 
-> **没有 Day3 朴素 Agent 怎么办？** 简单做法：把你的 v2 的 `chat()` 里"召回 / 压缩 / 提炼"全注释掉，就是 Day3 版。
+> **没有第3章朴素 Agent 怎么办？** 简单做法：把你的 v2 的 `chat()` 里"召回 / 压缩 / 提炼"全注释掉，就是第3章版。
 
 ### comparison.md 模板
 
 ```markdown
-# Day3 vs Day4 同任务 token 对比
+# 第3章 vs 第4章同任务 token 对比
 
 ## 任务
 
@@ -172,7 +172,7 @@ python demo_18_context_explosion.py
 
 ## 数据
 
-| 轮次 | Day3 prompt_tokens | Day4 v2 prompt_tokens | 节省 |
+| 轮次 | 第3章 prompt_tokens | 第4章 v2 prompt_tokens | 节省 |
 |---|---|---|---|
 | 1 | ... | ... | ... |
 | 2 | ... | ... | ... |
@@ -183,7 +183,7 @@ python demo_18_context_explosion.py
 
 1. v2 在第 ___ 轮触发了第一次压缩
 2. 召回事实在第 ___ 轮起作用（注入了"过敏"或"预算"事实）
-3. Day3 在第 ___ 轮起 prompt 长度超过了 v2
+3. 第3章在第 ___ 轮起 prompt 长度超过了 v2
 
 ## 一个意外发现
 
@@ -209,7 +209,7 @@ ___（你跑出来的，最让你意外的一件事）___
 - ContextManager 的"分层策略"实现里，**最难写的是哪一段**？
 - 你的 Memory 在 5 个测试事实 + 4 个查询里，有哪一对没有正确召回？为什么？
 - 跑 v2 的 12 轮任务时，Memory 召回最让你意外的一次是哪个？
-- 一个明天 Day5 你想看到的东西
+- 一个下一章（第5章）你想看到的东西
 
 ---
 
@@ -220,7 +220,7 @@ ___（你跑出来的，最让你意外的一件事）___
 - [ ] `memory.py` 的 embed 返回类型是 `np.ndarray`，不是 `list`
 - [ ] `cosine` 处理了零向量边界（除 0 不会崩）
 - [ ] `agent_v2.py` 的 `chat()` 真的同时做了"召回 + 压缩"两件事
-- [ ] `comparison.md` 含 Day3 vs Day4 的真实数据，不是凭空编
+- [ ] `comparison.md` 含第3章 vs 第4章的真实数据，不是凭空编
 
 ---
 

@@ -1,4 +1,4 @@
-"""edit_file 工具 — Day5 实现。"""
+"""edit_file 工具 — 第5章实现。"""
 
 
 def edit_file(file_path: str, old_content: str, new_content: str) -> str:

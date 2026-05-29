@@ -1,6 +1,6 @@
-"""ContextManager：分层策略 + 关键事实抽取（来自 Day4）。
+"""ContextManager：分层策略 + 关键事实抽取（来自 第4章）。
 
-把 Day4 demo_19 的 strategy_hierarchical 包成一个类。
+把 第4章 demo_19 的 strategy_hierarchical 包成一个类。
 跟 Memory 的区别再强调一遍：
 - ContextManager：管"本次对话的 messages"（短期工作记忆）
 - Memory：管"跨会话持久化事实"（长期记忆）

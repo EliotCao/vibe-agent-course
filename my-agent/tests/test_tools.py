@@ -1,4 +1,4 @@
-"""Day2 测试：ToolRegistry"""
+"""第2章 测试：ToolRegistry"""
 
 import sys
 import os
@@ -85,4 +85,4 @@ if __name__ == "__main__":
     print("  ✓ test_invoke_error_handling")
     test_multiple_tools()
     print("  ✓ test_multiple_tools")
-    print("\n✅ Day2 ToolRegistry 全部测试通过")
+    print("\n✅ 第2章 ToolRegistry 全部测试通过")

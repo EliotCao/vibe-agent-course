@@ -1,4 +1,4 @@
-"""list_dir 工具 — Day5 实现。"""
+"""list_dir 工具 — 第5章实现。"""
 
 import os
 

@@ -1,11 +1,11 @@
-"""CodingAgent：把 Day1-Day5 的 6 个零件组装起来。
+"""CodingAgent：把 第1章-第5章 的 6 个零件组装起来。
 
 数据流（讲义第 28 节）：
     user_input
         → Memory.search           召回长期事实
         → ContextManager.compress 必要时压缩 messages
-        → LLM.chat                Day1+Day2 协议
-        → ToolRegistry.invoke     Day5 工具
+        → LLM.chat                第1章+第2章 协议
+        → ToolRegistry.invoke     第5章 工具
         → 回灌到 messages
         → 给最终回答
         → Memory.distill          提炼新事实写回（可选）
@@ -136,7 +136,7 @@ class CodingAgent:
                 print(f"  \u2699\ufe0f  消息超过 {self.ctx.max_messages} 条，触发压缩")
             self.messages = self.ctx.compress(self.messages)
 
-        # 4) Agent Loop（Day2 第 9 节）
+        # 4) Agent Loop（第2章 第 9 节）
         for turn in range(1, self.max_tool_rounds + 1):
             resp: Message = self.llm.chat(
                 messages=self.messages,

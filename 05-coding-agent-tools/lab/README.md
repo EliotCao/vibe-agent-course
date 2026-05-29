@@ -1,4 +1,4 @@
-# Day 5 · 实操：写 5 个 Coding Agent 必备工具
+# 第 5 章 · 实操：写 5 个 Coding Agent 必备工具
 
 > 130 分钟 · 实操（第 26-27 节）
 
@@ -19,7 +19,7 @@
 | C | 60min | Part 2：实现写类工具 write / edit / bash |
 | D | 5min | Git 速通 5 个命令把代码 push 到 CNB |
 
-## 当日产物
+## 本章产物
 
 ```
 05-checkpoint/
@@ -33,7 +33,7 @@
 └── reflection.md         # 100-200 字反思
 ```
 
-> **不要求每个工具单测**——Day6 任务 2 会让你"让自己写的 Agent 给这些工具补单测"。
+> **不要求每个工具单测**——第6章任务 2 会让你"让自己写的 Agent 给这些工具补单测"。
 
 > **选做**：在 coding_tools/ 下再加 `glob.py` / `grep.py` / `todo.py` / `webfetch.py`（详见 exercises）。
 
@@ -145,7 +145,7 @@ git remote add origin git@cnb.cool:<owner>/<repo>.git
 
 # 2) 提交
 git add coding_tools/ reflection.md
-git commit -m "Day5: 5 个 coding agent 工具"
+git commit -m "ch5: 5 个 coding agent 工具"
 
 # 3) 推送到主分支（第一次加 -u）
 git push -u origin main
@@ -185,7 +185,7 @@ git push origin 05-tools
 1. 写 edit 的"唯一性约束"时，你想到了哪个具体的"如果不加这个约束会翻车"的场景？
 2. bash 的危险命令拦截，你的黑名单覆盖了几个？还有什么容易被绕过？
 3. 如果只能保留 3 个工具，你会选哪 3 个？为什么？
-4. 一个明天 Day6 你想看到的东西
+4. 一个下一章（第6章）你想看到的东西
 
 ---
 
@@ -209,4 +209,4 @@ git push origin 05-tools
 | 想看工具被 LLM 真调用 | `demo_26_end_to_end.py` |
 | 想看工程级实现 | [`examples/04-my-agent/tools/impl/`](../../examples/04-my-agent/tools/impl/) |
 
-> tip：[`examples/04-my-agent/tools/impl/edit.py`](../../examples/04-my-agent/tools/impl/edit.py) 是基于 `Tool` 基类的 OOP 写法，**比今天的函数式更工程化**——看一眼，Day6 整合时知道往哪个方向迭代。
+> tip：[`examples/04-my-agent/tools/impl/edit.py`](../../examples/04-my-agent/tools/impl/edit.py) 是基于 `Tool` 基类的 OOP 写法，**比本章的函数式更工程化**——看一眼，第6章整合时知道往哪个方向迭代。

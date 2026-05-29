@@ -1,8 +1,8 @@
 """
-Day6：组装完整 Agent
+第6章：组装完整 Agent
 =====================
 
-把 Day1-Day5 的零件拼起来，跑通一个真任务。
+把 第1章-第5章 的零件拼起来，跑通一个真任务。
 """
 
 from llm import LLMClient
@@ -35,8 +35,8 @@ def main():
         llm=llm,
         tools=tools,
         system_prompt=SYSTEM_PROMPT,
-        # context_manager=context,  # Day6 接入
-        # memory=mem,               # Day6 接入
+        # context_manager=context,  # 第6章 接入
+        # memory=mem,               # 第6章 接入
     )
 
     # 交互式 REPL

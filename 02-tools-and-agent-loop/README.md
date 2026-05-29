@@ -1,4 +1,4 @@
-# Day 2 · Function Calling 与最小 Agent
+# 第 2 章 · Function Calling 与最小 Agent
 
 > 本章目标：理解工具调用协议，实现 ToolRegistry，搭出最小 Agent Loop。
 > 产出：`my-agent/tools.py` — 你的 ToolRegistry 类。
@@ -29,7 +29,7 @@ python demo_08_tool_registry.py
 python demo_09_mini_agent.py
 ```
 
-## 今日产出
+## 本章产出
 
 补全 [`my-agent/tools.py`](../my-agent/tools.py) 中的 `ToolRegistry` 类，让测试通过：
 

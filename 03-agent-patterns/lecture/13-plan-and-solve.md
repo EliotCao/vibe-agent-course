@@ -35,7 +35,7 @@
 
 3 个角色：
 - **Planner**：一次 LLM 调用，输出一个步骤数组（通常要求 JSON 格式）
-- **Executor**：每个步骤一次小循环（可以复用 Day2 的最小 Agent Loop）
+- **Executor**：每个步骤一次小循环（可以复用第2章的最小 Agent Loop）
 - **Aggregator**：一次 LLM 调用，把所有步骤结果汇总成最终答案
 
 ## 跟 ReAct 的核心区别

@@ -62,7 +62,7 @@ def main() -> None:
     result = edit(
         os.path.join(workspace, "main.py"),
         old_content="def greet():\n    print('hello')",
-        new_content="def greet():\n    print('=== Day5 Demo ===')\n    print('hello')",
+        new_content="def greet():\n    print('=== Demo ===')\n    print('hello')",
     )
     print(result)
 
@@ -88,7 +88,7 @@ def main() -> None:
     print("     - list 输出 → 决定 read 哪个文件")
     print("     - read 输出 → 决定 edit 改哪一段")
     print("     - bash 输出 → 决定要不要再修一轮")
-    print("  ③ 把上面整段流程喂给 LLM + tool_calls 协议，就成了 Day6 的真 Agent")
+    print("  ③ 把上面整段流程喂给 LLM + tool_calls 协议，就成了 第6章 的真 Agent")
 
     # 清理
     shutil.rmtree(workspace)

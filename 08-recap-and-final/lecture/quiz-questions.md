@@ -1,11 +1,11 @@
 # 回顾提问题库
 
-> 随机提问用。难度适中，覆盖 Day1-Day7 所有核心知识点。
+> 随机提问用。难度适中，覆盖第1章-第7章所有核心知识点。
 > 建议打乱顺序随机抽，每题限时 30 秒回答。
 
 ---
 
-## Day1 · LLM 基础（5 题）
+## 第1章 · LLM 基础（5 题）
 
 **Q1.** LLM 生成文字的核心原理是什么？用一句话描述。
 > 参考答案：给定前面的 token 序列，预测下一个 token 的概率分布，然后从中采样。
@@ -24,7 +24,7 @@
 
 ---
 
-## Day2 · Function Calling 与 Agent Loop（5 题）
+## 第2章 · Function Calling 与 Agent Loop（5 题）
 
 **Q6.** Agent 和 Chatbot 最本质的区别是什么？
 > 参考答案：Agent 有循环——能调工具、看结果、根据结果决定下一步，直到任务完成。Chatbot 只能一问一答。
@@ -43,7 +43,7 @@
 
 ---
 
-## Day3 · Agent 范式（5 题）
+## 第3章 · Agent 范式（5 题）
 
 **Q11.** ReAct 的三个步骤叫什么？
 > 参考答案：Thought（思考）→ Action（行动 / 调工具）→ Observation（观察结果），然后循环。
@@ -62,7 +62,7 @@
 
 ---
 
-## Day4 · Context 与 Memory（5 题）
+## 第4章 · Context 与 Memory（5 题）
 
 **Q16.** 为什么不把所有对话历史都保留在 messages 里？
 > 参考答案：① token 贵，30 轮对话可能上万 token ② 超过窗口会报错 ③ "Lost in the Middle"——模型对中间内容注意力下降。
@@ -81,7 +81,7 @@
 
 ---
 
-## Day5 · Coding Agent 工具（5 题）
+## 第5章 · Coding Agent 工具（5 题）
 
 **Q21.** Coding Agent 的五阶段工作流是什么？
 > 参考答案：浏览（list_dir）→ 定位（grep/glob）→ 理解（read）→ 修改（write/edit）→ 验证（bash）。
@@ -100,7 +100,7 @@
 
 ---
 
-## Day6-7 · 整合与上线（5 题）
+## 第6-7章 · 整合与上线（5 题）
 
 **Q26.** CodingAgent 的 chat 方法主要做哪几步？
 > 参考答案：① Memory 召回相关事实 ② 加 user 消息 ③ 必要时 Context 压缩 ④ Agent Loop（调 LLM → 看 tool_calls → 执行 → 回灌）⑤ 结束时 distill 提炼记忆。

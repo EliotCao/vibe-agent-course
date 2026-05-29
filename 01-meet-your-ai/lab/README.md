@@ -1,4 +1,4 @@
-# Day 1 · 实操：综合 LLM 客户端
+# 第 1 章 · 实操：综合 LLM 客户端
 
 > 80 分钟 · 实操（第 6 节，理论 5 节后的总实操）
 
@@ -53,7 +53,7 @@ API_KEY=<你的 API Key>
 MODEL_ID=<使用的模型 ID>
 ```
 
-> ⚠️ `.env` **绝对不能提交到 Git**。Day5 会展开讲。
+> ⚠️ `.env` **绝对不能提交到 Git**。第5章会展开讲。
 
 ### A.3 验证
 
@@ -146,7 +146,7 @@ def stream_chat(messages):
 
 def main():
     global total_tokens
-    print(f"[Day1 LLM REPL] system: {messages[0]['content']}")
+    print(f"[Ch1 LLM REPL] system: {messages[0]['content']}")
     print("命令：/system <prompt>  /reset  exit\n")
 
     while True:
@@ -314,10 +314,10 @@ if __name__ == "__main__":
 ### 反思要求
 
 `reflection.md` 必须包含：
-- Day1 五节里你觉得最反常识的一点
+- 第1章五节里你觉得最反常识的一点
 - 你跑 demo_04 时哪个案例最离谱
 - 你最有把握/最没把握的概念
-- 一个明天 Day2 你想看到的东西
+- 一个下一章（第2章）你想看到的东西
 
 ---
 

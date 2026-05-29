@@ -181,7 +181,7 @@ if __name__ == "__main__":
     print("              else: break")
     print("            就这十行循环，让 LLM 有了'手脚'")
     print()
-    print("  下一步：Day2 后面几节会把这个循环做得更工程化——")
+    print("  下一步：第2章 后面几节会把这个循环做得更工程化——")
     print("    07. 用 OpenAI 官方 tool_calls 协议替代手写 JSON")
     print("    08. 用 ToolRegistry 自动从函数生成 schema")
     print("    09. 把循环的边界条件、错误处理写规范")

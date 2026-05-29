@@ -1,5 +1,5 @@
 """
-Day 5 工具集集合：把 5 个必做 + 1 个选做工具注册到 ToolRegistry
+第5章工具集集合：把 5 个必做 + 1 个选做工具注册到 ToolRegistry
 
 用法：
     from coding_tools import build_registry
@@ -20,7 +20,7 @@ from .grep import grep
 
 
 # ============================================================
-# 极简 ToolRegistry（来自 Day2，方便 Day5 demo 自洽运行）
+# 极简 ToolRegistry（来自 第2章，方便 第5章 demo 自洽运行）
 # ============================================================
 _TYPE_MAP = {str: "string", int: "integer", float: "number", bool: "boolean"}
 
@@ -83,7 +83,7 @@ class ToolRegistry:
 # 默认注册：5 个必做 + 1 个选做（grep）
 # ============================================================
 def build_registry() -> ToolRegistry:
-    """构造一个包含 Day5 所有工具的 ToolRegistry。"""
+    """构造一个包含 第5章 所有工具的 ToolRegistry。"""
     reg = ToolRegistry()
     reg.register(read, "读取文件内容，返回带行号的文本")
     reg.register(write, "新建文件或覆盖已有文件（已存在文件需 overwrite=True）")

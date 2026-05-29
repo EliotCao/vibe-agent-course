@@ -1,4 +1,4 @@
-"""Day4 测试：ContextManager"""
+"""第4章 测试：ContextManager"""
 
 import sys
 import os
@@ -61,4 +61,4 @@ if __name__ == "__main__":
     print("  ✓ test_should_compress_long")
     test_compress()
     print("  ✓ test_compress")
-    print("\n✅ Day4 ContextManager 全部测试通过")
+    print("\n✅ 第4章 ContextManager 全部测试通过")

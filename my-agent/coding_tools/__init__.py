@@ -1,5 +1,5 @@
 """
-Day5 产出：Coding 工具集
+第5章产出：Coding 工具集
 =========================
 
 在 coding_tools/ 目录下实现 5 个工具函数，然后在这里统一注册到 ToolRegistry。

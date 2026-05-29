@@ -1,4 +1,4 @@
-# Day 5 · Coding Agent 工具集
+# 第 5 章 · Coding Agent 工具集
 
 > 本章目标：实现 Coding Agent 的 5 个核心工具。
 > 产出：`my-agent/coding_tools/` — read / write / edit / list_dir / bash。
@@ -26,7 +26,7 @@ python demo_25_design_philosophy.py
 python demo_26_end_to_end.py
 ```
 
-## 今日产出
+## 本章产出
 
 补全 [`my-agent/coding_tools/`](../my-agent/coding_tools/) 下的 5 个工具文件，让测试通过：
 

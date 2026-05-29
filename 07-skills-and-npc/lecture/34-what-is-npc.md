@@ -8,7 +8,7 @@
 
 ![从本地 Agent 到仓库 NPC](./images/34-local-to-npc.png)
 
-| | Day6 的本地 Agent | Day7 的仓库 NPC |
+| | 第6章的本地 Agent | 第7章的仓库 NPC |
 |---|---|---|
 | 谁在跑 | 你自己的电脑 | 云端容器 |
 | 谁能触发 | 只有你 | 团队任何人（在 Issue/PR 评论里 @） |
@@ -29,13 +29,13 @@
 
 ## NPC 需要什么
 
-| 零件 | 来自哪天 | 作用 |
+| 零件 | 来自哪章 | 作用 |
 |---|---|---|
-| my_coding_agent | Day6 | Agent 本体（处理任务的引擎） |
-| Dockerfile | 今天写 | 把 Agent 打包成 Docker 镜像 |
-| npc-entrypoint.sh | 今天写 | 接收 CNB 事件 → 调 Agent → 回写评论 |
-| .cnb.yml | 今天写 | 告诉 CNB 平台"遇到 NPC 事件就跑这个流水线" |
-| .cnb/settings.yml | 今天写 | 定义 NPC 角色名和描述 |
+| my_coding_agent | 第6章 | Agent 本体（处理任务的引擎） |
+| Dockerfile | 本章写 | 把 Agent 打包成 Docker 镜像 |
+| npc-entrypoint.sh | 本章写 | 接收 CNB 事件 → 调 Agent → 回写评论 |
+| .cnb.yml | 本章写 | 告诉 CNB 平台"遇到 NPC 事件就跑这个流水线" |
+| .cnb/settings.yml | 本章写 | 定义 NPC 角色名和描述 |
 
 ## CNB 平台注入的环境变量
 
@@ -63,4 +63,4 @@ NPC 流水线运行时，CNB 会自动注入这些环境变量：
 - NPC = 仓库里的 AI 角色，@ 它就干活
 - 触发链路：评论 @ → CNB 事件 → 流水线 → Docker 容器 → Agent 处理 → 回写评论
 - 需要 5 个文件配合：Agent + Dockerfile + entrypoint.sh + .cnb.yml + settings.yml
-- 今天后面的 3 节就是依次搞定 Docker + Pipeline + 实操
+- 本章后面的 3 节就是依次搞定 Docker + Pipeline + 实操

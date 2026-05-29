@@ -1,5 +1,5 @@
 """
-Day 5 工具集 · write：写新文件 / 完整覆盖文件
+第5章工具集 · write：写新文件 / 完整覆盖文件
 
 设计要点：
   - **不能用来改已有文件** —— 改用 edit 工具（更精确、不会无意覆盖）
@@ -47,6 +47,6 @@ if __name__ == "__main__":
     tmp = tempfile.mkdtemp()
     p = os.path.join(tmp, "demo/hello.txt")
 
-    print(write(p, "Hello, Day5!"))     # ✅ 创建
+    print(write(p, "Hello, World!"))     # ✅ 创建
     print(write(p, "新内容"))             # ❌ 已存在
     print(write(p, "新内容", overwrite=True))   # ✅ 覆盖

@@ -89,10 +89,10 @@ def main(rounds: int = 30) -> None:
     if len(history_tokens) > 1:
         growth = history_tokens[-1] / history_tokens[0]
         print(f"  - 增长倍率：{growth:.1f}x")
-    print("\n  Day4 后面要解决的问题：")
+    print("\n  第4章 后面要解决的问题：")
     print("    1. 上下文窗口虽然 128K，但不能任由它涨")
     print("    2. token 是按用量计费的，全量塞回去成本飙升")
-    print("    3. Lost in the Middle：长上下文里中间的信息会被忽略（Day1 第 3 节讲过）")
+    print("    3. Lost in the Middle：长上下文里中间的信息会被忽略（第1章 第 3 节讲过）")
 
 
 if __name__ == "__main__":

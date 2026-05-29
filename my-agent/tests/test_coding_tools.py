@@ -1,4 +1,4 @@
-"""Day5 测试：Coding Tools"""
+"""第5章 测试：Coding Tools"""
 
 import sys
 import os
@@ -99,4 +99,4 @@ if __name__ == "__main__":
     print("  ✓ test_list_dir")
     test_bash()
     print("  ✓ test_bash")
-    print("\n✅ Day5 Coding Tools 全部测试通过")
+    print("\n✅ 第5章 Coding Tools 全部测试通过")

@@ -1,4 +1,4 @@
-"""Day3 测试：Agent"""
+"""第3章 测试：Agent"""
 
 import sys
 import os
@@ -55,4 +55,4 @@ if __name__ == "__main__":
     print("  ✓ test_tool_usage")
     test_max_iterations()
     print("  ✓ test_max_iterations")
-    print("\n✅ Day3 Agent 全部测试通过")
+    print("\n✅ 第3章 Agent 全部测试通过")

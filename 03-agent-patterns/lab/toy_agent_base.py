@@ -1,5 +1,5 @@
 """
-Day3 公共基础：极简 ToolRegistry + 5 个测试任务
+第3章 公共基础：极简 ToolRegistry + 5 个测试任务
 
 3 种范式（ReAct / Plan-and-Solve / Reflection）的 demo 都从这里 import。
 保证三个 demo 用的是**同一套工具**，让"横向对比"是 apple-to-apple。
@@ -15,7 +15,7 @@ from _env import get_model_id, make_client
 
 
 # ============================================================
-# 极简 ToolRegistry（来自 Day2 demo_08）
+# 极简 ToolRegistry（来自 第2章 demo_08）
 # ============================================================
 _TYPE_MAP = {str: "string", int: "integer", float: "number", bool: "boolean"}
 

@@ -1,4 +1,4 @@
-"""bash 工具 — Day5 实现。"""
+"""bash 工具 — 第5章实现。"""
 
 import subprocess
 import re

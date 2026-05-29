@@ -42,9 +42,9 @@ ReAct 的精髓不是"多了个 Action 字段"，是 **每一步把 Thought 也�
 
 如果不要 Thought 直接输出 Action（"零步推理"），模型在多步任务上的表现会显著变差。**Thought 是一种 chain-of-thought**，是模型在用文本"思考"。
 
-## 跟 Day2 Function Calling 的对比
+## 跟第2章 Function Calling 的对比
 
-| 维度 | Day2 Function Calling | ReAct |
+| 维度 | 第2章 Function Calling | ReAct |
 |---|---|---|
 | 工具调用怎么表达 | OpenAI 协议字段 `tool_calls` | prompt 里约定的 `Action: ...` 字符串 |
 | 解析方式 | 直接读结构化字段 | 正则解析 |
@@ -56,7 +56,7 @@ ReAct 的精髓不是"多了个 Action 字段"，是 **每一步把 Thought 也�
 - 用 Function Calling **执行**工具（健壮）
 - 用 ReAct 风格 prompt **诱导思考**（让模型在 `assistant.content` 里写 Thought，再发 `tool_calls`）
 
-两者**不是二选一**。Day2 demo 里 system prompt 没要求 Thought，但你也可以加上要求："请先输出一段思考再调工具"。
+两者**不是二选一**。第2章 demo 里 system prompt 没要求 Thought，但你也可以加上要求："请先输出一段思考再调工具"。
 
 ## 为什么 ReAct 至今仍被广泛讨论
 
@@ -116,7 +116,7 @@ python demo_12_react.py
 1. 模型的 Thought 是否合理？
 2. 哪个任务它能正确 Finish？
 3. 哪个任务正则解析翻车了？
-4. 跟 Day2 demo_09 的最小 Agent（用 tool_calls）相比，每步输出的 token 量怎么变化？
+4. 跟第2章 demo_09 的最小 Agent（用 tool_calls）相比，每步输出的 token 量怎么变化？
 
 ## 小结
 

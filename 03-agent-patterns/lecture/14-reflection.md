@@ -51,7 +51,7 @@ def run_with_reflection(question, max_rounds=2):
 ```
 
 **底层 Agent 可以是：**
-- Day2 的最小 Agent Loop
+- 第2章的最小 Agent Loop
 - demo_12 的 ReAct
 - demo_13 的 Plan-and-Solve
 - 甚至一个纯 chatbot（不调工具）
@@ -128,16 +128,16 @@ def solve(task):
     return answer
 ```
 
-## Day2 vs Day3 的关系
+## 第2章 vs 第3章的关系
 
-Day2 教的"最小 Agent Loop（带 tool_calls）"是**底盘**——一个能调工具、能循环的执行引擎。
+第2章教的"最小 Agent Loop（带 tool_calls）"是**底盘**——一个能调工具、能循环的执行引擎。
 
-Day3 三种范式是**装在底盘上的三种"驾驶模式"**：
+第3章三种范式是**装在底盘上的三种"驾驶模式"**：
 - ReAct = 走一步看一步的"巡航模式"
 - Plan-and-Solve = 先 GPS 规划好的"导航模式"
 - Reflection = 终点前再绕一圈检查的"复核模式"
 
-底盘还是 Day2 那个底盘——`tools` + `messages` + `tool_calls` + 循环。不同范式的差别**只在 prompt 怎么写、循环怎么组织**。
+底盘还是第2章那个底盘——`tools` + `messages` + `tool_calls` + 循环。不同范式的差别**只在 prompt 怎么写、循环怎么组织**。
 
 ## 动手试试
 

@@ -1,4 +1,4 @@
-# Day 1 · 认识你的 AI
+# 第 1 章 · 认识你的 AI
 
 > 本章目标：理解 LLM 的工作原理、使用方式和局限性。
 > 产出：`my-agent/llm.py` — 你的 LLMClient 类。
@@ -34,7 +34,7 @@ python demo_04_hallucinate.py    # 主动诱发幻觉
 python demo_05_with_tool.py      # 加工具前后对比 + Function Calling 预告
 ```
 
-## 今日产出
+## 本章产出
 
 补全 [`my-agent/llm.py`](../my-agent/llm.py) 中的 `LLMClient` 类，让测试通过：
 

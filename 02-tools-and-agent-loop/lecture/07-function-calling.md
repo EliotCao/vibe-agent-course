@@ -71,7 +71,7 @@ resp = client.chat.completions.create(
 
 ![一次完整 function calling 涉及 4 种角色的消息](./images/07-message-flow.png)
 
-Day1 我们见过 3 种角色：`system` / `user` / `assistant`。
+第1章我们见过 3 种角色：`system` / `user` / `assistant`。
 Function Calling 多了第 4 种：`tool`。
 
 一次完整调用，`messages` 里至少有 **4 条**消息：
@@ -148,7 +148,7 @@ for tc in resp.choices[0].message.tool_calls:
     result = run_tool(tc.function.name, json.loads(tc.function.arguments))
 ```
 
-两种写法 Day3 还会再做一次正面对比，让你亲眼看到为什么"Function Calling 是行业拐点"。
+两种写法第3章还会再做一次正面对比，让你亲眼看到为什么"Function Calling 是行业拐点"。
 
 ## 动手试试
 

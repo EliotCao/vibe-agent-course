@@ -43,5 +43,5 @@ feat(tools): add grep tool for recursive text search
 
 fix(edit): reject when old_content appears more than once
 
-docs(readme): add Day7 skills section
+docs(readme): add ch7 skills section
 ```

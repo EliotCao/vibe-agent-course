@@ -152,7 +152,7 @@ class ToolRegistry:
             return f"工具 {name} 执行出错: {e}"
 ```
 
-够你今天用了。Day5 我们会把它再扩展（异步执行 / 参数校验 / 工具集分组），但今天**不需要**。
+够你本章用了。第5章我们会把它再扩展（异步执行 / 参数校验 / 工具集分组），但现在**不需要**。
 
 ## 设计上的几个取舍
 
@@ -189,7 +189,7 @@ def invoke(self, name, args):
 
 为什么？因为**工具失败不应该让整个 Agent 崩**。把错误转成字符串塞回 messages，**让模型自己看到错误，自己决定下一步**（重试 / 换参数 / 放弃）。
 
-> 这是 Coding Agent 健壮性的关键 design——你会在 Day5 工具集和 Day6 整合里反复看到。
+> 这是 Coding Agent 健壮性的关键 design——你会在第5章工具集和第6章整合里反复看到。
 
 ## 一些可能的扩展（今天不做）
 
@@ -198,7 +198,7 @@ def invoke(self, name, args):
 - 工具命名空间：`@registry.tool("...", group="git")`
 - pydantic 模型作为参数类型，自动生成嵌套 schema
 
-这些**不是今天必须**的。Day5 / Day6 在真做 Coding Agent 时再加。
+这些**不是本章必须**的。第5章 / 第6章在真做 Coding Agent 时再加。
 
 ## 动手试试
 

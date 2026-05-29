@@ -1,14 +1,14 @@
 """
-Demo 21 · Agent v2：Day3 的 Agent 接上 ContextManager + Memory
+Demo 21 · Agent v2：第3章 的 Agent 接上 ContextManager + Memory
 ==============================================================
 
-把 Day2 / Day3 的最小 Agent Loop 升级成 v2：
+把 第2章 / 第3章 的最小 Agent Loop 升级成 v2：
   ① 每轮调 LLM 前，用 ContextManager 把 messages 压缩到合理长度
   ② 把 Memory 召回的相关长期事实注入到 system
   ③ 对话结束时，用 LLM 提炼"值得记住的事实"写进 Memory
 
 跑一个 30 轮的真实任务，对比：
-  - Day3 朴素 Agent vs Day4 v2 Agent 的 token 消耗
+  - 第3章 朴素 Agent vs 第4章 v2 Agent 的 token 消耗
   - 关键事实（早期透露的过敏 / 预算）有没有保住
 
 跑法：
@@ -148,7 +148,7 @@ class AgentV2:
 
 
 # ============================================================
-# 跑一个 12 轮对话，把 Day1 vs Day4 的 token 消耗对比一下
+# 跑一个 12 轮对话，把 第1章 vs 第4章 的 token 消耗对比一下
 # ============================================================
 def run_comparison() -> None:
     print("=" * 60)
@@ -201,11 +201,11 @@ if __name__ == "__main__":
     run_comparison()
 
     print("\n\n" + "=" * 60)
-    print("🎯 v2 Agent 跟 Day3 朴素版的区别")
+    print("🎯 v2 Agent 跟 第3章 朴素版的区别")
     print("=" * 60)
     print("  ① ContextManager：messages 超过阈值时主动压缩（截断/摘要/分层）")
     print("  ② Memory 召回：每轮用 user_input 检索相关长期事实，注入到 system")
     print("  ③ Memory 提炼：对话结束时用 LLM 提炼新事实，写回 Memory")
     print()
     print("  这三件事加在一起，让你的 Agent 第一次有了'跨会话的记忆'。")
-    print("  下一步（Day5/6）要做的：把这些组件接进真实的 Coding Agent。")
+    print("  下一步（第5章/6）要做的：把这些组件接进真实的 Coding Agent。")

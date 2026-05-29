@@ -4,7 +4,7 @@
 
 ## 目录
 
-| Day | 目录 | 题目 |
+| 章节 | 目录 | 题目 |
 |-----|------|------|
 | 1 | [01-meet-your-ai](./01-meet-your-ai/) | Token 计数 · System Prompt · 幻觉检测 · 流式输出 |
 | 2 | [02-tools-and-agent-loop](./02-tools-and-agent-loop/) | Function Calling 消息流 · ToolRegistry · Agent Loop |

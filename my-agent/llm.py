@@ -1,5 +1,5 @@
 """
-Day1 产出：LLMClient
+第1章产出：LLMClient
 =====================
 
 补全这个类，让 tests/test_llm.py 全部通过。

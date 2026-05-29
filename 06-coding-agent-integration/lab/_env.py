@@ -1,6 +1,6 @@
 """Demo 共用：从环境变量读取 LLM 配置。
 
-跟 Day1-Day5 完全一致——确保整合后行为不变。
+跟 第1章-第5章 完全一致——确保整合后行为不变。
 """
 
 from __future__ import annotations

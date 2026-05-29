@@ -1,4 +1,4 @@
-"""Day1 测试：LLMClient"""
+"""第1章 测试：LLMClient"""
 
 import sys
 import os
@@ -46,4 +46,4 @@ if __name__ == "__main__":
     print("  ✓ test_chat_stream")
     test_count_tokens()
     print("  ✓ test_count_tokens")
-    print("\n✅ Day1 LLMClient 全部测试通过")
+    print("\n✅ 第1章 LLMClient 全部测试通过")

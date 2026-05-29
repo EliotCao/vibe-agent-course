@@ -1,6 +1,6 @@
-# Day 8 · 总结 + 大作业
+# 第 8 章 · 总结 + 大作业
 
-> 最后一天。复盘 7 天链路、对比行业图景、分享交流、布置大作业。
+> 最后一章。复盘 7 章链路、对比行业图景、分享交流、布置大作业。
 
 ## 内容
 
@@ -13,21 +13,21 @@
 ## 复盘路线
 
 ```
-Day1: LLM 是什么 + token + 提示词 + 幻觉
+第1章: LLM 是什么 + token + 提示词 + 幻觉
        ↓
-Day2: Tools + 最小 Agent Loop
+第2章: Tools + 最小 Agent Loop
        ↓
-Day3: 三种范式（ReAct / Plan-and-Solve / Reflection）
+第3章: 三种范式（ReAct / Plan-and-Solve / Reflection）
        ↓
-Day4: Context + Memory
+第4章: Context + Memory
        ↓
-Day5: 5 个 Coding 工具
+第5章: 5 个 Coding 工具
        ↓
-Day6: 整合 → 完整 Agent
+第6章: 整合 → 完整 Agent
        ↓
-Day7: Skills + NPC
+第7章: Skills + NPC
        ↓
-Day8: 你下一步要做什么？
+第8章: 你下一步要做什么？
 ```
 
 ## 大作业

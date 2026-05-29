@@ -1,4 +1,4 @@
-"""write_file 工具 — Day5 实现。"""
+"""write_file 工具 — 第5章实现。"""
 
 import os
 

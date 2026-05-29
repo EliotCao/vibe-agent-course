@@ -1,5 +1,5 @@
 """
-Day 5 工具集 · list_dir：列目录内容
+第5章工具集 · list_dir：列目录内容
 
 注意：函数名叫 list_dir 不叫 list（list 是 Python 内置类型，会撞名）。
 

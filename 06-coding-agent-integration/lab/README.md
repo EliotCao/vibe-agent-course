@@ -1,6 +1,6 @@
-# Day6 · 实操指南
+# 第6章 · 实操指南
 
-> **核心任务**：把 Day1-Day5 写的 6 个零件组装成一个完整的 Coding Agent，然后用它跑 3 个真实任务。
+> **核心任务**：把第1章-第5章写的 6 个零件组装成一个完整的 Coding Agent，然后用它跑 3 个真实任务。
 
 ---
 
@@ -40,9 +40,9 @@ python demo_30_integration_walkthrough.py
 
 | # | 要点 | 参考 |
 |---|------|------|
-| 1 | 实例化 6 个零件 | Day2 ToolRegistry + Day4 ContextManager/Memory + Day5 build_registry |
-| 2 | 从 Memory 召回 → 注入 system 消息 | Day4 demo_20 |
-| 3 | Agent Loop 核心循环 | Day2 demo_09 mini_agent |
+| 1 | 实例化 6 个零件 | 第2章 ToolRegistry + 第4章 ContextManager/Memory + 第5章 build_registry |
+| 2 | 从 Memory 召回 → 注入 system 消息 | 第4章 demo_20 |
+| 3 | Agent Loop 核心循环 | 第2章 demo_09 mini_agent |
 | 4 | 循环结束返回最终回答 | — |
 
 ### 自检清单
@@ -101,7 +101,7 @@ python demo_31_three_tasks.py
 cd ~/vibe-agent-course
 git add 06-coding-agent-integration/lab/my_coding_agent/
 git add 06-coding-agent-integration/comparison.md
-git commit -m "day6: 完成 Coding Agent 整合"
+git commit -m "ch6: 完成 Coding Agent 整合"
 git push
 ```
 

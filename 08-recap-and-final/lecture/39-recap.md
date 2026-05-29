@@ -1,42 +1,42 @@
 # 第 39 节 · 总复盘：从 Token 到 NPC 的全链路
 
-## 一根线串起 7 天
+## 一根线串起 7 章
 
 ```
-Day1 · LLM 本质
+第1章 · LLM 本质
   "给定前面的 token，预测下一个"
   → 概率采样 / 涌现 / 幻觉 / 天生边界
        ↓
-Day2 · 让 LLM 行动
+第2章 · 让 LLM 行动
   "光说不干不是 Agent"
   → Function Calling / ToolRegistry / 最小 Agent Loop
        ↓
-Day3 · 教它怎么想
+第3章 · 教它怎么想
   "不同范式适合不同任务"
   → ReAct（边想边做）/ Plan-and-Solve（先规划再执行）/ Reflection（自我审阅）
        ↓
-Day4 · 让它记住事
+第4章 · 让它记住事
   "对话超过 30 轮就爆窗口"
   → ContextManager（压缩）+ Memory（embedding + cosine 召回）
        ↓
-Day5 · 给它工具箱
+第5章 · 给它工具箱
   "Coding Agent = 五阶段循环 × 安全工具"
   → read / list_dir / write / edit / bash + 设计哲学（old/new / 4 道闸门）
        ↓
-Day6 · 组装
+第6章 · 组装
   "120 行把 6 个零件拼起来"
   → CodingAgent 类 + REPL UI + 3 个真实任务
        ↓
-Day7 · 上线
+第7章 · 上线
   "你的 Agent 变成团队里的 NPC"
   → Skills 热插拔 + Docker 打包 + CNB Pipeline + NPC 回复
 ```
 
 ## 回顾要点
 
-### 每天一个"灵魂问题"
+### 每章一个"灵魂问题"
 
-| 天 | 灵魂问题 | 一句话答案 |
+| 章 | 灵魂问题 | 一句话答案 |
 |---|---|---|
 | 1 | LLM 为什么能写代码？ | 它不"理解"代码，它只是在做 next-token prediction，但规模够大时"涌现"出了编码能力 |
 | 2 | Agent 跟 Chatbot 有什么本质区别？ | Agent 有循环——能调工具、看结果、再调，直到完成任务 |
@@ -53,11 +53,11 @@ Day7 · 上线
 │                    CodingAgent                         │
 ├──────────┬──────────┬──────────┬──────────┬──────────┤
 │   LLM    │  Tools   │ Context  │  Memory  │   UI     │
-│  (Day1)  │ (Day2+5) │  (Day4)  │  (Day4)  │ (Day6)  │
+│ (第1章)  │(第2+5章) │ (第4章)  │ (第4章)  │ (第6章) │
 ├──────────┴──────────┴──────────┴──────────┴──────────┤
-│  Agent Loop (Day2) + 范式 (Day3) + Skills (Day7)     │
+│  Agent Loop (第2章) + 范式 (第3章) + Skills (第7章)   │
 ├──────────────────────────────────────────────────────┤
-│  Docker + CNB Pipeline + NPC (Day7)                   │
+│  Docker + CNB Pipeline + NPC (第7章)                  │
 └───────────────────────────────────────────────────────┘
 ```
 

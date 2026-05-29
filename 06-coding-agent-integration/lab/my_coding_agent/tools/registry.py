@@ -1,6 +1,6 @@
 """ToolRegistry：装饰器注册 + 自动 schema + 按名分发。
 
-跟 Day2 demo_08 的 ToolRegistry 几乎一致，多了一个 `bind_workdir`：
+跟 第2章 demo_08 的 ToolRegistry 几乎一致，多了一个 `bind_workdir`：
 让 bash 工具的 cwd 能被 Agent 锁定到工作区。
 """
 

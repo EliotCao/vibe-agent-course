@@ -1,4 +1,4 @@
-"""read_file 工具 — Day5 实现。"""
+"""read_file 工具 — 第5章实现。"""
 
 
 def read_file(file_path: str, offset: int = 1, limit: int | None = None) -> str:

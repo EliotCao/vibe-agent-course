@@ -1,10 +1,10 @@
-"""Memory：embedding + 余弦相似度的最小向量记忆（来自 Day4）。
+"""Memory：embedding + 余弦相似度的最小向量记忆（来自 第4章）。
 
 整合时新增两件小事：
 - 持久化：save() / load() 到 JSON
 - 阈值过滤：search 默认相似度 > 0.5 才返回
 
-跟 Day4 的 demo_20_memory.py 接口完全兼容。
+跟 第4章 的 demo_20_memory.py 接口完全兼容。
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-# Day 7 · Skills 扩展 + NPC 上线
+# 第 7 章 · Skills 扩展 + NPC 上线
 
 > 本章目标：让你的 Agent 学会领域规范（Skills），并作为 NPC 部署到仓库。
 > 产出：自定义 Skill + 仓库 NPC 能回复。
@@ -26,7 +26,7 @@ cd 07-skills-and-npc/lab
 python demo_33_skills.py
 ```
 
-## 今日产出
+## 本章产出
 
 1. 给你的 Agent 写至少 1 个自定义 Skill（`SKILL.md`）
 2. 用 Docker 打包

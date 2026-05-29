@@ -1,4 +1,4 @@
-# Day 4 · 上下文与记忆
+# 第 4 章 · 上下文与记忆
 
 > 本章目标：解决"聊久了爆炸"和"下次忘了"两个问题。
 > 产出：`my-agent/context.py` + `my-agent/memory.py`。
@@ -29,7 +29,7 @@ python demo_20_memory.py
 python demo_21_agent_v2.py
 ```
 
-## 今日产出
+## 本章产出
 
 补全 [`my-agent/context.py`](../my-agent/context.py) 和 [`my-agent/memory.py`](../my-agent/memory.py)，让测试通过：
 

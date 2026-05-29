@@ -1,4 +1,4 @@
-"""LLM 客户端封装（来自 Day1）。
+"""LLM 客户端封装（来自 第1章）。
 
 把 OpenAI 兼容客户端封装成一个 LLM 类，提供：
 - chat(messages, tools=None, stream=False)：非流式 / 流式两种调用

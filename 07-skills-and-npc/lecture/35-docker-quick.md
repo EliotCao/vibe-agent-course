@@ -8,7 +8,7 @@
 
 ![为什么需要 Docker 打包](./images/35-why-docker.png)
 
-你 Day6 的 Agent 在本地能跑，但：
+你第6章的 Agent 在本地能跑，但：
 - 队友的电脑上 Python 版本不一样 → 跑不起来
 - CNB 流水线要启动你的 Agent → 不知道怎么装依赖
 - 你重装系统后 → 环境没了
@@ -79,11 +79,11 @@ docker run --rm -it --entrypoint bash my-agent:latest
 2. 本地 `docker build -t my-agent:latest .` 构建一次
 3. `docker run --rm my-agent:latest --help` 确认二进制能跑
 
-**不要从零写 Dockerfile**——今天重点是 Skills + NPC，Docker 只是"交通工具"。
+**不要从零写 Dockerfile**——本章重点是 Skills + NPC，Docker 只是"交通工具"。
 
 ## 小结
 
 - Docker = 打包环境的"集装箱"
 - Dockerfile = 构建说明书，两阶段构建让镜像小 5 倍
 - 关键坑：builder 和 runtime 的 glibc 版本必须对齐
-- 今天你只需要改模板里的路径，不需要从零写
+- 本章你只需要改模板里的路径，不需要从零写

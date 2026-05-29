@@ -43,7 +43,7 @@
 修改阶段：write / edit
 验证阶段：bash
 ————————
-扩展阶段：todo / webfetch（选做，Day7 才用）
+扩展阶段：todo / webfetch（选做，第7章才用）
 ```
 
 **今天必做的 5 个**：`list_dir / read / write / edit / bash`。

@@ -13,7 +13,7 @@ Demo 13 · Plan-and-Solve：先规划再执行
   ② Executor：逐个执行每一步，每步可以调工具（用 Function Calling）
   ③ Aggregator：拿到所有步骤的结果，由 LLM 汇总成最终答案
 
-跟 Day2 的最小 Agent Loop 比，多了一个"规划阶段"。
+跟 第2章 的最小 Agent Loop 比，多了一个"规划阶段"。
 跟 demo_12 的 ReAct 比，少了"边走边看"的自由度。
 
 跑法：
@@ -84,7 +84,7 @@ def make_plan(question: str) -> list[str]:
 # Executor：执行单个子任务（用 Function Calling 把活干好）
 # ============================================================
 def execute_step(step_desc: str, prior_results: list[str], max_iters: int = 4) -> str:
-    """执行一个子任务，返回字符串结果。复用 Day2 的最小 Agent Loop。"""
+    """执行一个子任务，返回字符串结果。复用 第2章 的最小 Agent Loop。"""
     client, MODEL = make_llm()
 
     context = (

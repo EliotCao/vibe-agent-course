@@ -11,7 +11,7 @@ Reflection 是一个**包装层**：它不改变底层 Agent 怎么工作，
   ③ 重复 N 次或直到评审员说"没问题"
 
 本 demo 把 Reflection 包在 demo_13 (Plan-and-Solve) 的外面。
-你可以替换成 demo_12 (ReAct) 或者 Day2 的最小 Agent，逻辑一样。
+你可以替换成 demo_12 (ReAct) 或者 第2章 的最小 Agent，逻辑一样。
 
 跑法：
     python demo_14_reflection.py
@@ -142,5 +142,5 @@ if __name__ == "__main__":
     print("  - 适用场景：质量优先 > 速度优先（写代码、写报告、做推理）")
     print()
     print("  注意：Reflection 是个'包装层'，可以套在任何 Agent 外面。")
-    print("        你也可以把它套在 demo_12 (ReAct) 上，或者 Day2 的最小 Agent 上。")
+    print("        你也可以把它套在 demo_12 (ReAct) 上，或者 第2章 的最小 Agent 上。")
     print("=" * 60)

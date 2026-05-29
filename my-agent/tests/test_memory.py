@@ -1,4 +1,4 @@
-"""Day4 测试：Memory"""
+"""第4章 测试：Memory"""
 
 import sys
 import os
@@ -64,4 +64,4 @@ if __name__ == "__main__":
     print("  ✓ test_add_and_search")
     test_save_load()
     print("  ✓ test_save_load")
-    print("\n✅ Day4 Memory 全部测试通过")
+    print("\n✅ 第4章 Memory 全部测试通过")
