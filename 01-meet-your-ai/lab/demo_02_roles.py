@@ -13,23 +13,18 @@ Demo 02 · 三种 system prompt，三种"人格"
 
 from __future__ import annotations
 
-from _env import get_model_id, make_client
-
-client = make_client()
-MODEL = get_model_id()
+from _env import chat as llm_chat
 
 
-def chat(system: str, user: str) -> str:
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[
+def ask(system: str, user: str) -> str:
+    msg = llm_chat(
+        [
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ],
         temperature=0.3,
-        max_tokens=200,
     )
-    return resp.choices[0].message.content or ""
+    return msg.content or ""
 
 
 SYSTEM_PROMPTS = {
@@ -50,6 +45,6 @@ if __name__ == "__main__":
         print(f"\n【人格：{name}】")
         print(f"system: {sys_prompt}")
         print("-" * 40)
-        answer = chat(sys_prompt, QUESTION)
+        answer = ask(sys_prompt, QUESTION)
         print(answer)
         print()

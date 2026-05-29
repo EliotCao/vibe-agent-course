@@ -6,8 +6,6 @@
 
 ## 三种交互模式
 
-![三种交互模式：REPL / Solo / 流式](./images/29-three-modes.png)
-
 | 模式 | 一句话 | 典型代表 |
 |---|---|---|
 | **REPL** | 多轮交互，跟 Agent "聊一会儿" | Cursor 侧边栏、Claude Code 终端 |

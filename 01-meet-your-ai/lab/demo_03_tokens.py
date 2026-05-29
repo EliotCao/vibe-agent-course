@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import tiktoken
 
-from _env import get_model_id, make_client
+from _env import get_model_id, make_client, chat as llm_chat
 
 # tiktoken 支持的编码器；不同模型用不同 BPE，cl100k_base 适用于 GPT-3.5/4
 ENC = tiktoken.get_encoding("cl100k_base")
@@ -49,12 +49,11 @@ def trigger_context_overflow() -> None:
     print(f"\n构造超长输入：{len(huge)} 字符 ≈ {len(ENC.encode(huge)):,} token")
     print("尝试调用 API ...")
     try:
-        resp = client.chat.completions.create(
-            model=MODEL,
-            messages=[{"role": "user", "content": huge}],
-            max_tokens=10,
+        msg = llm_chat(
+            [{"role": "user", "content": huge}],
+            temperature=0,
         )
-        print(f"✅ 居然没爆？模型可能有超长窗口。回答：{resp.choices[0].message.content}")
+        print(f"✅ 居然没爆？模型可能有超长窗口。回答：{msg.content}")
     except Exception as e:
         print(f"❌ 报错（这就是上下文窗口的物理限制）：")
         print(f"   {type(e).__name__}: {str(e)[:200]}")

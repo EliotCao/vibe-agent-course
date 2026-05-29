@@ -42,8 +42,8 @@ def get_api_key() -> str:
 
 
 def get_model_id() -> str:
-    """获取模型 ID，默认 `hunyuan-turbos-latest`。"""
-    return os.environ.get("MODEL_ID", "deepseek-v4-flash")
+    """获取模型 ID，默认 `glm-5.0`。"""
+    return os.environ.get("MODEL_ID", "glm-5.0")
 
 
 def get_timeout() -> int:

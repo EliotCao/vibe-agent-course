@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 import urllib.request
 
-from _env import get_model_id, make_client
+from _env import get_model_id, make_client, chat as llm_chat
 
 client = make_client()
 MODEL = get_model_id()
@@ -40,14 +40,14 @@ def naive_chatbot() -> None:
     print("=" * 60)
     print(f"问题: {QUESTION}\n")
 
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": QUESTION}],
-        max_tokens=400,
+    resp = llm_chat(
+        [{"role": "user", "content": QUESTION}],
         temperature=0,
+        client=client,
+        model=MODEL,
     )
     print("回答：")
-    print(resp.choices[0].message.content)
+    print(resp.content)
     print()
     print("👆 注意观察：模型要么承认抓不到，要么编一个看起来很像的字节数。")
 
@@ -129,13 +129,13 @@ def mini_agent() -> None:
 
     for turn in range(1, 6):  # 最多 5 轮，防止跑飞
         print(f"--- 第 {turn} 轮 ---")
-        resp = client.chat.completions.create(
-            model=MODEL,
-            messages=messages,
-            max_tokens=300,
+        resp = llm_chat(
+            messages,
             temperature=0,
+            client=client,
+            model=MODEL,
         )
-        raw = resp.choices[0].message.content
+        raw = resp.content
         print(f"模型输出: {raw}")
 
         step = parse_step(raw)

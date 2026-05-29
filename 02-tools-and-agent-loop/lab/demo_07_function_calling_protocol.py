@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import json
 
-from _env import get_model_id, make_client
+from _env import get_model_id, make_client, chat, chat_stream
 
 client = make_client()
 MODEL = get_model_id()
@@ -84,17 +84,17 @@ def main() -> None:
 
     # ---- 第一次调用：把 tools schema 一并传过去 ----
     print("\n>>> 第一次调用 LLM（带 tools 参数）...")
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
+    msg = chat(
+        messages,
         tools=TOOLS_SCHEMA,
-        tool_choice="auto",  # 让模型自己决定要不要调
+        tool_choice="auto",
         temperature=0,
+        client=client,
+        model=MODEL,
     )
 
-    msg = resp.choices[0].message
     print("\n--- 第一次响应：assistant 消息 ---")
-    print(f"role:       {msg.role}")
+    print(f"role:       assistant")
     print(f"content:    {msg.content!r}   ← 注意可能是 None")
     print(f"tool_calls: {msg.tool_calls}")
     print()
@@ -143,15 +143,14 @@ def main() -> None:
 
     # ---- 第二次调用：让模型基于工具结果生成最终回答 ----
     print("\n>>> 第二次调用 LLM（带工具结果）...")
-    resp2 = client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
+    print("\n--- 第二次响应：assistant 最终回答 ---")
+    final_msg = chat_stream(
+        messages,
         tools=TOOLS_SCHEMA,
         temperature=0,
+        client=client,
+        model=MODEL,
     )
-    final_msg = resp2.choices[0].message
-    print("\n--- 第二次响应：assistant 最终回答 ---")
-    print(final_msg.content)
 
     # ---- 把最终消息也加回去，打印整段对话历史 ----
     messages.append({"role": "assistant", "content": final_msg.content})
@@ -159,28 +158,7 @@ def main() -> None:
     print("\n\n" + "=" * 60)
     print("📜 完整 messages 历史（4 种角色都出现了）：")
     print("=" * 60)
-    for i, m in enumerate(messages, 1):
-        role = m["role"]
-        if role == "tool":
-            print(f"[{i}] 🛠 tool      content={m['content']!r}")
-            print(f"      tool_call_id={m['tool_call_id']}")
-        elif role == "assistant" and m.get("tool_calls"):
-            print(f"[{i}] 🤖 assistant content={m['content']!r}")
-            for tc in m["tool_calls"]:
-                print(f"      tool_calls -> id={tc['id']}")
-                print(f"                    name={tc['function']['name']}")
-                print(f"                    args={tc['function']['arguments']}")
-        else:
-            content = m.get("content", "")
-            if content and len(content) > 80:
-                content = content[:80] + "..."
-            print(f"[{i}] {role:9s} content={content!r}")
-
-    print("\n💡 关键观察:")
-    print("  - 完整一次工具调用 = 4 条消息：system + user + assistant(tool_calls) + tool")
-    print("  - assistant.content 在调工具时通常是 None，真正的'指令'藏在 tool_calls 里")
-    print("  - tool 消息靠 tool_call_id 精准对应到上一条 assistant 的某个 tool_call")
-    print("  - 第二次调用时必须把上面 4 条都传回去，模型才能看见'刚才的工具结果'")
+    print(json.dumps(messages, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ from __future__ import annotations
 import math
 from typing import Literal
 
-from _env import get_model_id, make_client
+from _env import get_model_id, make_client, chat as llm_chat
 
 client = make_client()
 MODEL = get_model_id()
@@ -70,39 +70,21 @@ def show_top_candidates(
     print("-" * 60)
 
     messages = _build_messages(prefix, mode)
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        max_tokens=1,
-        temperature=0,
-        logprobs=True,
-        top_logprobs=top_k,
-    )
+    msg = llm_chat(messages, temperature=0)
 
-    choice = resp.choices[0]
-    chosen = choice.message.content
+    chosen = msg.content
     print(f"模型选择: {chosen!r}")
     print()
 
-    # 展示 logprobs（如果后端支持）
-    if choice.logprobs and choice.logprobs.content:
-        print(f"前 {top_k} 个候选（按概率从高到低，来源：logprobs）：")
-        top = choice.logprobs.content[0].top_logprobs
-        for i, item in enumerate(top, 1):
-            prob = math.exp(item.logprob)
-            bar = "█" * int(prob * 40)
-            print(f"  {i}. {item.token!r:>15s}  概率 {prob:6.2%}  {bar}")
-        print()
-    else:
-        print("⚠️  当前 base_url 不支持 logprobs，无法展示候选词分布")
-        print("   （需要支持 logprobs 的后端才能看到完整概率分布）")
-        print()
+    # logprobs 在流式模式下不一定支持
+    print("⚠️  流式模式下不支持 logprobs，仅展示模型选择的 token")
+    print()
 
 
 PREFIXES = [
-    # ("【实验 1】半句话补全：模型可能猜什么？", "今天的天气真"),
-    # ("【实验 2】数学：1 + 1 等于", "一加一等于"),
-    # ("【实验 3】常识：地球围绕", "地球围绕"),
+    ("【实验 1】半句话补全：模型可能猜什么？", "今天的天气真"),
+    ("【实验 2】数学：1 + 1 等于", "一加一等于"),
+    ("【实验 3】常识：地球围绕", "地球围绕"),
     ("【实验 4】陷阱：故意问个不确定的", "2026 年世界杯冠军是"),
 ]
 

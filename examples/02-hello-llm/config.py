@@ -26,7 +26,7 @@ def get_base_url() -> str:
     endpoint = os.environ.get("CNB_API_ENDPOINT", "")
     repo_slug = os.environ.get("CNB_REPO_SLUG", "")
     if endpoint and repo_slug:
-        return f"{endpoint}/{repo_slug}/-/ai/"
+        return f"{endpoint}/{repo_slug}/-/ai-ide/v2"
 
     raise EnvironmentError(
         "请设置 BASE_URL，或同时设置 CNB_API_ENDPOINT 和 CNB_REPO_SLUG 环境变量"
@@ -42,8 +42,8 @@ def get_api_key() -> str:
 
 
 def get_model_id() -> str:
-    """获取模型 ID，默认 `hunyuan-turbos-latest`。"""
-    return os.environ.get("MODEL_ID", "hunyuan-turbos-latest")
+    """获取模型 ID，默认 `glm-5.0`。"""
+    return os.environ.get("MODEL_ID", "glm-5.0")
 
 
 def get_timeout() -> int:

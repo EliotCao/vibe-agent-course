@@ -127,8 +127,7 @@ def run_agent(question: str, max_iters: int = 6, verbose: bool = True) -> str:
       ④ 有   → 逐个执行工具，把结果以 role=tool 追加到 messages
       ⑤ 回到 ①，直到不再要工具 / 达到 max_iters
     """
-    client = make_client()
-    MODEL = get_model_id()
+    from _env import chat as llm_chat
 
     messages = [
         {"role": "system", "content": "你是一个会用工具的助手。需要时调用工具，最终给出简洁的中文回答。"},
@@ -137,14 +136,12 @@ def run_agent(question: str, max_iters: int = 6, verbose: bool = True) -> str:
 
     for turn in range(1, max_iters + 1):
         # ① 调 LLM
-        resp = client.chat.completions.create(
-            model=MODEL,
-            messages=messages,
+        msg = llm_chat(
+            messages,
             tools=registry.to_schemas(),
             tool_choice="auto",
             temperature=0,
         )
-        msg = resp.choices[0].message
 
         # ② / ③ 没有 tool_calls：返回最终回答
         if not msg.tool_calls:

@@ -153,8 +153,7 @@ def show_schemas() -> None:
 # 跟 LLM 跑一次完整调用，看 ToolRegistry 怎么调度
 # ============================================================
 def run_with_llm() -> None:
-    client = make_client()
-    MODEL = get_model_id()
+    from _env import chat as llm_chat
 
     print("\n\n" + "=" * 60)
     print("【用 ToolRegistry 完整跑一次 function calling】")
@@ -168,14 +167,12 @@ def run_with_llm() -> None:
     # 多轮循环：模型可能会连续调多个工具
     for turn in range(1, 6):
         print(f"\n--- 第 {turn} 轮 ---")
-        resp = client.chat.completions.create(
-            model=MODEL,
-            messages=messages,
+        msg = llm_chat(
+            messages,
             tools=registry.to_schemas(),
             tool_choice="auto",
             temperature=0,
         )
-        msg = resp.choices[0].message
 
         if not msg.tool_calls:
             print(f"🎯 最终回答：{msg.content}")

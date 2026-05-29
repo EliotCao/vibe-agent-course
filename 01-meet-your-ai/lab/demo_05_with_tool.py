@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from _env import get_model_id, make_client
+from _env import get_model_id, make_client, chat as llm_chat
 
 client = make_client()
 MODEL = get_model_id()
@@ -51,13 +51,11 @@ def exp_internal_knowledge() -> None:
     question = "Hello-Agents 项目的交付截止时间是什么时候？联系人电话多少？"
 
     print("\n--- ① 纯 LLM 回答 ---")
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": question}],
-        max_tokens=200,
+    msg = llm_chat(
+        [{"role": "user", "content": question}],
         temperature=0,
     )
-    print(resp.choices[0].message.content)
+    print(msg.content)
     print("👆 模型不可能知道，要么承认不知道，要么编一个。")
 
     print("\n--- ② 把'内部文档'塞进 prompt ---")
@@ -70,13 +68,11 @@ def exp_internal_knowledge() -> None:
 【用户问题】
 {question}
 """
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": enriched}],
-        max_tokens=200,
+    msg = llm_chat(
+        [{"role": "user", "content": enriched}],
         temperature=0,
     )
-    print(resp.choices[0].message.content)
+    print(msg.content)
 
     print("\n💡 看：把'外部知识'喂进去，模型立刻能精准回答。")
     print("   这就是 RAG（Retrieval-Augmented Generation）的最朴素版本。")
@@ -106,13 +102,10 @@ def exp_real_tool_call() -> None:
     messages = [{"role": "user", "content": question}]
 
     # 第一轮：模型看到工具列表，自己决定是否调用
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
+    msg = llm_chat(
+        messages,
         tools=tools,
-        max_tokens=200,
     )
-    msg = resp.choices[0].message
 
     if msg.tool_calls:
         print("msg.tool_calls:", msg.tool_calls)
@@ -125,19 +118,30 @@ def exp_real_tool_call() -> None:
         print(f"   工具返回: {result}")
 
         # 第二轮：把工具结果回传，模型生成最终回答
-        messages.append(msg)
+        messages.append({
+            "role": "assistant",
+            "content": msg.content,
+            "tool_calls": [
+                {
+                    "id": tool_call.id,
+                    "type": "function",
+                    "function": {
+                        "name": tool_call.function.name,
+                        "arguments": tool_call.function.arguments,
+                    },
+                }
+            ],
+        })
         messages.append({
             "role": "tool",
             "tool_call_id": tool_call.id,
             "content": result,
         })
-        resp2 = client.chat.completions.create(
-            model=MODEL,
-            messages=messages,
+        final_msg = llm_chat(
+            messages,
             tools=tools,
-            max_tokens=200,
         )
-        print(f"\n🤖 最终回答: {resp2.choices[0].message.content}")
+        print(f"\n🤖 最终回答: {final_msg.content}")
     else:
         print(f"模型直接回答（没调工具）: {msg.content}")
 

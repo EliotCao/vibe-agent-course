@@ -24,13 +24,26 @@ MODEL = get_model_id()
 
 
 def chat(user_input: str) -> str:
-    """单轮对话：发送用户输入，返回模型回复。"""
-    resp = client.chat.completions.create(
+    """单轮对话：发送用户输入，流式逐字打印模型回复。"""
+    stream = client.chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": user_input}],
         temperature=0.9,
+        stream=True,
     )
-    return resp.choices[0].message.content or ""
+    parts = []
+    first = True
+    for chunk in stream:
+        if chunk.choices and chunk.choices[0].delta.content:
+            if first:
+                # 清除 thinking 标识，开始打印回复
+                print("\r\033[K" + "AI: ", end="", flush=True)
+                first = False
+            text = chunk.choices[0].delta.content
+            print(text, end="", flush=True)
+            parts.append(text)
+    print()  # 换行
+    return "".join(parts)
 
 
 if __name__ == "__main__":
@@ -50,7 +63,7 @@ if __name__ == "__main__":
         if user_input.lower() in ("quit", "exit", "q"):
             break
 
-        reply = chat(user_input)
-        print(f"\nAI: {reply}")
+        print("\nAI: 💭 thinking...", end="", flush=True)
+        chat(user_input)
 
     print("\n👋 再见！")

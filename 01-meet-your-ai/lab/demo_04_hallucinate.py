@@ -15,20 +15,15 @@ Demo 04 · 主动诱发 LLM 幻觉
 
 from __future__ import annotations
 
-from _env import get_model_id, make_client
-
-client = make_client()
-MODEL = get_model_id()
+from _env import chat as llm_chat
 
 
 def ask(prompt: str) -> str:
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": prompt}],
+    msg = llm_chat(
+        [{"role": "user", "content": prompt}],
         temperature=0.7,
-        max_tokens=300,
     )
-    return resp.choices[0].message.content or ""
+    return msg.content or ""
 
 
 CASES = [
@@ -74,13 +69,11 @@ def hallucination_check(question: str, answer: str) -> str:
 - 具体哪些点可能是编造的
 - 简短说明
 """
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": judge_prompt}],
+    msg = llm_chat(
+        [{"role": "user", "content": judge_prompt}],
         temperature=0,
-        max_tokens=300,
     )
-    return resp.choices[0].message.content or ""
+    return msg.content or ""
 
 
 if __name__ == "__main__":
