@@ -5,12 +5,21 @@
 # 2) NPC 事件:    @当前仓库(角色名) 时触发，跑 my-agent --solo exec
 #                 然后用 git-cnb 把回答以"工作模式"回写到 Issue/PR 评论
 #                 → 评论提交者会显示为 NPC 角色名
+# 3) CI 验证:     通过 include 引入独立 CI 仓库的各章节验证流水线
 #
 # 镜像地址约定：
 #   - main.push 用 ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
 #   - NPC 事件用 ${CNB_DOCKER_REGISTRY}/${CNB_NPC_SLUG_LOWERCASE}:latest
 #   两者在本仓库下取值一致。
 # =====================================================================
+
+# ---- 作业验证流水线（从 CI 仓库引入） ----
+include:
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter1.yml
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter2.yml
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter3.yml
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter4.yml
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter5.yml
 
 # ---- NPC 事件流水线锚点（issue / pull_request 评论触发） ----
 # 插件任务写法：stage 只写 image，不写 script，CNB 直接跑镜像 ENTRYPOINT。
