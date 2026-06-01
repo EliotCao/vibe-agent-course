@@ -172,7 +172,7 @@ for chunk in stream:
             tool_calls_buf[idx]["args"] += tc_delta.function.arguments
 ```
 
-> 这段代码看着繁琐，但**不会改**——所有家用 / 工业 LLM 客户端都是这个模式。先跑通一次，以后忘了回来抄。
+> 这段代码看着繁琐，但**不会改**——几乎所有的 LLM 客户端都是这个模式。先跑通一次，以后忘了回来抄。
 
 完整可跑版本：[`lab/demo_30_integration_walkthrough.py`](../lab/demo_30_integration_walkthrough.py) 的 `_chat_streaming` 函数。
 
