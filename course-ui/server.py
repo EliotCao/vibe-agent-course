@@ -437,7 +437,15 @@ class Handler(BaseHTTPRequestHandler):
 def main() -> None:
     port = int(os.environ.get("PORT", "8765"))
     addr = os.environ.get("HOST", "127.0.0.1")
-    httpd = ThreadingHTTPServer((addr, port), Handler)
+
+    # 强制 IPv4，避免某些 Python 构建在 ::: 上监听导致 127.0.0.1 不可达
+    import socket as _socket
+
+    class _IPv4HTTPServer(ThreadingHTTPServer):
+        address_family = _socket.AF_INET
+        allow_reuse_address = True
+
+    httpd = _IPv4HTTPServer((addr, port), Handler)
     print(f"[course-ui] http://{addr}:{port}  (Ctrl+C 退出)")
     print(f"[course-ui] 仓库根目录：{ROOT}")
     print(f"[course-ui] 已扫描 {len(COURSE_DIRS)} 节课")
