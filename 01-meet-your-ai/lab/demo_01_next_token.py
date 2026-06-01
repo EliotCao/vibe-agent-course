@@ -26,13 +26,33 @@ Demo 01 · 看 LLM 是怎么"猜下一个词"的
 
 from __future__ import annotations
 
-import math
+import os
 from typing import Literal
 
-from _env import get_model_id, make_client, chat as llm_chat
+from openai import OpenAI
 
-client = make_client()
-MODEL = get_model_id()
+# ------------------------------------------------------------------
+# 配置：与 demo_00 一致，直接从环境变量读取
+# ------------------------------------------------------------------
+_endpoint = os.environ.get("CNB_API_ENDPOINT", "")
+_slug = os.environ.get("CNB_REPO_SLUG", "")
+
+if _endpoint and _slug:
+    BASE_URL = f"{_endpoint}/{_slug}/-/ai-ide/v2"
+else:
+    BASE_URL = os.environ.get("BASE_URL", "")
+
+API_KEY = os.environ.get("API_KEY") or os.environ.get("CNB_TOKEN") or ""
+MODEL = os.environ.get("MODEL_ID", "glm-5.0")
+
+if not BASE_URL or not API_KEY:
+    raise EnvironmentError(
+        "请设置环境变量：\n"
+        "  方式1（CNB平台）：确保 CNB_API_ENDPOINT / CNB_REPO_SLUG / CNB_TOKEN 已注入\n"
+        "  方式2（本地开发）：export BASE_URL=... API_KEY=..."
+    )
+
+client = OpenAI(base_url=BASE_URL, api_key=API_KEY)
 
 # 把模型伪装成"续写引擎"用的 system prompt
 COMPLETE_SYSTEM_PROMPT = (
@@ -57,12 +77,8 @@ def _build_messages(prefix: str, mode: Literal["chat", "complete"]) -> list:
 def show_top_candidates(
     prefix: str,
     mode: Literal["chat", "complete"] = "chat",
-    top_k: int = 5,
 ) -> None:
-    """让模型只生成 1 个 token，并打印它认为的 top-k 候选词与对数概率。
-
-    若后端不支持 logprobs，则自动回退到"多次采样统计频率"的方式。
-    """
+    """让模型只生成 1 个 token，展示模型选择的结果。"""
     mode_label = "续写模式（complete）" if mode == "complete" else "对话模式（chat）"
     print("=" * 60)
     print(f"输入: {prefix!r}   [{mode_label}]")
@@ -70,14 +86,23 @@ def show_top_candidates(
     print("-" * 60)
 
     messages = _build_messages(prefix, mode)
-    msg = llm_chat(messages, temperature=0)
 
-    chosen = msg.content
+    # 直接调用 OpenAI API，设置 max_tokens=1 只拿一个 token
+    stream = client.chat.completions.create(
+        model=MODEL,
+        messages=messages,
+        temperature=0,
+        max_tokens=1,
+        stream=True,
+    )
+
+    parts = []
+    for chunk in stream:
+        if chunk.choices and chunk.choices[0].delta.content:
+            parts.append(chunk.choices[0].delta.content)
+
+    chosen = "".join(parts)
     print(f"模型选择: {chosen!r}")
-    print()
-
-    # logprobs 在流式模式下不一定支持
-    print("⚠️  流式模式下不支持 logprobs，仅展示模型选择的 token")
     print()
 
 
