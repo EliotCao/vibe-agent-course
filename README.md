@@ -20,16 +20,16 @@
 
 ## 内容总览
 
-| 模块 | 主题 | 你的产出 |
-|------|------|---------|
-| 01 | [认识你的 AI](./01-meet-your-ai/) | `my-agent/llm.py` — LLMClient 类 |
-| 02 | [Function Calling 与最小 Agent](./02-tools-and-agent-loop/) | `my-agent/tools.py` — ToolRegistry 类 |
-| 03 | [Agent 范式](./03-agent-patterns/) | `my-agent/agent.py` — Agent 主循环 |
-| 04 | [上下文与记忆](./04-context-and-memory/) | `my-agent/context.py` + `memory.py` |
-| 05 | [Coding Agent 工具集](./05-coding-agent-tools/) | `my-agent/coding_tools/` — 5 个工具 |
-| 06 | [整合：完整 Coding Agent](./06-coding-agent-integration/) | `my-agent/main.py` — 零件拼装 |
-| 07 | [Skills 扩展 + NPC 上线](./07-skills-and-npc/) | 自定义 Skills + 仓库 NPC |
-| 08 | [总结 + 大作业](./08-recap-and-final/) | 复盘与结课 |
+| 模块 | 主题 | 知识点 | 你的产出 |
+|------|------|--------|---------|
+| 01 | [认识你的 AI](./01-meet-your-ai/) | Next-token prediction · Token 与向量 · Messages 协议（system/user/assistant） · 上下文窗口与成本 · 幻觉 | `my-agent/llm.py` — LLMClient 类 |
+| 02 | [Function Calling 与最小 Agent](./02-tools-and-agent-loop/) | Chatbot vs Agent · Function Calling 协议 · ToolRegistry（自动生成 JSON schema） · 最小 Agent Loop | `my-agent/tools.py` — ToolRegistry 类 |
+| 03 | [Agent 范式](./03-agent-patterns/) | ReAct（边想边做） · Plan-and-Solve（先规划再执行） · Reflection（起草→评审→修订） · 范式选型 | `my-agent/agent.py` — Agent 主循环 |
+| 04 | [上下文与记忆](./04-context-and-memory/) | 上下文爆炸问题 · 管理策略（keep_last + 摘要压缩） · 向量记忆（Embedding + 余弦相似度） · Agent v2 整合 | `my-agent/context.py` + `memory.py` |
+| 05 | [Coding Agent 工具集](./05-coding-agent-tools/) | 5 阶段工作流（理解→定位→修改→验证→汇报） · 工具设计哲学 · 5 个核心工具（read/write/edit/list_dir/bash） | `my-agent/coding_tools/` — 5 个工具 |
+| 06 | [整合：完整 Coding Agent](./06-coding-agent-integration/) | 模块协作架构 · REPL 交互界面 · 端到端调试 · 真实任务闭环 | `my-agent/main.py` — 零件拼装 |
+| 07 | [Skills 扩展 + NPC 上线](./07-skills-and-npc/) | Skills 系统（SKILL.md） · NPC 概念 · Docker 打包 · CNB Pipeline + NPC 部署 | 自定义 Skills + 仓库 NPC |
+| 08 | [总结 + 大作业](./08-recap-and-final/) | 全链路复盘 · 行业图景对比 · 知识检验 · 大作业 | 复盘与结课 |
 
 ## 核心产出：my-agent
 
