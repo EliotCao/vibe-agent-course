@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vibe Agent · 课程学习中心</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/atom-one-dark.min.css"
+  />
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">VA</div>
+        <div>
+          <div class="brand-title">Vibe Agent</div>
+          <div class="brand-subtitle">从零搭建 Coding Agent · 课程学习中心</div>
+        </div>
+      </div>
+
+      <nav id="nav" class="nav"></nav>
+
+      <div class="sidebar-footer">
+        <span class="dot"></span> 后端：<code id="backend-status">检测中…</code>
+      </div>
+    </aside>
+
+    <!-- 主区域 -->
+    <main class="main">
+      <header class="topbar">
+        <div class="crumbs">
+          <span id="crumb-course">—</span>
+          <span class="sep">/</span>
+          <span id="crumb-piece">选择左侧课程开始学习</span>
+        </div>
+        <div class="topbar-actions">
+          <button id="btn-toc" class="ghost">目录</button>
+          <a class="ghost" target="_blank" rel="noreferrer"
+             href="https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course"
+            >仓库 ↗</a>
+        </div>
+      </header>
+
+      <section class="content" id="content">
+        <div class="welcome">
+          <h1>👋 欢迎来到 Vibe Agent 课程</h1>
+          <p>
+            本工具把 <code>01 ~ 08</code> 节课的 Markdown 讲义渲染成更易读的页面，并且让每节课的
+            Python Demo 可以 <strong>一键运行</strong>，输出实时回流到浏览器。
+          </p>
+          <ul>
+            <li>📚 左侧选择课程 → 阅读章节讲义</li>
+            <li>🐍 切到 “代码示例” 选项卡 → 点击 ▶ 运行 demo</li>
+            <li>⌨️ 交互式 demo 可在终端面板里输入文字并回车</li>
+          </ul>
+          <p class="tip">提示：运行示例前请先在仓库根目录配置好 <code>.env</code>（参考 <code>.env.example</code>），否则 LLM demo 会因缺少 API Key 报错。</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- markdown 渲染 + 代码高亮 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@13.0.3/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/languages/python.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
