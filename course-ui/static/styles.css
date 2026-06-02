@@ -680,3 +680,279 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
   .markdown h1 { font-size: 28px; }
   .markdown h2 { font-size: 22px; }
 }
+
+/* =========================================================================
+   细节打磨（Apple-grade polish）
+   ========================================================================= */
+
+/* 焦点环（键盘导航更优雅） */
+:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 按钮按下反馈 */
+.btn:active, .cta:active { transform: scale(0.97); }
+.cta { transition: all .2s var(--ease), transform .1s var(--ease); }
+.btn { transition: all .15s var(--ease), transform .1s var(--ease); }
+
+/* hero 微动画 */
+.hero h1 { animation: fadeUp .6s var(--ease-out) both; }
+.hero-desc { animation: fadeUp .6s .08s var(--ease-out) both; }
+.hero-cta  { animation: fadeUp .6s .14s var(--ease-out) both; }
+.hero-grid { animation: fadeUp .6s .20s var(--ease-out) both; }
+.hero-tip  { animation: fadeUp .6s .26s var(--ease-out) both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* hero 容器：反光描边（科技细节） */
+.hero {
+  position: relative;
+}
+.hero::after {
+  content: ""; position: absolute; inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg,
+    rgba(0,113,227,0.0) 0%,
+    rgba(0,113,227,0.16) 50%,
+    rgba(94,92,230,0.12) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px;
+  opacity: 0;
+}
+
+/* 章节序号——苹果发布会"超大数字"细节 */
+.course-head .num {
+  background: linear-gradient(135deg, #1d1d1f 0%, #6e6e73 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* 顶部进度条（页面顶部的极细发光条，运行 demo 时可点亮） */
+.progress-line {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: transparent;
+  z-index: 9999;
+  pointer-events: none;
+}
+.progress-line::before {
+  content: ""; display: block; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--c-primary), #5e5ce6, var(--c-primary), transparent);
+  background-size: 200% 100%;
+  width: 100%; opacity: 0;
+  transition: opacity .25s var(--ease);
+}
+.progress-line.active::before {
+  opacity: 1;
+  animation: progressShimmer 1.2s linear infinite;
+}
+@keyframes progressShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* =========================================================================
+   可编辑代码块
+   ========================================================================= */
+.demo-source { position: relative; }
+.demo-source .src-head .src-actions {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+}
+.demo-source .src-head .meta-tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px; color: var(--c-text-3);
+  letter-spacing: 0.5px;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.demo-source .src-head .meta-tag::before {
+  content: ""; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--c-mint);
+}
+.demo-source .src-head.dirty .meta-tag::before {
+  background: var(--c-amber);
+  box-shadow: 0 0 8px rgba(255,149,0,0.6);
+}
+.demo-source .src-head .iconbtn {
+  background: transparent; border: 0; cursor: pointer;
+  color: var(--c-text-3); padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--font-mono); font-size: 11px;
+  font-weight: 600; letter-spacing: 0.4px;
+  transition: all .15s var(--ease);
+}
+.demo-source .src-head .iconbtn:hover {
+  color: var(--c-text); background: rgba(0,0,0,0.04);
+}
+.demo-source .src-head .iconbtn.primary {
+  color: var(--c-primary);
+}
+.demo-source .src-head .iconbtn.primary:hover {
+  background: rgba(0,113,227,0.08);
+}
+.demo-source .src-head .iconbtn[disabled] {
+  opacity: 0.4; cursor: not-allowed;
+}
+
+/* 编辑器 textarea 与 pre 重叠（hidden by default） */
+.demo-source .editor-wrap {
+  position: relative;
+}
+.demo-source .editor {
+  display: none;
+  width: 100%; min-height: 240px;
+  padding: 22px 26px;
+  border: 0; outline: 0;
+  background: var(--c-code-bg);
+  font-family: var(--font-mono);
+  font-size: 13.5px; line-height: 1.65;
+  color: var(--c-text);
+  resize: vertical;
+  letter-spacing: 0;
+  white-space: pre;
+  tab-size: 4;
+}
+.demo-source.editing pre { display: none; }
+.demo-source.editing .editor { display: block; }
+
+/* hover 显示「编辑」按钮提示（更细致） */
+.demo-source .src-head .hint {
+  font-size: 11px; color: var(--c-text-4);
+  letter-spacing: 0;
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+@media (max-width: 768px) {
+  .demo-source .src-head .hint { display: none; }
+}
+
+/* 保存 toast */
+.toast-host {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+  z-index: 99;
+  display: flex; flex-direction: column; gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  background: rgba(29,29,31,0.95); color: #fff;
+  backdrop-filter: blur(20px);
+  padding: 11px 22px; border-radius: 980px;
+  font-size: 13px; font-weight: 500;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+  display: flex; align-items: center; gap: 8px;
+  animation: toastIn .3s var(--ease-out) both;
+}
+.toast.fade-out { animation: toastOut .3s var(--ease) both; }
+.toast.success::before { content: "✓"; color: #34c759; font-weight: 700; }
+.toast.error::before   { content: "✕"; color: #ff3b30; font-weight: 700; }
+.toast.info::before    { content: "›"; color: var(--c-primary); font-weight: 700; }
+@keyframes toastIn  { from { opacity: 0; transform: translateX(-50%) translateY(10px); } }
+@keyframes toastOut { to   { opacity: 0; transform: translateX(-50%) translateY(10px); } }
+
+/* =========================================================================
+   "在 VSCode 中打开" 引导
+   ========================================================================= */
+.vscode-banner {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; margin: 18px 0 0;
+  background: linear-gradient(135deg, rgba(0,113,227,0.06), rgba(94,92,230,0.04));
+  border: 1px solid rgba(0,113,227,0.15);
+  border-radius: 14px;
+  font-size: 13.5px; color: var(--c-text-2);
+  letter-spacing: -0.01em;
+}
+.vscode-banner .vsc-icon {
+  width: 32px; height: 32px; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--c-primary); color: #fff;
+  border-radius: 9px;
+  font-weight: 700; font-size: 14px;
+}
+.vscode-banner .vsc-text { flex: 1; }
+.vscode-banner .vsc-text b { color: var(--c-text); font-weight: 600; }
+.vscode-banner .vsc-text small {
+  display: block; font-size: 11.5px; color: var(--c-text-3); margin-top: 3px;
+  font-family: var(--font-mono);
+}
+.vscode-banner .vsc-cta {
+  flex-shrink: 0;
+  padding: 7px 16px; border-radius: 980px;
+  background: var(--c-text); color: #fff;
+  font-size: 12.5px; font-weight: 500;
+  text-decoration: none;
+  transition: opacity .15s var(--ease);
+}
+.vscode-banner .vsc-cta:hover { opacity: 0.85; text-decoration: none; }
+
+/* hero 内嵌的 VSCode 引导 */
+.hero-vscode {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 24px;
+  font-size: 13px; color: var(--c-text-3);
+  padding: 8px 16px;
+  background: var(--c-bg-soft);
+  border-radius: 980px;
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.hero-vscode:hover {
+  background: rgba(0,113,227,0.08); color: var(--c-primary);
+}
+.hero-vscode .kbd {
+  font-family: var(--font-mono); font-size: 11px;
+  padding: 2px 6px; border-radius: 4px;
+  background: #fff;
+  border: 1px solid var(--c-border-2);
+  border-bottom-width: 2px;
+  color: var(--c-text-2);
+}
+
+/* 激活态指示线（侧栏左侧） */
+.nav-item.active {
+  position: relative;
+}
+
+/* 加宽侧栏后再做一点优化：滚动条隐藏 */
+.nav { scrollbar-width: thin; }
+.nav::-webkit-scrollbar { width: 6px; }
+.nav::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); }
+
+/* topbar 增加细微阴影感 */
+.topbar { box-shadow: 0 1px 0 rgba(0,0,0,0.04); }
+
+/* 课程头加一行小副标题（科技感的"代号"） */
+.course-head .meta-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px; color: var(--c-text-3);
+  letter-spacing: 0.6px;
+}
+.course-head .meta-row .dot-sep { color: var(--c-text-4); }
+
+/* Demo head：增加一个状态指示（运行/未运行） */
+.demo-head .live-pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c-text-4);
+  flex-shrink: 0; transition: all .2s var(--ease);
+}
+.demo-card.running .demo-head .live-pulse {
+  background: var(--c-mint);
+  box-shadow: 0 0 0 4px rgba(52,199,89,0.18);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.demo-card.error .demo-head .live-pulse {
+  background: var(--c-rose);
+  box-shadow: 0 0 0 4px rgba(255,59,48,0.18);
+}
+
+/* 让运行中的卡片头部有一个轻微的 shimmer 边 */
+.demo-card.running {
+  border-color: rgba(0,113,227,0.35);
+  box-shadow: 0 0 0 4px rgba(0,113,227,0.06);
+}
+

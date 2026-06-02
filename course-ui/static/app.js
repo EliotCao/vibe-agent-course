@@ -298,23 +298,43 @@ function buildDemoCard(demo, indexNum, scope) {
   card.innerHTML = `
     <div class="demo-head">
       <div class="index-chip">${numLabel}</div>
+      <div class="live-pulse" title="运行状态"></div>
       <div class="demo-title">
         <div class="name">${escapeHtml(demo.title)}</div>
         <div class="file">${escapeHtml(demo.path)}</div>
       </div>
       <div class="demo-actions">
-        <button class="btn primary" data-act="run">▶ <span class="btn-label">运行</span></button>
-        <button class="btn danger" data-act="stop" style="display:none;">■ <span class="btn-label">停止</span></button>
+        <button class="btn primary" data-act="run" title="运行 (Cmd/Ctrl+Enter)">▶ <span class="btn-label">运行</span></button>
+        <button class="btn danger" data-act="stop" style="display:none;" title="停止">■ <span class="btn-label">停止</span></button>
       </div>
       <div class="caret">›</div>
     </div>
     <div class="demo-body">
+      <div class="vscode-banner">
+        <div class="vsc-icon">VS</div>
+        <div class="vsc-text">
+          <b>想完整阅读这份代码？</b>
+          <small>切换到 VSCode 网页编辑器，享受跳转定义/全文搜索/Git diff</small>
+        </div>
+        <a class="vsc-cta" data-act="open-vscode">在 VSCode 中打开</a>
+      </div>
       <div class="demo-source">
         <div class="src-head">
           <span class="pyicon"></span>
-          <span>${escapeHtml(demo.path)}</span>
+          <span class="mono">${escapeHtml(demo.path)}</span>
+          <span class="meta-tag">SAVED</span>
+          <div class="src-actions">
+            <span class="hint">点击 ✎ 编辑代码</span>
+            <button class="iconbtn" data-act="edit"  title="进入编辑模式">✎ 编辑</button>
+            <button class="iconbtn primary" data-act="save"   title="保存修改 (Cmd/Ctrl+S)" style="display:none;">⌘S 保存</button>
+            <button class="iconbtn"          data-act="cancel" title="取消编辑" style="display:none;">取消</button>
+            <button class="iconbtn"          data-act="reset"  title="重置到磁盘内容" style="display:none;">↺ 重置</button>
+          </div>
         </div>
-        <pre><code class="language-python">加载中…</code></pre>
+        <div class="editor-wrap">
+          <pre><code class="language-python">加载中…</code></pre>
+          <textarea class="editor mono" spellcheck="false"></textarea>
+        </div>
       </div>
       <div class="terminal">
         <div class="terminal-head">
@@ -331,10 +351,18 @@ function buildDemoCard(demo, indexNum, scope) {
     </div>
   `;
 
-  const head     = $('.demo-head', card);
-  const btnRun   = $('[data-act=run]', card);
-  const btnStop  = $('[data-act=stop]', card);
-  const srcCode  = $('.demo-source code', card);
+  const head      = $('.demo-head', card);
+  const btnRun    = $('[data-act=run]', card);
+  const btnStop   = $('[data-act=stop]', card);
+  const srcWrap   = $('.demo-source', card);
+  const srcHead   = $('.demo-source .src-head', card);
+  const srcCode   = $('.demo-source code', card);
+  const editor    = $('.demo-source .editor', card);
+  const btnEdit   = $('[data-act=edit]',   card);
+  const btnSave   = $('[data-act=save]',   card);
+  const btnCancel = $('[data-act=cancel]', card);
+  const btnReset  = $('[data-act=reset]',  card);
+  const btnVscode = $('[data-act=open-vscode]', card);
   const out      = $('.terminal-output', card);
   const status   = $('.terminal-head .status', card);
   const inputBar = $('.terminal-input', card);
@@ -344,10 +372,10 @@ function buildDemoCard(demo, indexNum, scope) {
   let runId = null;
   let evtSource = null;
   let srcLoaded = false;
+  let lastSaved = '';   // 上次磁盘内容，用于 dirty 标记 / 重置
 
   // ---- 头部点击 = 手风琴展开/收起 ----
   head.addEventListener('click', (e) => {
-    // 点按钮不要触发折叠
     if (e.target.closest('.btn')) return;
     toggleCard(card, scope);
   });
@@ -359,12 +387,114 @@ function buildDemoCard(demo, indexNum, scope) {
       const data = await fetch('/api/file?path=' + encodeURIComponent(demo.path)).then((r) =>
         r.json()
       );
-      srcCode.textContent = data.content || '';
+      const text = data.content || '';
+      srcCode.textContent = text;
+      editor.value = text;
+      lastSaved = text;
       highlightOne(srcCode);
       srcLoaded = true;
     } catch (err) {
       srcCode.textContent = '加载失败：' + err;
     }
+  });
+
+  // ---- 进入编辑模式 ----
+  btnEdit.addEventListener('click', (e) => {
+    e.stopPropagation();
+    srcWrap.classList.add('editing');
+    btnEdit.style.display = 'none';
+    btnSave.style.display   = 'inline-flex';
+    btnCancel.style.display = 'inline-flex';
+    btnReset.style.display  = 'inline-flex';
+    $('.hint', srcHead).style.display = 'none';
+    // 自适应高度
+    const rows = (editor.value.match(/\n/g) || []).length + 2;
+    editor.style.height = Math.min(Math.max(rows * 22, 240), 720) + 'px';
+    editor.focus();
+  });
+
+  // ---- 取消 ----
+  btnCancel.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editor.value = lastSaved;
+    exitEditMode();
+  });
+
+  // ---- 重置 ----
+  btnReset.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editor.value = lastSaved;
+    markDirty(false);
+    toast('已重置为最近一次磁盘内容', 'info');
+  });
+
+  // ---- 保存 ----
+  async function save() {
+    const content = editor.value;
+    try {
+      const r = await fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: demo.path, content }),
+      });
+      const data = await r.json();
+      if (!r.ok || !data.ok) {
+        toast('保存失败：' + (data.error || r.statusText), 'error');
+        return false;
+      }
+      lastSaved = content;
+      srcCode.textContent = content;
+      highlightOne(srcCode);
+      markDirty(false);
+      toast('已保存', 'success');
+      return true;
+    } catch (e) {
+      toast('保存失败：' + e, 'error');
+      return false;
+    }
+  }
+  btnSave.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (await save()) exitEditMode();
+  });
+
+  // 编辑器内 Cmd/Ctrl+S 保存
+  editor.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      e.preventDefault();
+      save();
+    } else if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      save().then((ok) => { if (ok) { exitEditMode(); btnRun.click(); } });
+    } else if (e.key === 'Escape') {
+      btnCancel.click();
+    }
+  });
+  editor.addEventListener('input', () => {
+    markDirty(editor.value !== lastSaved);
+  });
+
+  function markDirty(dirty) {
+    srcHead.classList.toggle('dirty', dirty);
+    const tag = $('.meta-tag', srcHead);
+    if (tag) tag.textContent = dirty ? 'UNSAVED' : 'SAVED';
+  }
+  function exitEditMode() {
+    srcWrap.classList.remove('editing');
+    btnEdit.style.display = 'inline-flex';
+    btnSave.style.display = 'none';
+    btnCancel.style.display = 'none';
+    btnReset.style.display = 'none';
+    const hint = $('.hint', srcHead);
+    if (hint) hint.style.display = '';
+    markDirty(false);
+  }
+
+  // ---- VSCode 引导 ----
+  btnVscode.addEventListener('click', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    openInVscode();
   });
 
   // 收起时如果还在运行，发停止并清理
@@ -379,10 +509,17 @@ function buildDemoCard(demo, indexNum, scope) {
   });
 
   // ---- 运行 ----
-  btnRun.addEventListener('click', (e) => {
+  btnRun.addEventListener('click', async (e) => {
     e.stopPropagation();
     // 没展开就先展开
     if (!card.classList.contains('open')) toggleCard(card, scope, true);
+
+    // 如果处在编辑模式且有 dirty，先尝试保存
+    if (srcWrap.classList.contains('editing') && srcHead.classList.contains('dirty')) {
+      const ok = await save();
+      if (!ok) return;
+      exitEditMode();
+    }
 
     out.innerHTML = '';
     appendMeta(out, `▶ 启动 ${demo.path} ...`);
@@ -391,6 +528,9 @@ function buildDemoCard(demo, indexNum, scope) {
     btnRun.disabled = true;
     btnStop.style.display = 'inline-flex';
     inputBar.classList.remove('disabled');
+    card.classList.add('running');
+    card.classList.remove('error');
+    progress(true);
     inputEl.focus();
 
     evtSource = new EventSource('/api/run?path=' + encodeURIComponent(demo.path));
@@ -407,12 +547,18 @@ function buildDemoCard(demo, indexNum, scope) {
       append(out, `\n[exit code ${d.code}]`, ok ? 'exit-ok' : 'exit-fail');
       status.textContent = ok ? '已完成' : `异常退出 (${d.code})`;
       status.className = 'status ' + (ok ? 'ok' : 'fail');
+      card.classList.remove('running');
+      card.classList.toggle('error', !ok);
+      progress(false);
       cleanup();
     });
     evtSource.onerror = () => {
       append(out, '\n[连接已断开]', 'exit-fail');
       status.textContent = '已断开';
       status.className = 'status fail';
+      card.classList.remove('running');
+      card.classList.add('error');
+      progress(false);
       cleanup();
     };
   });
@@ -474,4 +620,46 @@ function escapeHtml(s) {
   );
 }
 
-// （已移除 #btn-toc 按钮）
+// ---------------- Toast / 进度条 ----------------
+function toast(msg, type = 'info', dur = 2200) {
+  const host = $('#toast-host');
+  if (!host) return;
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('fade-out');
+    setTimeout(() => el.remove(), 320);
+  }, dur);
+}
+function progress(active) {
+  const el = $('#progress-line');
+  if (el) el.classList.toggle('active', !!active);
+}
+
+// ---------------- 切换到 VSCode 模式 ----------------
+function openInVscode() {
+  // 在 CNB only-preview 模式下，运行时通常会注入这些环境变量；
+  // 浏览器侧无法直接读，但 CNB 工作区右上角有"启动远程开发"按钮可切。
+  // 我们尝试两种方式：
+  // 1) 如果 URL 包含 cnb only-preview 的 token，可以直接跳到 vscode 子路径
+  // 2) 否则提示用户手动点击"启动远程开发"
+  const host = location.host;
+  const isCNB = /cnb\.cool|cnb-rto|cnb\./.test(host);
+  if (isCNB) {
+    // CNB 会把 ?vscode=1 视为请求切换；不可识别则忽略，所以不会出错
+    const target = new URL(location.href);
+    target.searchParams.set('vscode', '1');
+    window.open(target.toString(), '_top');
+    toast('正在请求切换到 VSCode 远程开发…', 'info');
+  } else {
+    toast('请在 CNB 工作区右上角点击「启动远程开发」', 'info', 3500);
+  }
+}
+
+// ---------------- 启动钩子 ----------------
+document.addEventListener('DOMContentLoaded', () => {
+  const heroVsc = document.getElementById('hero-vscode');
+  if (heroVsc) heroVsc.addEventListener('click', openInVscode);
+});

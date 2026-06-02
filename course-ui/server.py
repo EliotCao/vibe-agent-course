@@ -343,6 +343,24 @@ class Handler(BaseHTTPRequestHandler):
                 rp.stop()
                 return self._send_json({"ok": True})
 
+            if path == "/api/save":
+                rel = body.get("path", "")
+                content = body.get("content", "")
+                if not isinstance(content, str):
+                    return self._send_error_json(400, "content 必须是字符串")
+                try:
+                    target = _safe_resolve(rel)
+                except ValueError as e:
+                    return self._send_error_json(400, str(e))
+                # 只允许保存各课 lab 下的 demo_*.py
+                rel_norm = target.relative_to(ROOT).as_posix()
+                if not re.match(r"^0[1-8]-.+/lab/demo_.+\.py$", rel_norm):
+                    return self._send_error_json(400, "只允许编辑各课 lab 下的 demo_*.py")
+                if len(content.encode("utf-8")) > 512 * 1024:
+                    return self._send_error_json(413, "文件过大（>512KB）")
+                target.write_text(content, encoding="utf-8")
+                return self._send_json({"ok": True, "path": rel_norm, "size": len(content)})
+
             return self._send_error_json(404, "not found")
         except Exception as e:  # noqa: BLE001
             self._send_error_json(500, f"server error: {e}")
