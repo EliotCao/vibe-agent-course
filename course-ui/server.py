@@ -270,6 +270,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(path.stat().st_size))
+        # 静态资源禁用缓存，避免改完前端旧代码还在生效
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
         self.end_headers()
         with path.open("rb") as fh:
             for chunk in iter(lambda: fh.read(64 * 1024), b""):

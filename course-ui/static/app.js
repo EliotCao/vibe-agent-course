@@ -7,35 +7,41 @@ const state = {
   current: { courseId: null, kind: null, path: null },
 };
 
-// marked + highlight（支持离线时的降级）
-const HLJS_OK = typeof window.hljs !== 'undefined';
-const MARKED_OK = typeof window.marked !== 'undefined';
+// marked + highlight（兜底：每次调用时即时检查全局对象，
+// 避免脚本加载顺序异常时仍引用裸 `hljs` / `marked` 触发 ReferenceError）
+const hasHljs   = () => typeof window !== 'undefined' && typeof window.hljs   !== 'undefined';
+const hasMarked = () => typeof window !== 'undefined' && typeof window.marked !== 'undefined';
 
 function hl(code, lang) {
-  if (!HLJS_OK) return escapeHtml(code);
+  if (!hasHljs()) return escapeHtml(code);
   try {
-    if (lang && hljs.getLanguage(lang)) {
-      return hljs.highlight(code, { language: lang }).value;
+    if (lang && window.hljs.getLanguage(lang)) {
+      return window.hljs.highlight(code, { language: lang }).value;
     }
-    return hljs.highlightAuto(code).value;
+    return window.hljs.highlightAuto(code).value;
   } catch {
     return escapeHtml(code);
   }
 }
 
 function renderMarkdown(text) {
-  if (!MARKED_OK) {
+  if (!hasMarked()) {
     return `<pre style="white-space:pre-wrap;">${escapeHtml(text || '')}</pre>`;
   }
-  marked.setOptions({ gfm: true, breaks: false, highlight: hl });
-  return marked.parse(text || '');
+  window.marked.setOptions({ gfm: true, breaks: false, highlight: hl });
+  return window.marked.parse(text || '');
 }
 
 function highlightAll(root) {
-  if (!HLJS_OK) return;
+  if (!hasHljs()) return;
   $$('pre code', root).forEach((b) => {
-    try { hljs.highlightElement(b); } catch {}
+    try { window.hljs.highlightElement(b); } catch {}
   });
+}
+
+function highlightOne(el) {
+  if (!hasHljs() || !el) return;
+  try { window.hljs.highlightElement(el); } catch {}
 }
 
 // ---------------- 启动 ----------------
@@ -299,7 +305,7 @@ async function buildDemoCard(demo) {
           r.json()
         );
         srcCode.textContent = data.content || '';
-        if (HLJS_OK) { try { hljs.highlightElement(srcCode); } catch {} }
+        highlightOne(srcCode);
         srcLoaded = true;
       } catch (e) {
         srcCode.textContent = '加载失败：' + e;
