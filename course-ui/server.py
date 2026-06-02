@@ -68,6 +68,25 @@ def _safe_resolve(rel: str) -> Path:
     return target
 
 
+def _run_git(args: list[str], cwd: Path) -> tuple[int, str]:
+    """运行 git 子命令，返回 (returncode, combined_output)。"""
+    try:
+        proc = subprocess.run(
+            ["git", *args],
+            cwd=str(cwd),
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
+    except FileNotFoundError:
+        return 127, "git not found"
+    except subprocess.TimeoutExpired:
+        return 124, "git timeout"
+    except Exception as e:  # noqa: BLE001
+        return 1, f"git error: {e}"
+
+
 def _sort_key(name: str) -> tuple:
     m = re.search(r"(\d+)", name)
     return (int(m.group(1)) if m else 9999, name)
@@ -360,6 +379,82 @@ class Handler(BaseHTTPRequestHandler):
                     return self._send_error_json(413, "文件过大（>512KB）")
                 target.write_text(content, encoding="utf-8")
                 return self._send_json({"ok": True, "path": rel_norm, "size": len(content)})
+
+            if path == "/api/notes/sync":
+                # 把笔记批量写到 notes/<lecture-path>.md，并尝试 git commit (+push 由前端选择)
+                items = body.get("notes", [])
+                push = bool(body.get("push", False))
+                if not isinstance(items, list):
+                    return self._send_error_json(400, "notes 必须是数组")
+                notes_root = ROOT / "notes"
+                notes_root.mkdir(parents=True, exist_ok=True)
+
+                written: list[str] = []
+                for it in items:
+                    p = (it or {}).get("path", "")
+                    c = (it or {}).get("content", "")
+                    if not isinstance(p, str) or not isinstance(c, str) or not p:
+                        continue
+                    # 安全：只允许把笔记写到当前仓库范围内的 notes/ 目录
+                    safe_name = p.lstrip("/").replace("..", "_")
+                    out = (notes_root / (safe_name + ".md")).resolve()
+                    try:
+                        out.relative_to(notes_root.resolve())
+                    except ValueError:
+                        continue
+                    out.parent.mkdir(parents=True, exist_ok=True)
+                    header = (
+                        f"# 笔记 · `{p}`\n\n"
+                        f"> 同步时间：{time.strftime('%Y-%m-%d %H:%M:%S')}    "
+                        f"来自 Course UI\n\n"
+                    )
+                    out.write_text(header + c.strip() + "\n", encoding="utf-8")
+                    written.append(out.relative_to(ROOT).as_posix())
+
+                # 尝试 git add + commit
+                git_log: list[str] = []
+                committed = False
+                pushed = False
+                if written:
+                    try:
+                        rc, ot = _run_git(["add", "notes"], cwd=ROOT)
+                        git_log.append(f"add: rc={rc} {ot.strip()[:200]}")
+                        # 确认有变化才 commit
+                        rc, status_out = _run_git(
+                            ["status", "--porcelain", "notes"], cwd=ROOT
+                        )
+                        if status_out.strip():
+                            msg = (
+                                f"docs(notes): sync {len(written)} note(s) from Course UI"
+                            )
+                            rc, ot = _run_git(
+                                [
+                                    "-c", "user.name=Course UI",
+                                    "-c", "user.email=course-ui@local",
+                                    "commit", "-m", msg,
+                                ],
+                                cwd=ROOT,
+                            )
+                            git_log.append(f"commit: rc={rc} {ot.strip()[:200]}")
+                            committed = rc == 0
+                        else:
+                            git_log.append("commit: skipped (no changes)")
+                        if push and committed:
+                            rc, ot = _run_git(["push"], cwd=ROOT)
+                            git_log.append(f"push: rc={rc} {ot.strip()[:300]}")
+                            pushed = rc == 0
+                    except Exception as e:  # noqa: BLE001
+                        git_log.append(f"git error: {e}")
+
+                return self._send_json(
+                    {
+                        "ok": True,
+                        "written": written,
+                        "committed": committed,
+                        "pushed": pushed,
+                        "log": git_log,
+                    }
+                )
 
             return self._send_error_json(404, "not found")
         except Exception as e:  # noqa: BLE001

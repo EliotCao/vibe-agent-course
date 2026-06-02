@@ -195,17 +195,20 @@ async function openPiece(courseId, kind, path) {
 
   // Tabs：讲义 / 代码示例
   const tabsHtml = `
-    <div class="tabs">
-      <div class="tab ${kind === 'lecture' ? 'active' : ''}" data-tab="lecture">
-        📚 讲义 <span class="pill">${course.lectures.length}</span>
-      </div>
-      <div class="tab ${kind === 'demo' ? 'active' : ''}" data-tab="demo">
-        🐍 代码示例 <span class="pill">${course.demos.length}</span>
+    <div class="tabs-row">
+      <div class="tabs">
+        <div class="tab ${kind === 'lecture' ? 'active' : ''}" data-tab="lecture">
+          📚 讲义 <span class="pill">${course.lectures.length}</span>
+        </div>
+        <div class="tab ${kind === 'demo' ? 'active' : ''}" data-tab="demo">
+          🐍 代码示例 <span class="pill">${course.demos.length}</span>
+        </div>
       </div>
     </div>
   `;
 
   $('#content').innerHTML = header + tabsHtml + '<div id="tab-body"></div>';
+  $('#content').dataset.kind = kind;
 
   $$('.tab').forEach((t) =>
     t.addEventListener('click', () => {
@@ -254,6 +257,7 @@ async function renderLecture(path) {
               <span class="notes-key mono">${escapeHtml(path.split('/').pop())}</span>
             </div>
             <div class="notes-actions">
+              <button class="iconbtn primary" data-act="notes-sync"  title="把所有笔记写到仓库 notes/ 并 git commit">☁ 同步到仓库</button>
               <button class="iconbtn" data-act="notes-export" title="导出全部笔记为 Markdown">↓ 导出</button>
               <button class="iconbtn" data-act="notes-clear"  title="清空当前页笔记">✕</button>
             </div>
@@ -401,6 +405,10 @@ function setupNotes(path) {
   if (exportBtn) {
     exportBtn.addEventListener('click', () => exportAllNotes());
   }
+  const syncBtn = $('[data-act=notes-sync]');
+  if (syncBtn) {
+    syncBtn.addEventListener('click', () => syncNotesToRepo(syncBtn));
+  }
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
       if (!confirm('确认清空当前页笔记？')) return;
@@ -414,6 +422,53 @@ function setupNotes(path) {
   function updateMeta() {
     const len = (ta.value || '').length;
     if (meta) meta.textContent = `${len} 字`;
+  }
+}
+
+// 收集所有 localStorage 中的笔记（按 path 区分）
+function collectAllNotes() {
+  const all = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith('vibe-notes::')) continue;
+    const path = k.slice('vibe-notes::'.length);
+    const v = localStorage.getItem(k) || '';
+    if (v.trim()) all.push({ path, content: v });
+  }
+  return all;
+}
+
+// 把所有笔记写到仓库 notes/ 目录并 git commit；可选 push
+async function syncNotesToRepo(btn) {
+  const all = collectAllNotes();
+  if (!all.length) { toast('还没有任何笔记', 'info'); return; }
+  const wantPush = confirm(`将把 ${all.length} 份笔记写入仓库 notes/ 目录并 git commit。\n\n是否同时推送到远程？\n点「确定」同时 push；点「取消」只本地 commit。`);
+
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ 同步中…';
+  try {
+    const r = await fetch('/api/notes/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: all, push: wantPush }),
+    });
+    const data = await r.json();
+    if (!r.ok || !data.ok) {
+      toast('同步失败：' + (data.error || r.statusText), 'error', 4000);
+      console.error(data);
+      return;
+    }
+    let msg = `已写入 ${data.written.length} 份笔记`;
+    if (data.committed) msg += ' · 已 commit';
+    if (data.pushed)    msg += ' · 已 push';
+    toast(msg, 'success', 3500);
+    console.log('[notes-sync]', data.log);
+  } catch (e) {
+    toast('同步失败：' + e, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = orig;
   }
 }
 
@@ -892,4 +947,19 @@ function openInVscode() {
 document.addEventListener('DOMContentLoaded', () => {
   const heroVsc = document.getElementById('hero-vscode');
   if (heroVsc) heroVsc.addEventListener('click', openInVscode);
+
+  // pin 按钮：钉住/解除侧栏（写入 localStorage）
+  const pinBtn = document.getElementById('pin-btn');
+  const app = document.querySelector('.app');
+  const pinned = localStorage.getItem('vibe-sidebar-pinned') === '1';
+  if (app && pinned) app.classList.add('sidebar-pinned');
+  if (pinBtn && app) {
+    pinBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      app.classList.toggle('sidebar-pinned');
+      const now = app.classList.contains('sidebar-pinned');
+      localStorage.setItem('vibe-sidebar-pinned', now ? '1' : '0');
+      toast(now ? '侧栏已钉住' : '侧栏已收起', 'info', 1200);
+    });
+  }
 });

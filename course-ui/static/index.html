@@ -13,7 +13,7 @@
 
   <div class="app">
     <!-- 侧边栏 -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="brand">
         <div class="brand-mark">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -22,10 +22,16 @@
             <path d="M2 17 L12 22 L22 17" opacity=".5"/>
           </svg>
         </div>
-        <div>
+        <div class="brand-text">
           <div class="brand-title">Vibe Agent</div>
           <div class="brand-subtitle">从零搭建 Coding Agent</div>
         </div>
+        <button class="pin-btn" id="pin-btn" title="钉住侧栏（始终展开）" aria-label="pin">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 17v5"/>
+            <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>
+          </svg>
+        </button>
       </div>
 
       <nav id="nav" class="nav"></nav>
@@ -33,7 +39,7 @@
       <div class="sidebar-footer">
         <span class="status-pill">
           <span class="dot" id="status-dot"></span>
-          <span id="backend-status">检测中…</span>
+          <span class="status-text" id="backend-status">检测中…</span>
         </span>
       </div>
     </aside>
