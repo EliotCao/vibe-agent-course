@@ -68,13 +68,15 @@ async function init() {
   }
 }
 
+// 后端在线检测：状态变更
 async function checkBackend() {
   try {
     const t = await fetch('/health').then((r) => r.text());
     $('#backend-status').textContent = t === 'ok' ? '在线' : t;
+    $('#status-dot').classList.toggle('bad', t !== 'ok');
   } catch {
     $('#backend-status').textContent = '离线';
-    $('.dot').classList.add('bad');
+    $('#status-dot').classList.add('bad');
   }
 }
 
@@ -147,9 +149,10 @@ function navItem(kind, title, onClick) {
   const el = document.createElement('div');
   el.className = 'nav-item';
   el.dataset.title = title;
-  el.innerHTML = `<span class="badge ${kind}">${kind === 'py' ? 'PY' : 'MD'}</span>${escapeHtml(
-    title
-  )}`;
+  el.innerHTML = `
+    <span class="badge ${kind}">${kind === 'py' ? 'PY' : 'MD'}</span>
+    <span class="nav-item-text">${escapeHtml(title)}</span>
+  `;
   el.addEventListener('click', () => {
     $$('.nav-item').forEach((x) => x.classList.remove('active'));
     el.classList.add('active');
@@ -236,39 +239,77 @@ async function renderLecture(path) {
   }
 }
 
-// ---------------- Demo 列表（代码示例 tab） ----------------
+// ---------------- Demo 列表（手风琴：单选展开） ----------------
 async function renderDemos(course) {
   const body = $('#tab-body');
   if (!course.demos.length) {
     body.innerHTML = '<div class="markdown">本节没有可运行的 Python 示例。</div>';
     return;
   }
+  const wrap = document.createElement('div');
+  wrap.className = 'demos';
   body.innerHTML = '';
-  for (const demo of course.demos) {
-    const card = await buildDemoCard(demo);
-    body.appendChild(card);
+  body.appendChild(wrap);
+
+  course.demos.forEach((demo, idx) => {
+    const card = buildDemoCard(demo, idx + 1, wrap);
+    wrap.appendChild(card);
+    // 默认展开第一个 demo，便于一进来就看到完整源码
+    if (idx === 0) toggleCard(card, wrap, true);
+  });
+}
+
+/** 让目标 card 展开/收起，handles 单选互斥 */
+function toggleCard(card, scope, forceOpen) {
+  const willOpen = forceOpen ?? !card.classList.contains('open');
+  if (willOpen) {
+    // 关闭其他卡片，停掉它们的运行
+    $$('.demo-card.open', scope).forEach((other) => {
+      if (other !== card) {
+        other.classList.remove('open');
+        other.dispatchEvent(new CustomEvent('demo:closed'));
+      }
+    });
+    card.classList.add('open');
+    card.dispatchEvent(new CustomEvent('demo:opened'));
+  } else {
+    card.classList.remove('open');
+    card.dispatchEvent(new CustomEvent('demo:closed'));
   }
 }
 
-async function buildDemoCard(demo) {
+function buildDemoCard(demo, indexNum, scope) {
+  // 从文件名抓出 demo_XX 的数字
+  const m = demo.filename.match(/demo[_-]?(\d+)/i);
+  const numLabel = m ? m[1].padStart(2, '0') : String(indexNum).padStart(2, '0');
+
   const card = document.createElement('div');
   card.className = 'demo-card';
   card.innerHTML = `
     <div class="demo-head">
+      <div class="index-chip">${numLabel}</div>
       <div class="demo-title">
         <div class="name">${escapeHtml(demo.title)}</div>
         <div class="file">${escapeHtml(demo.path)}</div>
       </div>
-      <button class="btn secondary" data-act="toggle-src">查看源码</button>
-      <button class="btn primary" data-act="run">▶ 运行</button>
-      <button class="btn danger" data-act="stop" style="display:none;">■ 停止</button>
+      <div class="demo-actions">
+        <button class="btn primary" data-act="run">▶ <span class="btn-label">运行</span></button>
+        <button class="btn danger" data-act="stop" style="display:none;">■ <span class="btn-label">停止</span></button>
+      </div>
+      <div class="caret">›</div>
     </div>
     <div class="demo-body">
-      <div class="demo-source" style="display:none;"><pre><code class="language-python">加载中…</code></pre></div>
+      <div class="demo-source">
+        <div class="src-head">
+          <span class="pyicon"></span>
+          <span>${escapeHtml(demo.path)}</span>
+        </div>
+        <pre><code class="language-python">加载中…</code></pre>
+      </div>
       <div class="terminal">
         <div class="terminal-head">
           <div class="lights"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-          <div class="label">terminal · ${escapeHtml(demo.path.split('/').pop())}</div>
+          <div class="label">terminal · ${escapeHtml(demo.filename)}</div>
           <div class="status">就绪</div>
         </div>
         <div class="terminal-output"></div>
@@ -280,40 +321,59 @@ async function buildDemoCard(demo) {
     </div>
   `;
 
-  const btnSrc = $('[data-act=toggle-src]', card);
-  const btnRun = $('[data-act=run]', card);
-  const btnStop = $('[data-act=stop]', card);
-  const srcWrap = $('.demo-source', card);
-  const srcCode = $('.demo-source code', card);
-  const out = $('.terminal-output', card);
-  const status = $('.terminal-head .status', card);
+  const head     = $('.demo-head', card);
+  const btnRun   = $('[data-act=run]', card);
+  const btnStop  = $('[data-act=stop]', card);
+  const srcCode  = $('.demo-source code', card);
+  const out      = $('.terminal-output', card);
+  const status   = $('.terminal-head .status', card);
   const inputBar = $('.terminal-input', card);
-  const inputEl = $('input', inputBar);
-  const sendBtn = $('button', inputBar);
+  const inputEl  = $('input', inputBar);
+  const sendBtn  = $('button', inputBar);
 
   let runId = null;
   let evtSource = null;
   let srcLoaded = false;
 
-  btnSrc.addEventListener('click', async () => {
-    const isHidden = srcWrap.style.display === 'none';
-    srcWrap.style.display = isHidden ? 'block' : 'none';
-    btnSrc.textContent = isHidden ? '收起源码' : '查看源码';
-    if (isHidden && !srcLoaded) {
-      try {
-        const data = await fetch('/api/file?path=' + encodeURIComponent(demo.path)).then((r) =>
-          r.json()
-        );
-        srcCode.textContent = data.content || '';
-        highlightOne(srcCode);
-        srcLoaded = true;
-      } catch (e) {
-        srcCode.textContent = '加载失败：' + e;
-      }
+  // ---- 头部点击 = 手风琴展开/收起 ----
+  head.addEventListener('click', (e) => {
+    // 点按钮不要触发折叠
+    if (e.target.closest('.btn')) return;
+    toggleCard(card, scope);
+  });
+
+  // 展开时按需加载源码
+  card.addEventListener('demo:opened', async () => {
+    if (srcLoaded) return;
+    try {
+      const data = await fetch('/api/file?path=' + encodeURIComponent(demo.path)).then((r) =>
+        r.json()
+      );
+      srcCode.textContent = data.content || '';
+      highlightOne(srcCode);
+      srcLoaded = true;
+    } catch (err) {
+      srcCode.textContent = '加载失败：' + err;
     }
   });
 
-  btnRun.addEventListener('click', () => {
+  // 收起时如果还在运行，发停止并清理
+  card.addEventListener('demo:closed', () => {
+    if (runId) {
+      try { fetch('/api/stop/' + runId, { method: 'POST' }); } catch {}
+    }
+    if (evtSource) {
+      evtSource.close();
+      evtSource = null;
+    }
+  });
+
+  // ---- 运行 ----
+  btnRun.addEventListener('click', (e) => {
+    e.stopPropagation();
+    // 没展开就先展开
+    if (!card.classList.contains('open')) toggleCard(card, scope, true);
+
     out.innerHTML = '';
     appendMeta(out, `▶ 启动 ${demo.path} ...`);
     status.textContent = '运行中';
@@ -321,21 +381,18 @@ async function buildDemoCard(demo) {
     btnRun.disabled = true;
     btnStop.style.display = 'inline-flex';
     inputBar.classList.remove('disabled');
+    inputEl.focus();
 
     evtSource = new EventSource('/api/run?path=' + encodeURIComponent(demo.path));
-    evtSource.addEventListener('start', (e) => {
-      const d = JSON.parse(e.data);
+    evtSource.addEventListener('start', (ev) => {
+      const d = JSON.parse(ev.data);
       runId = d.run_id;
       appendMeta(out, `[runner] python=${d.python}  pid=${d.run_id}`);
     });
-    evtSource.addEventListener('stdout', (e) => {
-      append(out, JSON.parse(e.data), 'stdout');
-    });
-    evtSource.addEventListener('stderr', (e) => {
-      append(out, JSON.parse(e.data), 'stderr');
-    });
-    evtSource.addEventListener('exit', (e) => {
-      const d = JSON.parse(e.data);
+    evtSource.addEventListener('stdout', (ev) => append(out, JSON.parse(ev.data), 'stdout'));
+    evtSource.addEventListener('stderr', (ev) => append(out, JSON.parse(ev.data), 'stderr'));
+    evtSource.addEventListener('exit', (ev) => {
+      const d = JSON.parse(ev.data);
       const ok = d.code === 0;
       append(out, `\n[exit code ${d.code}]`, ok ? 'exit-ok' : 'exit-fail');
       status.textContent = ok ? '已完成' : `异常退出 (${d.code})`;
@@ -350,7 +407,8 @@ async function buildDemoCard(demo) {
     };
   });
 
-  btnStop.addEventListener('click', async () => {
+  btnStop.addEventListener('click', async (e) => {
+    e.stopPropagation();
     if (!runId) return;
     await fetch('/api/stop/' + runId, { method: 'POST' });
     appendMeta(out, '\n[已发送停止信号]');
@@ -367,7 +425,7 @@ async function buildDemoCard(demo) {
     append(out, `> ${text}\n`, 'meta');
     inputEl.value = '';
   }
-  sendBtn.addEventListener('click', send);
+  sendBtn.addEventListener('click', (e) => { e.stopPropagation(); send(); });
   inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -406,7 +464,4 @@ function escapeHtml(s) {
   );
 }
 
-// 目录按钮：滚动到主区域顶部
-$('#btn-toc').addEventListener('click', () => {
-  $('.content').scrollIntoView({ behavior: 'smooth' });
-});
+// （已移除 #btn-toc 按钮）
