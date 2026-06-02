@@ -393,7 +393,9 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
         def write_event(name: str, data: Any) -> bool:
-            payload = data if isinstance(data, str) else json.dumps(data, ensure_ascii=False)
+            # 始终 JSON 编码，前端统一 JSON.parse；
+            # 这样字符串里的 \n / 引号 / Unicode 都能安全穿越 SSE 协议。
+            payload = json.dumps(data, ensure_ascii=False)
             try:
                 self.wfile.write(f"event: {name}\ndata: {payload}\n\n".encode("utf-8"))
                 self.wfile.flush()
