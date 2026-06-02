@@ -13,10 +13,10 @@
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-mark">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2 L22 7 L12 12 L2 7 Z"/>
-            <path d="M2 12 L12 17 L22 12" opacity=".7"/>
-            <path d="M2 17 L12 22 L22 17" opacity=".4"/>
+            <path d="M2 12 L12 17 L22 12" opacity=".75"/>
+            <path d="M2 17 L12 22 L22 17" opacity=".5"/>
           </svg>
         </div>
         <div>
@@ -39,47 +39,53 @@
     <main class="main">
       <header class="topbar">
         <div class="crumbs">
-          <span id="crumb-course" class="crumb-course">—</span>
-          <span class="sep">›</span>
-          <span id="crumb-piece" class="crumb-piece">选择左侧课程开始学习</span>
+          <span id="crumb-course" class="crumb-course">Vibe Agent</span>
+          <span class="sep">/</span>
+          <span id="crumb-piece" class="crumb-piece">课程学习中心</span>
         </div>
         <div class="topbar-actions">
           <a class="ghost" target="_blank" rel="noreferrer"
              href="https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course"
-            >仓库 ↗</a>
+            >GitHub ›</a>
         </div>
       </header>
 
       <section class="content" id="content">
         <div class="welcome">
           <div class="hero">
-            <div class="hero-eyebrow">VIBE AGENT · COURSE</div>
-            <h1>把 Markdown 讲义和 Python Demo<br/>装进一个能跑的页面</h1>
+            <div class="hero-eyebrow">Coding Agent. 从零开始。</div>
+            <h1>把 8 节课<br/><span class="grad">装进一个能跑的页面</span>。</h1>
             <p class="hero-desc">
-              本工具把仓库里 <code>01 ~ 08</code> 节课的 Markdown 渲染成更易读的页面，
-              并让每节课的 Python Demo <strong>可以一键运行</strong>，输出实时回流到浏览器。
+              在浏览器里阅读全部讲义，并一键运行每节课的 Python Demo。
+              输出实时回流，交互式 Demo 还能在终端里直接对话。
             </p>
+            <div class="hero-cta">
+              <button class="cta primary" id="cta-start">开始学习</button>
+              <a class="cta ghost" href="https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course" target="_blank">了解更多</a>
+            </div>
+
             <div class="hero-grid">
               <div class="hero-card">
-                <div class="hero-icon">📚</div>
+                <div class="hero-icon">📖</div>
                 <div class="hero-card-title">阅读讲义</div>
-                <div class="hero-card-desc">左侧选择课程 → 点开任意章节</div>
+                <div class="hero-card-desc">8 节课的 Markdown，统一排版渲染，离线可读。</div>
               </div>
               <div class="hero-card">
-                <div class="hero-icon">🐍</div>
-                <div class="hero-card-title">运行 Demo</div>
-                <div class="hero-card-desc">切到「代码示例」标签，单击展开运行</div>
+                <div class="hero-icon">⚡</div>
+                <div class="hero-card-title">一键运行</div>
+                <div class="hero-card-desc">点击 ▶ 即可执行 Demo，输出实时流式回传。</div>
               </div>
               <div class="hero-card">
                 <div class="hero-icon">⌨️</div>
                 <div class="hero-card-title">交互输入</div>
-                <div class="hero-card-desc">运行后可向 demo stdin 发送任意一行</div>
+                <div class="hero-card-desc">运行后可向 Demo 进程发送任意一行 stdin。</div>
               </div>
             </div>
+
             <p class="hero-tip">
-              💡 提示：运行 LLM 类 demo 前，请按
-              <code>.env.example</code> 在仓库根目录创建 <code>.env</code> 并配置
-              <code>BASE_URL</code>/<code>API_KEY</code>/<code>MODEL_ID</code>。
+              运行 LLM 类 Demo 前，请按 <code>.env.example</code> 在仓库根目录创建
+              <code>.env</code> 并配置 <code>BASE_URL</code> / <code>API_KEY</code> /
+              <code>MODEL_ID</code>。
             </p>
           </div>
         </div>

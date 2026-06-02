@@ -57,15 +57,25 @@ async function init() {
   state.courses = r.courses;
   renderNav();
 
-  // 默认进入第一节课
-  if (state.courses.length) {
-    const first = state.courses[0];
-    const piece = first.lectures[0] || first.demos[0];
-    if (piece) {
-      const kind = first.lectures[0] ? 'lecture' : 'demo';
-      openPiece(first.id, kind, piece.path);
-    }
+  // CTA：开始学习 → 进入第一节课
+  const cta = $('#cta-start');
+  if (cta) {
+    cta.addEventListener('click', enterFirstLesson);
   }
+
+  // 不再自动跳转，保留 hero 欢迎页
+}
+
+function enterFirstLesson() {
+  if (!state.courses.length) return;
+  const first = state.courses[0];
+  const piece = first.lectures[0] || first.demos[0];
+  if (!piece) return;
+  const kind = first.lectures[0] ? 'lecture' : 'demo';
+  // 展开第一节
+  const navEl = $('.nav-course');
+  if (navEl) navEl.classList.add('open');
+  openPiece(first.id, kind, piece.path);
 }
 
 // 后端在线检测：状态变更
@@ -94,11 +104,11 @@ function renderNav() {
     head.className = 'nav-course-header';
     head.innerHTML = `
       <div class="nav-course-index">${num}</div>
-      <div style="min-width:0; flex:1;">
+      <div class="nav-course-text">
         <div class="nav-course-title">${escapeHtml(c.title)}</div>
         <div class="nav-course-sub">${escapeHtml(c.subtitle)}</div>
       </div>
-      <div class="nav-course-caret">▸</div>
+      <div class="nav-course-caret">›</div>
     `;
     head.addEventListener('click', () => {
       courseEl.classList.toggle('open');
