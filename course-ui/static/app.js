@@ -226,14 +226,52 @@ async function openPiece(courseId, kind, path) {
   }
 }
 
-// ---------------- 讲义渲染 ----------------
+// ---------------- 讲义渲染（三栏：TOC + Markdown + 笔记） ----------------
 async function renderLecture(path) {
   const body = $('#tab-body');
   body.innerHTML = '<div class="markdown">加载中…</div>';
   try {
     const data = await fetch('/api/file?path=' + encodeURIComponent(path)).then((r) => r.json());
     const html = renderMarkdown(data.content || '');
-    body.innerHTML = `<div class="markdown">${html}</div>`;
+
+    // 三栏布局
+    body.innerHTML = `
+      <div class="lecture-layout">
+        <aside class="toc" id="toc">
+          <div class="toc-head">
+            <span class="toc-title">本节大纲</span>
+            <span class="toc-count" id="toc-count">0</span>
+          </div>
+          <div class="toc-list" id="toc-list"></div>
+        </aside>
+
+        <article class="markdown" id="lecture-md">${html}</article>
+
+        <aside class="notes" id="notes">
+          <div class="notes-head">
+            <div class="notes-title">
+              <span>我的笔记</span>
+              <span class="notes-key mono">${escapeHtml(path.split('/').pop())}</span>
+            </div>
+            <div class="notes-actions">
+              <button class="iconbtn" data-act="notes-export" title="导出全部笔记为 Markdown">↓ 导出</button>
+              <button class="iconbtn" data-act="notes-clear"  title="清空当前页笔记">✕</button>
+            </div>
+          </div>
+          <textarea
+            class="notes-area mono"
+            id="notes-area"
+            spellcheck="false"
+            placeholder="在这里随手记录想法 / 课堂要点 / 待办…&#10;&#10;支持 Markdown，自动按页面保存到浏览器，关闭也不会丢。"
+          ></textarea>
+          <div class="notes-foot">
+            <span class="notes-status" id="notes-status">已保存</span>
+            <span class="notes-meta mono" id="notes-meta">0 字</span>
+          </div>
+        </aside>
+      </div>
+    `;
+
     // 修复相对图片路径
     $$('.markdown img').forEach((img) => {
       const src = img.getAttribute('src');
@@ -244,9 +282,174 @@ async function renderLecture(path) {
     });
     // 高亮代码块
     highlightAll($('.markdown', body));
+
+    // 构建大纲 / 滚动联动
+    buildTOC($('#lecture-md'), $('#toc-list'), $('#toc-count'));
+    // 启用笔记
+    setupNotes(path);
   } catch (e) {
     body.innerHTML = `<div class="markdown">加载失败：${escapeHtml(String(e))}</div>`;
   }
+}
+
+// 自动生成本节大纲，并接入滚动联动
+function buildTOC(mdRoot, listEl, countEl) {
+  if (!mdRoot || !listEl) return;
+  const heads = $$('h1, h2, h3', mdRoot);
+  // 给每个标题加 id
+  const used = new Set();
+  const items = heads.map((h, i) => {
+    let id = h.id;
+    if (!id) {
+      id = (h.textContent || `sec-${i}`)
+        .toLowerCase()
+        .replace(/[^a-z0-9\u4e00-\u9fa5\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .slice(0, 60) || `sec-${i}`;
+      while (used.has(id)) id += '-x';
+      h.id = id;
+    }
+    used.add(id);
+    return { id, level: parseInt(h.tagName.slice(1), 10), text: h.textContent || '' };
+  });
+  countEl.textContent = items.length;
+
+  listEl.innerHTML = items
+    .map(
+      (it) =>
+        `<a class="toc-item lvl-${it.level}" href="#${it.id}" data-id="${it.id}">${escapeHtml(
+          it.text
+        )}</a>`
+    )
+    .join('');
+
+  $$('.toc-item', listEl).forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = a.getAttribute('data-id');
+      const tgt = document.getElementById(id);
+      if (tgt) {
+        tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // 高亮 1.2s
+        tgt.classList.add('hl-flash');
+        setTimeout(() => tgt.classList.remove('hl-flash'), 1200);
+      }
+    });
+  });
+
+  // 滚动监听：根据视口最上方第一个标题更新 active
+  if (items.length === 0) return;
+  const onScroll = () => {
+    const top = 80;
+    let active = items[0].id;
+    for (const it of items) {
+      const el = document.getElementById(it.id);
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (r.top - top <= 0) active = it.id;
+      else break;
+    }
+    $$('.toc-item', listEl).forEach((a) =>
+      a.classList.toggle('active', a.dataset.id === active)
+    );
+  };
+  // 节流
+  let raf = null;
+  const handler = () => {
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = null; onScroll(); });
+  };
+  // 主滚动容器是 window
+  window.addEventListener('scroll', handler, { passive: true });
+  onScroll();
+}
+
+// 笔记面板：localStorage 按 path 持久化
+function setupNotes(path) {
+  const key = 'vibe-notes::' + path;
+  const ta = $('#notes-area');
+  const status = $('#notes-status');
+  const meta = $('#notes-meta');
+  const exportBtn = $('[data-act=notes-export]');
+  const clearBtn = $('[data-act=notes-clear]');
+
+  let timer = null;
+  const saved = localStorage.getItem(key) || '';
+  ta.value = saved;
+  updateMeta();
+
+  ta.addEventListener('input', () => {
+    if (status) { status.textContent = '编辑中…'; status.classList.add('dirty'); }
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      localStorage.setItem(key, ta.value);
+      if (status) { status.textContent = '已保存'; status.classList.remove('dirty'); }
+      updateMeta();
+    }, 350);
+  });
+
+  ta.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      e.preventDefault();
+      localStorage.setItem(key, ta.value);
+      if (status) { status.textContent = '已保存'; status.classList.remove('dirty'); }
+      toast('笔记已保存', 'success', 1200);
+    }
+  });
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => exportAllNotes());
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      if (!confirm('确认清空当前页笔记？')) return;
+      ta.value = '';
+      localStorage.removeItem(key);
+      updateMeta();
+      toast('已清空当前页笔记', 'info', 1200);
+    });
+  }
+
+  function updateMeta() {
+    const len = (ta.value || '').length;
+    if (meta) meta.textContent = `${len} 字`;
+  }
+}
+
+function exportAllNotes() {
+  const all = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith('vibe-notes::')) continue;
+    const path = k.slice('vibe-notes::'.length);
+    const v = localStorage.getItem(k) || '';
+    if (v.trim()) all.push({ path, content: v });
+  }
+  if (!all.length) {
+    toast('还没有任何笔记', 'info');
+    return;
+  }
+  const ts = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+  const md = [
+    `# Vibe Agent · 我的课程笔记`,
+    `> 导出时间：${new Date().toLocaleString()}    共 ${all.length} 条`,
+    '',
+    ...all.map(
+      (n) => `## \`${n.path}\`\n\n${n.content.trim()}\n`
+    ),
+  ].join('\n');
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `vibe-agent-notes-${ts}.md`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }, 0);
+  toast(`已导出 ${all.length} 条笔记`, 'success');
 }
 
 // ---------------- Demo 列表（手风琴：单选展开） ----------------
@@ -304,6 +507,7 @@ function buildDemoCard(demo, indexNum, scope) {
         <div class="file">${escapeHtml(demo.path)}</div>
       </div>
       <div class="demo-actions">
+        <button class="btn icon-btn" data-act="layout" title="切换源码与终端的并排/上下布局" aria-label="切换布局">⫴</button>
         <button class="btn primary" data-act="run" title="运行 (Cmd/Ctrl+Enter)">▶ <span class="btn-label">运行</span></button>
         <button class="btn danger" data-act="stop" style="display:none;" title="停止">■ <span class="btn-label">停止</span></button>
       </div>
@@ -354,6 +558,7 @@ function buildDemoCard(demo, indexNum, scope) {
   const head      = $('.demo-head', card);
   const btnRun    = $('[data-act=run]', card);
   const btnStop   = $('[data-act=stop]', card);
+  const btnLayout = $('[data-act=layout]', card);
   const srcWrap   = $('.demo-source', card);
   const srcHead   = $('.demo-source .src-head', card);
   const srcCode   = $('.demo-source code', card);
@@ -598,6 +803,31 @@ function buildDemoCard(demo, indexNum, scope) {
     btnRun.disabled = false;
     btnStop.style.display = 'none';
     inputBar.classList.add('disabled');
+  }
+
+  // ---- 布局切换：单栏 / 并排 ----
+  const LAYOUT_KEY = 'vibe-demo-layout';
+  // 优先读偏好；否则在宽视口默认 split
+  const initialLayout =
+    localStorage.getItem(LAYOUT_KEY) ||
+    (window.innerWidth >= 1280 ? 'split' : 'stack');
+  applyLayout(initialLayout);
+
+  btnLayout.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const cur = card.classList.contains('split') ? 'split' : 'stack';
+    const next = cur === 'split' ? 'stack' : 'split';
+    applyLayout(next);
+    localStorage.setItem(LAYOUT_KEY, next);
+    // 全部 demo 卡片同步
+    $$('.demo-card', scope).forEach((c) => c.classList.toggle('split', next === 'split'));
+    toast(next === 'split' ? '已切换：源码 / 终端 并排' : '已切换：单栏布局', 'info', 1200);
+  });
+
+  function applyLayout(mode) {
+    card.classList.toggle('split', mode === 'split');
+    btnLayout.textContent = mode === 'split' ? '⫴' : '☰';
+    btnLayout.title = mode === 'split' ? '当前：并排 · 点击切换为单栏' : '当前：单栏 · 点击切换为并排';
   }
 
   return card;
