@@ -15,11 +15,11 @@
 
 # ---- 作业验证流水线（从 CI 仓库引入） ----
 include:
-  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter1.yml
-  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter2.yml
-  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter3.yml
-  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter4.yml
-  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter5.yml
+  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter1.yml
+  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter2.yml
+  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter3.yml
+  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter4.yml
+  - https://cnb.coo/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter5.yml
 
 # ---- NPC 事件流水线锚点（issue / pull_request 评论触发） ----
 # 插件任务写法：stage 只写 image，不写 script，CNB 直接跑镜像 ENTRYPOINT。
