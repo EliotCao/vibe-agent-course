@@ -7,21 +7,36 @@ const state = {
   current: { courseId: null, kind: null, path: null },
 };
 
-// marked + highlight
-marked.setOptions({
-  gfm: true,
-  breaks: false,
-  highlight(code, lang) {
-    try {
-      if (lang && hljs.getLanguage(lang)) {
-        return hljs.highlight(code, { language: lang }).value;
-      }
-      return hljs.highlightAuto(code).value;
-    } catch {
-      return code;
+// marked + highlight（支持离线时的降级）
+const HLJS_OK = typeof window.hljs !== 'undefined';
+const MARKED_OK = typeof window.marked !== 'undefined';
+
+function hl(code, lang) {
+  if (!HLJS_OK) return escapeHtml(code);
+  try {
+    if (lang && hljs.getLanguage(lang)) {
+      return hljs.highlight(code, { language: lang }).value;
     }
-  },
-});
+    return hljs.highlightAuto(code).value;
+  } catch {
+    return escapeHtml(code);
+  }
+}
+
+function renderMarkdown(text) {
+  if (!MARKED_OK) {
+    return `<pre style="white-space:pre-wrap;">${escapeHtml(text || '')}</pre>`;
+  }
+  marked.setOptions({ gfm: true, breaks: false, highlight: hl });
+  return marked.parse(text || '');
+}
+
+function highlightAll(root) {
+  if (!HLJS_OK) return;
+  $$('pre code', root).forEach((b) => {
+    try { hljs.highlightElement(b); } catch {}
+  });
+}
 
 // ---------------- 启动 ----------------
 init().catch((err) => {
@@ -198,7 +213,7 @@ async function renderLecture(path) {
   body.innerHTML = '<div class="markdown">加载中…</div>';
   try {
     const data = await fetch('/api/file?path=' + encodeURIComponent(path)).then((r) => r.json());
-    const html = marked.parse(data.content || '');
+    const html = renderMarkdown(data.content || '');
     body.innerHTML = `<div class="markdown">${html}</div>`;
     // 修复相对图片路径
     $$('.markdown img').forEach((img) => {
@@ -209,7 +224,7 @@ async function renderLecture(path) {
       }
     });
     // 高亮代码块
-    $$('.markdown pre code').forEach((b) => hljs.highlightElement(b));
+    highlightAll($('.markdown', body));
   } catch (e) {
     body.innerHTML = `<div class="markdown">加载失败：${escapeHtml(String(e))}</div>`;
   }
@@ -284,7 +299,7 @@ async function buildDemoCard(demo) {
           r.json()
         );
         srcCode.textContent = data.content || '';
-        hljs.highlightElement(srcCode);
+        if (HLJS_OK) { try { hljs.highlightElement(srcCode); } catch {} }
         srcLoaded = true;
       } catch (e) {
         srcCode.textContent = '加载失败：' + e;

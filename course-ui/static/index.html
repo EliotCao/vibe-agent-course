@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Vibe Agent · 课程学习中心</title>
   <link rel="stylesheet" href="/static/styles.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/atom-one-dark.min.css"
-  />
+  <link rel="stylesheet" href="/static/vendor/atom-one-dark.min.css" />
 </head>
 <body>
   <div class="app">
@@ -63,10 +60,18 @@
     </main>
   </div>
 
-  <!-- markdown 渲染 + 代码高亮 -->
-  <script src="https://cdn.jsdelivr.net/npm/marked@13.0.3/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/highlight.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/languages/python.min.js"></script>
+  <!-- markdown 渲染 + 代码高亮（本地 vendor，离线可用） -->
+  <script src="/static/vendor/marked.min.js"></script>
+  <script src="/static/vendor/highlight.min.js"></script>
+  <script src="/static/vendor/highlight-python.min.js"></script>
+  <script src="/static/vendor/highlight-bash.min.js"></script>
+  <script>
+    // 注册语言（cdnjs 版的语言包通常会自动 registerLanguage，这里兜底一次）
+    if (window.hljs) {
+      try { if (window.hljsDefinePython) hljs.registerLanguage('python', window.hljsDefinePython); } catch {}
+      try { if (window.hljsDefineBash)   hljs.registerLanguage('bash',   window.hljsDefineBash);   } catch {}
+    }
+  </script>
   <script src="/static/app.js"></script>
 </body>
 </html>
