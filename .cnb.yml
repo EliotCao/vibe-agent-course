@@ -14,12 +14,20 @@
 # =====================================================================
 
 # ---- 作业验证流水线（从 CI 仓库引入） ----
-include:
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter1.yml
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter2.yml
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter3.yml
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter4.yml
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter5.yml
+# 注意：opencamp/vibe-agent-course-ci 是私有仓库，PR 作者无访问权限时
+# CNB 解析整份 .cnb.yml 会失败（GetResourceAccess: not found），
+# 进而导致：
+#   - 云原生开发 / 课程 UI 一键预览初始化失败；
+#   - PR 流水线直接卡在 "Unable to obtain correct CI configuration file"，
+#     无法通过审查。
+# 本分支 feat/oli-ui-perf 仅交付 course-ui 改动，与作业 CI 解耦，
+# 因此暂时屏蔽 include；待权限放开或并到 main 时再恢复。
+# include:
+#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter1.yml
+#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter2.yml
+#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter3.yml
+#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter4.yml
+#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter5.yml
 
 # ---- NPC 事件流水线锚点（issue / pull_request 评论触发） ----
 # 插件任务写法：stage 只写 image，不写 script，CNB 直接跑镜像 ENTRYPOINT。
@@ -40,6 +48,7 @@ include:
 $:
   issue.comment@npc: *npc
   pull_request.comment@npc: *npc
+  # ---- vscode 事件：仓库自带"云原生开发"按钮 → 留给 VSCode WebIDE ----
   vscode:
     - runner:
         cpus: 16
@@ -57,6 +66,32 @@ $:
           script: |
             cd /root && npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y
             cd /workspace && uv sync --all-packages
+
+  # ---- web_trigger_course_ui：自定义按钮触发，启动课程学习中心（only-preview） ----
+  # 配套 .cnb/web_trigger.yml 中的 "📚 启动课程学习中心" 按钮。
+  # 与上面的 vscode 事件并列：用户在仓库分支详情页可同时看到
+  #   - 「云原生开发」按钮 → 进入 VSCode WebIDE（编辑代码）
+  #   - 「📚 启动课程学习中心」按钮 → 直接打开课程 UI（only-preview）
+  web_trigger_course_ui:
+    - runner:
+        cpus: 8
+      docker:
+        image: docker.cnb.cool/looc/default-dev-env:latest
+      env:
+        VIRTUAL_ENV_DISABLE_PROMPT: "1"
+      services:
+        - docker
+        - name: vscode
+          options:
+            # only-preview：直接打开课程 UI，不进 WebIDE。
+            # 业务端口固定 8686；onlyPreview 仍可在页面上点"启动远程开发"切回 WebIDE。
+            onlyPreview: true
+            # daemon=true：launch 命令会被当作后台进程托管，CNB 探测到 8686 端口
+            # 监听后立即跳转到预览。daemon=false 会等 launch 自身退出，
+            # 而 course-ui/server.py 是常驻前台进程，会卡在"环境创建中"。
+            launch: bash -lc 'cd /workspace && uv sync --all-packages && PORT=8686 HOST=0.0.0.0 bash course-ui/run.sh'
+            keepAliveTimeout: 3600000
+            daemon: true
 
 # ---- 默认分支推送：构建并推送镜像 ----
 main:
