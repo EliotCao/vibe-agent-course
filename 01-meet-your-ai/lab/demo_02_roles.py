@@ -12,8 +12,6 @@ Demo 02 · 三种 system prompt，三种"人格"
 """
 
 from __future__ import annotations
-
-from _env import chat as llm_chat
 from _env import chat_stream
 
 

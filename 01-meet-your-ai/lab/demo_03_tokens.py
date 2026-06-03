@@ -10,7 +10,6 @@ Demo 03 · Token 计算与上下文窗口
   3) 故意构造一个超出窗口的输入，看 API 报错（体感"窗口"是真实约束）
 
 跑法：
-    pip install tiktoken
     python demo_03_tokens.py
 """
 
@@ -29,7 +28,17 @@ MODEL = get_model_id()
 
 def show_tokens(text: str, label: str = "") -> None:
     ids = ENC.encode(text)
-    pieces = [ENC.decode([i]) for i in ids]
+    pieces = []
+    for i in ids:
+        # 拿到这个 token 对应的原始字节（不做 UTF-8 解码）
+        b = ENC.decode_single_token_bytes(i)
+        try:
+            # 单个 token 本身就是合法 UTF-8 → 正常显示文本
+            pieces.append(repr(b.decode("utf-8")))
+        except UnicodeDecodeError:
+            # 单个 token 只是「半个汉字 / 半个 emoji」的字节碎片
+            # 显式标成字节，避免渲染成乱码 �
+            pieces.append(f"<bytes {b.hex()}>")
 
     print(f"\n[{label}]")
     print(f"原文 ({len(text)} 字符): {text}")
