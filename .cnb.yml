@@ -14,16 +14,12 @@
 # =====================================================================
 
 # ---- 作业验证流水线（从 CI 仓库引入） ----
-# 注意：opencamp/vibe-agent-course-ci 是私有仓库，无访问权限时
-# CNB 解析整份 .cnb.yml 会失败（GetResourceAccess: not found），
-# 进而导致云原生开发/一键预览初始化失败。本分支 (feat/oli-ui-perf)
-# 暂时屏蔽 include；合并回 main 前请按需恢复。
-# include:
-#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter1.yml
-#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter2.yml
-#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter3.yml
-#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter4.yml
-#   - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter5.yml
+include:
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter1.yml
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter2.yml
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter3.yml
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter4.yml
+  - https://cnb.cool/opencamp/vibe-agent-course-ci/-/blob/main/chapter5.yml
 
 # ---- NPC 事件流水线锚点（issue / pull_request 评论触发） ----
 # 插件任务写法：stage 只写 image，不写 script，CNB 直接跑镜像 ENTRYPOINT。
