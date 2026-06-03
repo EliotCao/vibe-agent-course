@@ -40,6 +40,7 @@ include:
 $:
   issue.comment@npc: *npc
   pull_request.comment@npc: *npc
+  # ---- vscode 事件：仓库自带"云原生开发"按钮 → 留给 VSCode WebIDE ----
   vscode:
     - runner:
         cpus: 16
@@ -48,12 +49,34 @@ $:
       env:
         VIRTUAL_ENV_DISABLE_PROMPT: "1"
       services:
-        # docker 必须放在 only-preview 的 vscode service 之前
+        - vscode
+        - docker
+      # 开发环境启动后自动执行：把所有章节依赖同步到根 .venv，
+      # 这样 IDE 一打开就能跳转到第三方库源码，不需要手动选解释器。
+      stages:
+        - name: uv sync
+          script: |
+            cd /root && npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y
+            cd /workspace && uv sync --all-packages
+
+  # ---- web_trigger_course_ui：自定义按钮触发，启动课程学习中心（only-preview） ----
+  # 配套 .cnb/web_trigger.yml 中的 "📚 启动课程学习中心" 按钮。
+  # 与上面的 vscode 事件并列：用户在仓库分支详情页可同时看到
+  #   - 「云原生开发」按钮 → 进入 VSCode WebIDE（编辑代码）
+  #   - 「📚 启动课程学习中心」按钮 → 直接打开课程 UI（only-preview）
+  web_trigger_course_ui:
+    - runner:
+        cpus: 8
+      docker:
+        image: docker.cnb.cool/looc/default-dev-env:latest
+      env:
+        VIRTUAL_ENV_DISABLE_PROMPT: "1"
+      services:
         - docker
         - name: vscode
           options:
-            # only-preview：点击"云原生开发"按钮直接打开课程 UI（不进 WebIDE）
-            # 业务端口固定 8686；onlyPreview 仍可在页面上点"启动远程开发"切回 WebIDE
+            # only-preview：直接打开课程 UI，不进 WebIDE。
+            # 业务端口固定 8686；onlyPreview 仍可在页面上点"启动远程开发"切回 WebIDE。
             onlyPreview: true
             # daemon=true：launch 命令会被当作后台进程托管，CNB 探测到 8686 端口
             # 监听后立即跳转到预览。daemon=false 会等 launch 自身退出，
@@ -61,14 +84,6 @@ $:
             launch: bash -lc 'cd /workspace && uv sync --all-packages && PORT=8686 HOST=0.0.0.0 bash course-ui/run.sh'
             keepAliveTimeout: 3600000
             daemon: true
-      # 开发环境启动后自动执行：把所有章节依赖同步到根 .venv，
-      # 这样 IDE 一打开就能跳转到第三方库源码，不需要手动选解释器；
-      # 同时让 only-preview 模式下的 demo 一键运行也能直接用上 openai 等依赖。
-      stages:
-        - name: uv sync
-          script: |
-            cd /root && npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y
-            cd /workspace && uv sync --all-packages
 
 # ---- 默认分支推送：构建并推送镜像 ----
 main:
