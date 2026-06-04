@@ -1,0 +1,15 @@
+# =====================================================================
+# 自定义按钮配置（CNB web_trigger）
+#
+# 在分支详情页右上角，与"云原生开发"按钮并列展示：
+#   - 「云原生开发」（CNB 默认）   → VSCode WebIDE，编辑/调试代码
+#   - 「📚 课程学习中心」（自定义） → 启动 only-preview 工作区
+#                                     （在流水线日志页点击预览 URL 进入）
+#
+# 文档：https://docs.cnb.cool/zh/build/web-trigger.html
+# =====================================================================
+branch:
+  - buttons:
+      - name: 📚 课程学习中心
+        description: 在浏览器读 8 节课讲义并一键运行 Python Demo
+        event: web_trigger_course_ui

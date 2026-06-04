@@ -40,10 +40,10 @@ include:
 $:
   issue.comment@npc: *npc
   pull_request.comment@npc: *npc
-  # ---- vscode 事件：仓库自带"云原生开发"按钮 → VSCode WebIDE ----
-  # 学习课程 UI 见 README 顶部的入口指引；
-  # 在 WebIDE 终端里执行 `bash course-ui/run.sh` 即可启动课程学习中心，
-  # 浏览器访问端口转发的 8765 端口（详见 course-ui/README.md）。
+
+  # ---- vscode 事件：仓库自带「云原生开发」按钮 → VSCode WebIDE ----
+  # 进入 IDE 后，cnbcool/cnb-welcome 插件会自动打开终端并运行 CNB_WELCOME_CMD，
+  # 用一段醒目卡片提示"如何启动课程学习中心"。
   vscode:
     - runner:
         cpus: 16
@@ -51,6 +51,8 @@ $:
         image: docker.cnb.cool/looc/default-dev-env:latest
       env:
         VIRTUAL_ENV_DISABLE_PROMPT: "1"
+        # 进入 WebIDE 后自动在终端执行的命令（cnbcool/cnb-welcome 插件接管）
+        CNB_WELCOME_CMD: "bash /workspace/course-ui/welcome.sh"
       services:
         - vscode
         - docker
@@ -61,6 +63,30 @@ $:
           script: |
             cd /root && npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y
             cd /workspace && uv sync --all-packages
+
+  # ---- web_trigger_course_ui：自定义按钮触发，启动课程学习中心（only-preview）----
+  # 配套 .cnb/web_trigger.yml 中的 "📚 课程学习中心" 按钮。
+  # 平台限制：only-preview 自动跳转预览页这一行为仅在 vscode 事件下生效；
+  # 这里的 web_trigger 事件并不会"自动跳预览"——但因为 services.vscode.options.onlyPreview: true，
+  # CNB 仍会创建一个支持 8686 端口预览的工作区。流水线日志页会输出预览 URL，用户点击即可访问。
+  web_trigger_course_ui:
+    - runner:
+        cpus: 8
+      docker:
+        image: docker.cnb.cool/looc/default-dev-env:latest
+      env:
+        VIRTUAL_ENV_DISABLE_PROMPT: "1"
+      services:
+        # docker 必须放在 only-preview 的 vscode service 之前
+        - docker
+        - name: vscode
+          options:
+            onlyPreview: true
+            # daemon=true：launch 命令被当作后台进程托管；CNB 探测到 8686 端口
+            # 监听后即可访问预览页（详见 course-ui/server.py）。
+            launch: bash -lc 'cd /workspace && uv sync --all-packages && PORT=8686 HOST=0.0.0.0 bash course-ui/run.sh'
+            keepAliveTimeout: 3600000
+            daemon: true
 
 # ---- 默认分支推送：构建并推送镜像 ----
 main:
