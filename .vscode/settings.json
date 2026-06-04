@@ -31,5 +31,16 @@
   "terminal.integrated.env.linux": {
     "VIRTUAL_ENV": "${workspaceFolder}/.venv",
     "PATH": "${workspaceFolder}/.venv/bin:${env:PATH}"
-  }
+  },
+  // 自定义终端 Profile：首次打开终端时自动展示课程学习中心欢迎信息
+  // （作为 cnb-welcome 插件 CNB_WELCOME_CMD 的兜底方案）
+  "terminal.integrated.profiles.linux": {
+    "bash-with-welcome": {
+      "path": "bash",
+      "args": ["-c", "bash /workspace/course-ui/welcome.sh; exec bash -l"],
+      "icon": "book",
+      "color": "terminal.ansiYellow"
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "bash-with-welcome"
 }

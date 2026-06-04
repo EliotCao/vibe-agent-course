@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 # course-ui/welcome.sh
-# 进入 CNB WebIDE 后，cnbcool/cnb-welcome 插件会自动打开终端运行此脚本。
-# 由 .cnb.yml 中 vscode 事件的 env.CNB_WELCOME_CMD 触发。
+# 进入 CNB WebIDE 后展示课程学习中心入口信息。
+# 触发方式（按优先级）：
+#   1. cnb-welcome 插件：读取 env.CNB_WELCOME_CMD，首次打开终端时自动执行
+#   2. VSCode 终端 Profile：.vscode/settings.json 中配置默认终端启动时运行本脚本
+# 通过 /tmp 锁文件避免重复输出。
 
 set -u
+
+# 避免同一容器会话内重复显示
+LOCK="/tmp/.cnb_welcome_shown"
+[ -f "$LOCK" ] && exit 0
+touch "$LOCK"
 
 # 颜色（如果终端不支持就静默降级为空）
 B="$(printf '\033[1m')";   D="$(printf '\033[0m')"
