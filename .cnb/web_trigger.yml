@@ -3,8 +3,12 @@
 #
 # 在分支详情页右上角，与"云原生开发"按钮并列展示：
 #   - 「云原生开发」（CNB 默认）   → VSCode WebIDE，编辑/调试代码
-#   - 「📚 课程学习中心」（自定义） → 启动 only-preview 工作区
-#                                     （在流水线日志页点击预览 URL 进入）
+#   - 「📚 课程学习中心」（自定义） → 一键进入课程学习中心预览页
+#
+# 关键配置：openWorkspace: true
+#   表示该按钮启动云原生开发环境，触发构建后会直接进入云原生开发
+#   启动的 loading 页；配合 .cnb.yml 中 onlyPreview: true，最终自动
+#   跳转到课程学习中心预览页面。
 #
 # 文档：https://docs.cnb.cool/zh/build/web-trigger.html
 # =====================================================================
@@ -13,3 +17,4 @@ branch:
       - name: 📚 课程学习中心
         description: 在浏览器读 8 节课讲义并一键运行 Python Demo
         event: web_trigger_course_ui
+        openWorkspace: true
