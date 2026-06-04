@@ -5,7 +5,7 @@
 - 读取 markdown 讲义、Python 示例源码，渲染图片资源
 - 一键运行 lab/demo_*.py，并通过 SSE 流式回传 stdout/stderr
 - 支持向运行中进程注入 stdin（演示交互式 demo）
-- 默认监听 127.0.0.1:8765
+- 默认监听 0.0.0.0:8765（可通过环境变量 HOST/PORT 覆盖）
 """
 
 from __future__ import annotations
@@ -553,9 +553,9 @@ class Handler(BaseHTTPRequestHandler):
 
 def main() -> None:
     port = int(os.environ.get("PORT", "8765"))
-    addr = os.environ.get("HOST", "127.0.0.1")
+    addr = os.environ.get("HOST", "0.0.0.0")
 
-    # 强制 IPv4，避免某些 Python 构建在 ::: 上监听导致 127.0.0.1 不可达
+    # 强制 IPv4，避免某些 Python 构建在 ::: 上监听导致 0.0.0.0 不可达
     import socket as _socket
 
     class _IPv4HTTPServer(ThreadingHTTPServer):

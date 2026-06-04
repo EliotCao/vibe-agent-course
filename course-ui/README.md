@@ -14,9 +14,9 @@ python3 course-ui/server.py        # 直接跑
 bash   course-ui/run.sh            # 启动脚本
 ```
 
-> 默认监听 `127.0.0.1:8765`，可用环境变量 `PORT=9000 HOST=0.0.0.0` 覆盖。
+> 默认监听 `0.0.0.0:8765`，可用环境变量 `PORT=9000 HOST=127.0.0.1` 覆盖。
 
-打开浏览器访问 <http://127.0.0.1:8765>。
+打开浏览器访问 <http://localhost:8765>。
 
 > **运行 LLM 相关 demo 之前**：参考 `.env.example` 在仓库根目录创建
 > `.env`，填入 `BASE_URL` / `API_KEY` / `MODEL_ID`，否则 demo 会因
@@ -61,4 +61,5 @@ course-ui/
 - `/api/file` 只允许读取 `.md / .py / .txt` 且必须位于仓库内。
 - `/api/run` 只允许执行 `0X-*/lab/demo_*.py`，路径严格校验。
 - `/api/asset` 只允许图片资源（png/jpg/jpeg/gif/webp/svg）。
-- 服务默认仅监听 `127.0.0.1`，不暴露到外网。
+- 服务默认监听 `0.0.0.0`，在云环境/容器内可被外部访问；
+  本地开发如需仅限本机，可设置 `HOST=127.0.0.1`。
