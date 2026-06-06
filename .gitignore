@@ -26,3 +26,7 @@ ENV/
 .DS_Store
 
 .workbuddy
+
+
+# 课件
+04-context-and-memory/lab/notes/

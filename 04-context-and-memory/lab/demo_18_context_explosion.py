@@ -1,5 +1,5 @@
 """
-Demo 18 · 上下文爆炸：跑一个 30 轮的任务感受失控
+Demo 18 · 上下文爆炸：跑一个 20 轮的任务感受失控
 =============================================
 
 配套：第 18 节《上下文工程：为什么要管、什么时候爆》
@@ -31,7 +31,6 @@ FOLLOW_UP = (
 
 def main(rounds: int = 30) -> None:
     client = make_client()
-    MODEL = get_model_id()
 
     messages = [
         {"role": "system", "content": "你是一个旅行规划助手，回答尽量详细。"},
@@ -43,19 +42,41 @@ def main(rounds: int = 30) -> None:
 
     for turn in range(1, rounds + 1):
         try:
-            resp = client.chat.completions.create(
-                model=MODEL,
+            # 当前接口仅支持流式输出（stream=True）；
+            # 想拿到 usage 字段需显式打开 stream_options.include_usage=True，
+            # 这样最后一个 chunk 会带上 usage。
+            stream = client.chat.completions.create(
+                model=get_model_id(),
                 messages=messages,
                 temperature=0.4,
                 max_tokens=400,
+                stream=True,
+                stream_options={"include_usage": True},
             )
+
+            reply_parts: list[str] = []
+            usage = None
+            for chunk in stream:
+                # 注意：带 usage 的最后一个 chunk，choices 通常是空列表
+                if chunk.choices:
+                    delta = chunk.choices[0].delta
+                    if getattr(delta, "content", None):
+                        reply_parts.append(delta.content)
+                if getattr(chunk, "usage", None):
+                    usage = chunk.usage
         except Exception as e:
             print(f"\n💥 第 {turn} 轮调用失败: {e}")
             print("   这往往就是上下文撞窗口或者 timeout 了。")
             break
 
-        reply = resp.choices[0].message.content or ""
-        usage = resp.usage
+        reply = "".join(reply_parts)
+
+        if usage is None:
+            # 极少数兼容性问题：没拿到 usage 就跳过本轮统计，但仍然把对话累积下去
+            print(f"[第 {turn:2d} 轮] ⚠️ 无 usage 字段，跳过统计")
+            messages.append({"role": "assistant", "content": reply})
+            messages.append({"role": "user", "content": FOLLOW_UP})
+            continue
 
         prompt_tk = usage.prompt_tokens
         total_tk = usage.total_tokens
@@ -84,11 +105,14 @@ def main(rounds: int = 30) -> None:
             print(f"第 {i:2d} 轮 [{tk:>5d} tk] {bar}")
 
     print("\n💡 关键观察")
-    print(f"  - 起始 prompt：{history_tokens[0]} tokens")
-    print(f"  - 最终 prompt：{history_tokens[-1]} tokens")
-    if len(history_tokens) > 1:
-        growth = history_tokens[-1] / history_tokens[0]
-        print(f"  - 增长倍率：{growth:.1f}x")
+    if not history_tokens:
+        print("  - 一轮都没跑成功，无法统计 token 增长。请先排查接口/网络。")
+    else:
+        print(f"  - 起始 prompt：{history_tokens[0]} tokens")
+        print(f"  - 最终 prompt：{history_tokens[-1]} tokens")
+        if len(history_tokens) > 1:
+            growth = history_tokens[-1] / history_tokens[0]
+            print(f"  - 增长倍率：{growth:.1f}x")
     print("\n  第4章 后面要解决的问题：")
     print("    1. 上下文窗口虽然 128K，但不能任由它涨")
     print("    2. token 是按用量计费的，全量塞回去成本飙升")
