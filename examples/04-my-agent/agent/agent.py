@@ -13,7 +13,7 @@ from typing import Dict, List, Optional
 
 from llm import LLM
 from tools import ToolRegistry
-from context import ContextBuilder
+from context import ContextBuilder, Source
 
 
 class Agent(ABC):
@@ -88,8 +88,8 @@ class SimpleAgent(Agent):
             if not tool_calls:
                 # 无工具调用，即为最终回答
                 # 将本轮对话记录到 context 中，供下次调用使用
-                self.context.add(user_input, source="user", relevance=0.5)
-                self.context.add(response, source="assistant", relevance=0.5)
+                self.context.add(user_input, source=Source.USER, relevance=0.5)
+                self.context.add(response, source=Source.ASSISTANT, relevance=0.5)
                 return response
 
             # 执行工具，将结果注入上下文
@@ -100,7 +100,7 @@ class SimpleAgent(Agent):
 
             # 工具结果以高相关性注入 context
             tool_output = "\n".join(results)
-            self.context.add(tool_output, source="tool", relevance=1.0)
+            self.context.add(tool_output, source=Source.TOOL, relevance=1.0)
 
             # 重新构建 messages（含工具结果），再次调用 LLM
             messages = self.context.build(
@@ -203,8 +203,8 @@ Action: 选择以下之一:
             # 检查是否结束
             if action and action.lower().startswith("finish"):
                 answer = self._extract_finish(action)
-                self.context.add(user_input, source="user", relevance=0.5)
-                self.context.add(answer, source="assistant", relevance=0.5)
+                self.context.add(user_input, source=Source.USER, relevance=0.5)
+                self.context.add(answer, source=Source.ASSISTANT, relevance=0.5)
                 return answer
 
             # 执行工具
@@ -216,7 +216,7 @@ Action: 选择以下之一:
                 # 将每步结果注入 context，供后续步骤参考
                 self.context.add(
                     f"Step {step}: {thought} → {action} → {observation}",
-                    source="tool",
+                    source=Source.TOOL,
                     relevance=0.8,
                 )
                 history_lines.append(f"Thought: {thought}")

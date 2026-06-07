@@ -2,7 +2,7 @@
 name = "my-agent"
 version = "0.1.0"
 description = "第 4 章：自己动手搭建 agent"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "openai>=1.0.0",
     "python-dotenv>=1.0.0",

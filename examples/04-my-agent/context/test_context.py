@@ -1,7 +1,22 @@
-"""测试上下文构建器。"""
+"""
+测试上下文构建器。
+
+运行方式：
+
+source .venv/bin/activate
+cd examples/04-my-agent
+python context/test_context.py
+"""
+
+import sys
+from pathlib import Path
+
+# 把 04-my-agent/ 加进 sys.path，让 from llm import LLM 能命中
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 
 from llm import LLM
-from context import ContextBuilder
+from context.context_builder import ContextBuilder, Source
 
 
 def main():
@@ -14,12 +29,12 @@ def main():
     # 添加背景信息
     builder.add(
         "Agent 是一种利用 LLM 作为推理引擎，能自主规划、使用工具并完成任务的系统。",
-        source="memory",
+        source=Source.MEMORY,
         relevance=0.9,
     )
     builder.add(
         "上下文工程关注如何在每次模型调用前拼装最优输入上下文，提升正确性与效率。",
-        source="tool",
+        source=Source.TOOL,
         relevance=0.8,
     )
 
