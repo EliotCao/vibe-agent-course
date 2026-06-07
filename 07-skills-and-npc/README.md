@@ -18,6 +18,7 @@
 | 34 | NPC 是什么 | [34-what-is-npc.md](./lecture/34-what-is-npc.md) | — |
 | 35 | Docker 速通 | [35-docker-quick.md](./lecture/35-docker-quick.md) | — |
 | 36 | CNB Pipeline + NPC | [36-cnb-pipeline-and-npc.md](./lecture/36-cnb-pipeline-and-npc.md) | — |
+| 37 | 结课大作业 | [37-final-assignment.md](./lecture/37-final-assignment.md) | — |
 
 ## 运行 Demo
 
