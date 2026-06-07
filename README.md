@@ -49,10 +49,10 @@ bash course-ui/run.sh
 | 模块 | 主题 | 知识点 | 你的产出 |
 |------|------|--------|---------|
 | 01 | [VibeCoding 入门](./01-vibecoding-intro/) | VibeCoding 是什么 · 跟 AI 协作的节奏 · vibe 一个小游戏 · 推到 CNB · 云原生开发环境运行 | 一个你 vibe 出来、跑在 CNB 上的小游戏 |
-| 02 | [认识你的 AI](./02-meet-your-ai/) | Next-token prediction · Token 与向量 · Messages 协议（system/user/assistant） · 上下文窗口与成本 · 幻觉 | `my-agent/llm.py` — LLMClient 类 |
-| 03 | [Function Calling 与最小 Agent](./03-tools-and-agent-loop/) | Chatbot vs Agent · Function Calling 协议 · ToolRegistry（自动生成 JSON schema） · 最小 Agent Loop | `my-agent/tools.py` — ToolRegistry 类 |
-| 04 | [Agent 范式](./04-agent-patterns/) | ReAct（边想边做） · Plan-and-Solve（先规划再执行） · Reflection（起草→评审→修订） · 范式选型 | `my-agent/agent.py` — Agent 主循环 |
-| 05 | [上下文与记忆](./05-context-and-memory/) | 上下文爆炸问题 · 管理策略（keep_last + 摘要压缩） · 向量记忆（Embedding + 余弦相似度） · Agent v2 整合 | `my-agent/context.py` + `memory.py` |
+| 02 | [认识你的 AI](./02-meet-your-ai/)（老师负责理论部分） | Next-token prediction · Token 与向量 · Messages 协议（system/user/assistant） · 上下文窗口与成本 · 幻觉 | `my-agent/llm.py` — LLMClient 类 |
+| 03 | [Function Calling 与最小 Agent](./03-tools-and-agent-loop/)（老师负责理论部分） | Chatbot vs Agent · Function Calling 协议 · ToolRegistry（自动生成 JSON schema） · 最小 Agent Loop | `my-agent/tools.py` — ToolRegistry 类 |
+| 04 | [Agent 范式](./04-agent-patterns/)（老师负责理论部分） | ReAct（边想边做） · Plan-and-Solve（先规划再执行） · Reflection（起草→评审→修订） · 范式选型 | `my-agent/agent.py` — Agent 主循环 |
+| 05 | [上下文与记忆](./05-context-and-memory/)（老师负责理论部分） | 上下文爆炸问题 · 管理策略（keep_last + 摘要压缩） · 向量记忆（Embedding + 余弦相似度） · Agent v2 整合 | `my-agent/context.py` + `memory.py` |
 | 06 | [Coding Agent 工具集](./06-coding-agent-tools/) | 5 阶段工作流（理解→定位→修改→验证→汇报） · 工具设计哲学 · 5 个核心工具（read/write/edit/list_dir/bash） | `my-agent/coding_tools/` — 5 个工具 |
 | 07 | [整合：完整 Coding Agent](./07-coding-agent-integration/) | 模块协作架构 · REPL 交互界面 · 端到端调试 · 真实任务闭环 | `my-agent/main.py` — 零件拼装 |
 | 08 | [Skills 扩展 + NPC 上线 + 大作业](./08-skills-and-npc/) | Skills 系统（SKILL.md） · NPC 概念 · Docker 打包 · CNB Pipeline + NPC 部署 · 结课大作业 | 自定义 Skills + 仓库 NPC + 大作业 |
