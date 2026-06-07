@@ -35,24 +35,24 @@ STATIC_DIR = HERE / "static"
 COURSE_DIRS = sorted([p for p in ROOT.iterdir() if re.match(r"^0[1-8]-", p.name)])
 
 COURSE_TITLES: dict[str, str] = {
-    "01-meet-your-ai": "认识你的 AI",
-    "02-tools-and-agent-loop": "Function Calling 与最小 Agent",
-    "03-agent-patterns": "Agent 范式（ReAct / Plan / Reflection）",
-    "04-context-and-memory": "上下文与记忆",
-    "05-coding-agent-tools": "Coding Agent 工具集",
-    "06-coding-agent-integration": "整合：完整 Coding Agent",
-    "07-skills-and-npc": "Skills 扩展 + NPC 上线",
-    "08-recap-and-final": "总结与大作业",
+    "01-vibecoding-intro": "VibeCoding 入门：先玩起来",
+    "02-meet-your-ai": "认识你的 AI",
+    "03-tools-and-agent-loop": "Function Calling 与最小 Agent",
+    "04-agent-patterns": "Agent 范式（ReAct / Plan / Reflection）",
+    "05-context-and-memory": "上下文与记忆",
+    "06-coding-agent-tools": "Coding Agent 工具集",
+    "07-coding-agent-integration": "整合：完整 Coding Agent",
+    "08-skills-and-npc": "Skills 扩展 + NPC 上线 + 大作业",
 }
 COURSE_SUBTITLES: dict[str, str] = {
-    "01-meet-your-ai": "Next-token · Tokens · Roles · 幻觉",
-    "02-tools-and-agent-loop": "Function Calling · ToolRegistry · Agent Loop",
-    "03-agent-patterns": "ReAct · Plan-and-Solve · Reflection",
-    "04-context-and-memory": "上下文管理 · 向量记忆 · Agent v2",
-    "05-coding-agent-tools": "5 阶段工作流 · 5 个核心工具",
-    "06-coding-agent-integration": "REPL · 端到端调试 · 真实任务闭环",
-    "07-skills-and-npc": "SKILL.md · NPC · Docker · CNB Pipeline",
-    "08-recap-and-final": "全链路复盘 · 大作业",
+    "01-vibecoding-intro": "vibe 一个游戏 · 推到 CNB · 云原生运行",
+    "02-meet-your-ai": "Next-token · Tokens · Roles · 幻觉",
+    "03-tools-and-agent-loop": "Function Calling · ToolRegistry · Agent Loop",
+    "04-agent-patterns": "ReAct · Plan-and-Solve · Reflection",
+    "05-context-and-memory": "上下文管理 · 向量记忆 · Agent v2",
+    "06-coding-agent-tools": "5 阶段工作流 · 5 个核心工具",
+    "07-coding-agent-integration": "REPL · 端到端调试 · 真实任务闭环",
+    "08-skills-and-npc": "SKILL.md · NPC · Docker · CNB · 大作业",
 }
 
 # ------------------------------------------------------------------
