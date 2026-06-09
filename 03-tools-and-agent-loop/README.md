@@ -18,6 +18,7 @@
 | 7 | Function Calling 协议 | [07-function-calling.md](./lecture/07-function-calling.md) | `demo_07_function_calling_protocol.py` |
 | 8 | ToolRegistry | [08-tool-registry.md](./lecture/08-tool-registry.md) | `demo_08_tool_registry.py` |
 | 9 | 最小 Agent Loop | [09-agent-loop.md](./lecture/09-agent-loop.md) | `demo_09_mini_agent.py` |
+| 10 | Tool Calling 扩展面（MCP / Skill / RAG 预告） | [10-tool-calling-extensions.md](./lecture/10-tool-calling-extensions.md) | — |
 
 ## 运行 Demo
 

@@ -17,14 +17,8 @@ touch "$LOCK"
 B="$(printf '\033[1m')";   D="$(printf '\033[0m')"
 C="$(printf '\033[36m')";  G="$(printf '\033[32m')";  Y="$(printf '\033[33m')"
 M="$(printf '\033[35m')";  W="$(printf '\033[97m')"
-
-# 端口转发预览 URL（CNB 提供 CNB_VSCODE_WEB_URL，再拼端口前缀）
-PORT="${PORT:-8765}"
-PREVIEW_URL=""
-if [ -n "${CNB_VSCODE_WEB_URL:-}" ]; then
-  # CNB 端口转发地址形如 https://<workspace-host>/-/proxy/<port>/
-  PREVIEW_URL="${CNB_VSCODE_WEB_URL%/}/-/proxy/${PORT}/"
-fi
+# 反白高亮（用于"可复制命令"），降级时退化为加粗
+INV="$(printf '\033[7m')"
 
 cat <<EOF
 
@@ -36,27 +30,15 @@ ${C}${B}║${D}    ${W}三栏阅读 + 一键运行 Demo + 可编辑代码 + 笔�
 ${C}${B}║${D}                                                                      ${C}${B}║${D}
 ${C}${B}╚══════════════════════════════════════════════════════════════════════╝${D}
 
-  ${G}${B}▶ 启动课程 UI（一行命令即可）${D}
+  ${G}${B}▶ 第 1 步：在下方终端粘贴并回车，启动课程 UI${D}
 
-      ${Y}bash course-ui/run.sh${D}
+      ${INV}${B} bash course-ui/run.sh ${D}
 
-  ${G}${B}▶ 启动后访问${D}
+  ${G}${B}▶ 第 2 步：在 server 启动日志里拿到预览链接${D}
 
-EOF
-
-if [ -n "$PREVIEW_URL" ]; then
-  echo "      ${C}${B}${PREVIEW_URL}${D}"
-  echo
-  echo "      ${W}（CNB 已自动做端口转发，复制到浏览器或 Cmd/Ctrl+点击直接打开）${D}"
-else
-  echo "      ${W}- 在 VSCode 右下角弹窗里点 'Open in Browser'${D}"
-  echo "      ${W}- 或在 PORTS / 端口转发面板找到 8765${D}"
-fi
-
-cat <<EOF
-
-  ${G}${B}▶ 也可点击仓库分支页右上角的「📚 课程学习中心」按钮${D}
-      ${W}（CNB 自定义按钮，免在 IDE 里手动启动）${D}
+      ${W}启动后终端会打印一行 ${Y}🔗 预览链接：https://xxxx-8765.cnb.run/${D}
+      ${W}该链接由 CNB 端口转发实时生成，⌘/Ctrl + 点击即可在浏览器打开${D}
+      ${W}（链接随容器实例动态变化，不要从其它文档复制粘贴）${D}
 
   ${G}${B}▶ 文档${D}
       ${W}- 总览：${D}course-ui/README.md

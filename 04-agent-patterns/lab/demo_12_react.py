@@ -24,7 +24,10 @@ from __future__ import annotations
 
 import re
 
+from _env import chat as llm_chat
 from toy_agent_base import TASKS, make_llm, registry
+
+client, MODEL = make_llm()
 
 
 REACT_PROMPT_TEMPLATE = """你是一个会思考的助手，严格按以下格式回应。每一轮你只输出一对 Thought 和 Action，不要多输出。
@@ -94,7 +97,6 @@ def parse_action(action: str):
 
 
 def run_react(question: str, max_steps: int = 6, verbose: bool = True) -> str:
-    client, MODEL = make_llm()
     history_lines: list[str] = []
 
     for step in range(1, max_steps + 1):
@@ -103,12 +105,13 @@ def run_react(question: str, max_steps: int = 6, verbose: bool = True) -> str:
             question=question,
             history="\n".join(history_lines) if history_lines else "（无）",
         )
-        resp = client.chat.completions.create(
-            model=MODEL,
+        msg = llm_chat(
             messages=[{"role": "user", "content": prompt}],
             temperature=0,
+            client=client,
+            model=MODEL,
         )
-        raw = resp.choices[0].message.content or ""
+        raw = msg.content or ""
         thought, action = parse_react_output(raw)
 
         if verbose:

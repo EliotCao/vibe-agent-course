@@ -117,3 +117,15 @@ def load_skill(name: str) -> str:
 - SKILL.md = YAML frontmatter（元数据）+ Markdown body（完整指令）
 - 渐进式加载：启动只加索引，运行时按需加 body
 - 给 Agent 加 2 个工具（list_skills / load_skill）就能让 LLM 自主管理 Skills
+
+---
+
+## 随堂练习
+
+> 看懂 SKILL.md 标准不算数，**自己写一个能跑通的 Skill** 才算。下面这道必做题就是让你为真实项目场景产出一份 SKILL.md，并让 Agent 自动加载它：
+>
+> 🧪 [作业 7.1 · 写一个自定义 Skill](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/08-skills-and-npc/README.md)（README 中的 §7.1）
+>
+> 进阶选做：把"`list_skills` + `load_skill` 由 LLM 调"改成"chat 入口自动 `skills.match()`"，体会 token 节省 vs LLM 自主决策的权衡：
+>
+> 🧪 [作业 7.4 ★ Skills 自动匹配](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/08-skills-and-npc/README.md)（README 中的 §7.4）

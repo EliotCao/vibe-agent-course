@@ -64,30 +64,6 @@ $:
             cd /root && npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y
             cd /workspace && uv sync --all-packages
 
-  # ---- web_trigger_course_ui：自定义按钮触发，启动课程学习中心（only-preview）----
-  # 配套 .cnb/web_trigger.yml 中的 "📚 课程学习中心" 按钮。
-  # 按钮配置 openWorkspace: true，触发后会直接进入云原生开发 loading 页；
-  # 配合 services.vscode.options.onlyPreview: true，最终自动跳转到课程
-  # 学习中心预览页面（8686 端口，由 course-ui/server.py 提供服务）。
-  web_trigger_course_ui:
-    - runner:
-        cpus: 8
-      docker:
-        image: docker.cnb.cool/looc/default-dev-env:latest
-      env:
-        VIRTUAL_ENV_DISABLE_PROMPT: "1"
-      services:
-        # docker 必须放在 only-preview 的 vscode service 之前
-        - docker
-        - name: vscode
-          options:
-            onlyPreview: true
-            # daemon=true：launch 命令被当作后台进程托管；CNB 探测到 8686 端口
-            # 监听后即可访问预览页（详见 course-ui/server.py）。
-            launch: bash -lc 'cd /workspace && uv sync --all-packages && PORT=8686 HOST=0.0.0.0 bash course-ui/run.sh'
-            keepAliveTimeout: 3600000
-            daemon: true
-
 # ---- 默认分支推送：构建并推送镜像 ----
 main:
   push:

@@ -15,5 +15,6 @@ fi
 
 PORT="${PORT:-8765}"
 HOST="${HOST:-0.0.0.0}"
-echo "[course-ui] 启动 http://${HOST}:${PORT}  (Ctrl+C 退出)"
+# 启动前不再打印「启动 http://...」预告 —— server.py 起来后会直接输出一行
+# 「🔗 预览链接：...」，那是真正可达的 URL，避免重复噪音。
 PORT="$PORT" HOST="$HOST" "$PY" "$HERE/server.py"

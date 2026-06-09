@@ -129,26 +129,71 @@ assistant.tool_calls = [
 
 ## ReAct 老写法 vs Function Calling 新写法
 
+时间线先讲清楚：**2022 年 ReAct 论文**（Yao et al.）就提出了"模型边想边调工具"的范式，但当时**没有** `tool_calls` 这种结构化字段——所有调用都得**塞进 prompt、再从 `res.content` 里抠出来**。
+
+也就是说，那时候的"调工具"完全靠两件东西：
+1. **Prompt 约定**：在 system 里强行规定模型必须按 `Thought: ... / Action: ... / Observation: ...` 这种格式输出。
+2. **正则解析**：模型回完之后，你再用 `re.search()` 把 `Action: get_weather(city="北京")` 这一行抠出来。
+
+来看一段当年典型的 `res.content` 长什么样：
+
+```
+Thought: 用户想知道北京天气，我应该调用 get_weather 工具，参数是 city="北京"。
+Action: get_weather(city="北京")
+```
+
+对应的解析代码就是这种调调：
+
 ```python
-# 旧（ReAct 风格，2023 年前主流）
+import re
+
+raw = resp.choices[0].message.content   # ← 注意：是 content，不是 tool_calls
+m = re.search(r'Action:\s*(\w+)\((.*?)\)', raw)
+if m:
+    name, arg_str = m.group(1), m.group(2)
+    # arg_str 形如：city="北京"
+    args = dict(re.findall(r'(\w+)\s*=\s*"([^"]*)"', arg_str))
+    result = run_tool(name, args)
+    # 把 Observation 拼回 prompt，再调一次 LLM …
+```
+
+看着没问题？真跑起来你会发现**这条路 4 类崩法天天遇到**：
+
+| 失败模式 | 模型可能输出的样子 | 为什么炸 |
+|---|---|---|
+| ① 模型多说一句 | `Action: get_weather(city="北京")\n这是因为...` | 正则贪婪/非贪婪写错就把后面那段也吞进 `args` |
+| ② 参数里带引号/逗号 | `Action: search(query="hello, "world"")` | 嵌套引号、逗号让 `re.findall` 切错；想正确解析得上 AST |
+| ③ 模型把 Action 换行 | `Action:\n  get_weather(\n    city="北京"\n  )` | 单行正则 miss；改成 `re.DOTALL` 又容易匹配过头 |
+| ④ 流式截断在中间 | `Action: get_weather(city="北` | 流式输出还没收完就拿去解析，参数残缺 |
+
+工程版 ReAct 一般要写**几百行 fallback** 才能勉强稳住——还要应付模型偶尔把 `Action:` 写成 `action:`、`Tool:`、`Use:` 各种中文化变体。"模型不规矩就崩"是 ReAct 时代的常态。
+
+---
+
+**2023 年 6 月 OpenAI 推出 Function Calling**，把这件事直接**搬出 prompt**：模型不再把"我要调谁"写在自然语言里，而是返回一个独立的、严格 JSON 化的 `tool_calls` 字段。
+
+```python
+# 旧（ReAct 风格，2022~2023 主流）
 prompt = """
 ...请按以下格式输出:
 Thought: ...
 Action: tool_name(arg=value)
 Observation: ...
 """
-# 然后用正则解析模型输出，脆得一批
+# 然后用正则解析模型输出，脆得一批 —— 见上表的 4 类炸法
 
 # 新（Function Calling，2023 年 6 月起）
 resp = client.chat.completions.create(
     messages=...,
     tools=[schema_a, schema_b, ...],
 )
-for tc in resp.choices[0].message.tool_calls:
+for tc in resp.choices[0].message.tool_calls:    # ← 结构化字段，没正则
     result = run_tool(tc.function.name, json.loads(tc.function.arguments))
 ```
 
-两种写法第3章还会再做一次正面对比，让你亲眼看到为什么"Function Calling 是行业拐点"。
+**结构化字段 vs 自然语言+正则**——这就是行业拐点。从此调工具的脆弱性问题被 OpenAI 这一层协议从根上消除了，写 Agent 的门槛骤降，工业级 Coding Agent（Cursor / Claude Code / Devin）也是从这一刻才井喷的。
+
+> 第 4 章我们讲 Agent 范式时还会再正面跑一次 ReAct 老写法的 demo，让你**亲手感受一次"模型不规矩就崩"**——你会很庆幸现在有 `tool_calls`。
 
 ## 动手试试
 
@@ -173,6 +218,12 @@ python demo_07_function_calling_protocol.py
 | 4 种角色 | system / user / assistant / **tool**（新增） |
 | `tool_calls` 字段 | 模型决定调工具时藏在 assistant 里的结构化字段 |
 | `tool_call_id` | tool 消息怎么对应到上一条 assistant 的某个调用 |
+
+## 随堂练习
+
+> 协议看懂了，**只有自己拼一遍 messages 才算真懂**。这道题让你手搓一次 user → assistant(tool_calls) → tool(result) → assistant(final) 的完整 4 步消息流：
+>
+> 🧪 [练习 2.1 · 手搓 Function Calling 消息流](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/03-tools-and-agent-loop/ex_2_1.py)
 
 ---
 

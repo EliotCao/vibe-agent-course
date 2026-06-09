@@ -118,6 +118,12 @@ python demo_24_five_stages.py
 | 工具输出 | 给 LLM 看的 UI，要带行号 / 区分类型 / 含状态码 |
 | 必做 5 个 | list_dir / read / write / edit / bash |
 
+## 随堂练习
+
+> 五阶段的第 ③ 步"理解"对应的就是 `read`——而工业上 `read` 的关键设计是**带行号返回**（方便下一步 `edit` 引用）。亲手写一遍：
+>
+> 🧪 [练习 5.1 · read_file 工具](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/06-coding-agent-tools/ex_5_1.py)
+
 ---
 
 下一节：每个工具背后藏着大量的"防 LLM 翻车"设计。**第 25 节会拆 4 个最关键的设计选择。**

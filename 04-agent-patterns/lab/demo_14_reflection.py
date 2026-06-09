@@ -21,8 +21,11 @@ from __future__ import annotations
 
 import re
 
+from _env import chat as llm_chat
 from toy_agent_base import TASKS, make_llm
 from demo_13_plan_and_solve import run_plan_and_solve
+
+client, MODEL = make_llm()
 
 
 # ============================================================
@@ -51,13 +54,13 @@ ISSUES:
 
 def review(question: str, answer: str) -> tuple[bool, str]:
     """返回 (是否通过, 评审意见字符串)。"""
-    client, MODEL = make_llm()
-    resp = client.chat.completions.create(
-        model=MODEL,
+    msg = llm_chat(
         messages=[{"role": "user", "content": REVIEW_PROMPT.format(question=question, answer=answer)}],
         temperature=0,
+        client=client,
+        model=MODEL,
     )
-    raw = resp.choices[0].message.content or ""
+    raw = msg.content or ""
     verdict_match = re.search(r"VERDICT:\s*(\w+)", raw)
     issues_match = re.search(r"ISSUES:\s*(.*)", raw, re.DOTALL)
     verdict = verdict_match.group(1).upper() if verdict_match else "PASS"
@@ -70,7 +73,6 @@ def review(question: str, answer: str) -> tuple[bool, str]:
 # Refiner：拿着评审意见再写一次
 # ============================================================
 def refine(question: str, prev_answer: str, review_feedback: str) -> str:
-    client, MODEL = make_llm()
     prompt = f"""你之前回答了一个用户问题，但评审员指出了问题。请基于评审意见**重写一份更好的答案**。
 
 用户问题：{question}
@@ -83,12 +85,13 @@ def refine(question: str, prev_answer: str, review_feedback: str) -> str:
 
 # 重写后的答案
 """
-    resp = client.chat.completions.create(
-        model=MODEL,
+    msg = llm_chat(
         messages=[{"role": "user", "content": prompt}],
         temperature=0,
+        client=client,
+        model=MODEL,
     )
-    return resp.choices[0].message.content or ""
+    return msg.content or ""
 
 
 # ============================================================

@@ -26,3 +26,6 @@ ENV/
 .DS_Store
 
 .workbuddy
+
+# Codebuddy 工作计划（运行时生成，不提交）
+.codebuddy/plans

@@ -138,6 +138,12 @@ system_prompt = """
 | assistant | AI 的历史回复 |
 | 模型无状态 | 每次调用必须全量传入历史 |
 
+## 随堂练习
+
+> 一行 system prompt = 一个不同的"人格"，亲手切一下就知道 messages 协议到底怎么工作：
+>
+> 🧪 [练习 1.2 · System Prompt 切换器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-meet-your-ai/ex_1_2.py)
+
 ---
 
 下一节：聊了这么多，**这些消息到底要花多少钱**？Token 是什么？上下文窗口又是什么？

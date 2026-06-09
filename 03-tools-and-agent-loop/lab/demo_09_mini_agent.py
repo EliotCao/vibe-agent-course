@@ -98,17 +98,25 @@ def calculator(expr: str) -> str:
     return str(eval(expr))  # noqa: S307 demo 简化
 
 
-@registry.tool("抓取一个 URL，返回前 500 字内容")
+@registry.tool(
+    "抓取一个 URL 的网页内容。返回 JSON 字符串，包含 total_length（原文真实字符总长度）"
+    "和 preview（前 500 字预览）。若需要字符长度请直接读 total_length，不要把 preview 当作全文。"
+)
 def fetch_url(url: str) -> str:
     try:
         with urllib.request.urlopen(url, timeout=10) as resp:
             body = resp.read().decode("utf-8", errors="replace")
-        return body[:500]
+        return json.dumps({
+            "url": url,
+            "total_length": len(body),
+            "preview": body[:500],
+            "truncated": len(body) > 500,
+        }, ensure_ascii=False)
     except Exception as e:
-        return f"抓取失败: {e}"
+        return json.dumps({"error": f"抓取失败: {e}"}, ensure_ascii=False)
 
 
-@registry.tool("获取当前北京时间，格式 YYYY-MM-DD HH:MM:SS")
+@registry.tool("获取当前北京时间，格式 YYYY-MM-DD HH:MM:SS。本工具返回的就是此刻最新时间，无需重复调用确认。")
 def current_time() -> str:
     import datetime
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -130,7 +138,16 @@ def run_agent(question: str, max_iters: int = 6, verbose: bool = True) -> str:
     from _env import chat as llm_chat
 
     messages = [
-        {"role": "system", "content": "你是一个会用工具的助手。需要时调用工具，最终给出简洁的中文回答。"},
+        {
+            "role": "system",
+            "content": (
+                "你是一个会用工具的助手。规则：\n"
+                "1) 工具返回的结果就是最新真值，不要重复调用同一个无参工具去\"确认\"。\n"
+                "2) 涉及网页字符长度时，请使用 fetch_url 返回 JSON 中的 total_length 字段，"
+                "不要用 preview 的截断长度当作全文长度。\n"
+                "3) 最终用简洁中文回答。"
+            ),
+        },
         {"role": "user", "content": question},
     ]
 
@@ -192,7 +209,7 @@ def run_agent(question: str, max_iters: int = 6, verbose: bool = True) -> str:
 TASKS = [
     "现在几点？",
     "17 * 23 等于多少？",
-    "请抓取 https://example.com 的内容并告诉我它的字符长度除以 7 是多少。",
+    "请抓取 https://example.com 的内容，告诉我它的网页字符总长度，再用 calculator 算出该长度除以 7 的结果。",
     "帮我查一下你训练数据里没有的'2099 年世界杯冠军是谁'。",
 ]
 

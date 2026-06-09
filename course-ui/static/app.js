@@ -5,6 +5,11 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const state = {
   courses: [],
   current: { courseId: null, kind: null, path: null },
+  // 跨 tab 记忆：切换 讲义/代码示例 后回到之前看的位置
+  lastLecturePath: null,
+  lastDemoPath: null,
+  // 由 server /api/courses 注入的运行时 env，比如 cnb_web_url
+  env: { cnb_web_url: '' },
 };
 
 // marked + highlight（兜底：每次调用时即时检查全局对象，
@@ -41,7 +46,15 @@ function highlightAll(root) {
 
 function highlightOne(el) {
   if (!hasHljs() || !el) return;
-  try { window.hljs.highlightElement(el); } catch {}
+  // hljs 在第一次高亮后会给元素打上 data-highlighted="yes" 并加 hljs/语言 class，
+  // 第二次直接调 highlightElement 会被它跳过（导致保存后只显示纯文本）。
+  // 这里先把状态清掉，再重新高亮。
+  try {
+    el.removeAttribute('data-highlighted');
+    const keepLangClass = Array.from(el.classList).find(c => c.startsWith('language-'));
+    el.className = keepLangClass || '';
+    window.hljs.highlightElement(el);
+  } catch {}
 }
 
 // ---------------- 启动 ----------------
@@ -55,6 +68,7 @@ async function init() {
   await checkBackend();
   const r = await fetch('/api/courses').then((r) => r.json());
   state.courses = r.courses;
+  state.env = r.env || { cnb_web_url: '' };
   renderNav();
 
   // CTA：开始学习 → 进入第一节课
@@ -171,8 +185,41 @@ function navItem(kind, title, onClick) {
   return el;
 }
 
+// 从文件路径里抠出第一个数字段（讲义/demo 的编号）
+function extractNumFromPath(p) {
+  const fname = (p || '').split('/').pop() || '';
+  const m = fname.match(/(\d+)/);
+  return m ? m[1].replace(/^0+/, '') : null;
+}
+function findMatchingDemo(course, lecturePath) {
+  const num = extractNumFromPath(lecturePath);
+  if (!num) return null;
+  return (
+    course.demos.find((d) => {
+      const dn = extractNumFromPath(d.path);
+      return dn === num;
+    }) || null
+  );
+}
+function findMatchingLecture(course, demoPath) {
+  const num = extractNumFromPath(demoPath);
+  if (!num) return null;
+  return (
+    course.lectures.find((l) => {
+      const ln = extractNumFromPath(l.path);
+      return ln === num;
+    }) || null
+  );
+}
+
 // ---------------- 打开内容 ----------------
 async function openPiece(courseId, kind, path) {
+  // 记忆当前位置（方便跨 tab 跳转时回到原小节）
+  if (kind === 'lecture') {
+    state.lastLecturePath = path;
+  } else if (kind === 'demo') {
+    state.lastDemoPath = path;
+  }
   state.current = { courseId, kind, path };
   const course = state.courses.find((c) => c.id === courseId);
   if (!course) return;
@@ -193,7 +240,14 @@ async function openPiece(courseId, kind, path) {
     </div>
   `;
 
-  // Tabs：讲义 / 代码示例
+  // Tabs：讲义 / 代码示例 / 随堂练习
+  // 「随堂练习」仅在 server 发现 exercises/<同名> 目录时才显示（用 course.exercises 判定），
+  // 没有就只渲染前两个 tab，避免出现「点进去空白」的尴尬。
+  const exTab = course.exercises
+    ? `<div class="tab ${kind === 'exercise' ? 'active' : ''}" data-tab="exercise">
+         📝 随堂练习 <span class="pill">${course.exercises.items.length}</span>
+       </div>`
+    : '';
   const tabsHtml = `
     <div class="tabs-row">
       <div class="tabs">
@@ -203,6 +257,7 @@ async function openPiece(courseId, kind, path) {
         <div class="tab ${kind === 'demo' ? 'active' : ''}" data-tab="demo">
           🐍 代码示例 <span class="pill">${course.demos.length}</span>
         </div>
+        ${exTab}
       </div>
     </div>
   `;
@@ -214,16 +269,39 @@ async function openPiece(courseId, kind, path) {
     t.addEventListener('click', () => {
       const newKind = t.dataset.tab;
       if (newKind === kind) return;
-      const piece =
-        newKind === 'lecture'
-          ? course.lectures[0]
-          : course.demos[0];
+      // 「随堂练习」tab：固定切到本章练习视图，不依赖 piece（练习不是讲义/demo 那种条目）。
+      // 用一个伪 path（目录路径）放进 state.current 仅用于面包屑显示。
+      if (newKind === 'exercise') {
+        if (!course.exercises) return;
+        openPiece(courseId, 'exercise', course.exercises.dir);
+        return;
+      }
+      let piece;
+      if (newKind === 'lecture') {
+        // 切到讲义：① 当前 demo 对应的讲义 > ② 上次看的讲义 > ③ 第一篇
+        piece =
+          (kind === 'demo' ? findMatchingLecture(course, path) : null) ||
+          (state.lastLecturePath
+            ? course.lectures.find((l) => l.path === state.lastLecturePath)
+            : null) ||
+          course.lectures[0];
+      } else {
+        // 切到 demo：① 当前讲义对应的 demo > ② 上次看的 demo > ③ 第一个
+        piece =
+          (kind === 'lecture' ? findMatchingDemo(course, path) : null) ||
+          (state.lastDemoPath
+            ? course.demos.find((d) => d.path === state.lastDemoPath)
+            : null) ||
+          course.demos[0];
+      }
       if (piece) openPiece(courseId, newKind, piece.path);
     })
   );
 
   if (kind === 'lecture') {
     await renderLecture(path);
+  } else if (kind === 'exercise') {
+    await renderExercises(course);
   } else {
     await renderDemos(course);
   }
@@ -237,8 +315,36 @@ async function renderLecture(path) {
     const data = await fetch('/api/file?path=' + encodeURIComponent(path)).then((r) => r.json());
     const html = renderMarkdown(data.content || '');
 
-    // 三栏布局
-    body.innerHTML = `
+    // 跨 tab 跳转：讲义 → Demo（精准到对应小节）
+  // 改造点：原本 demo 跳转 banner 放在讲义正文「顶部」，按用户要求挪到「末尾」，
+  // 同时格式从横条 banner 升级为「随堂练习」tab 同款卡片（.ex-card），
+  // 通过修饰类 .ex-card--demo 切到蓝调（代码示例语义）。
+  const course = state.courses.find((c) => c.id === state.current.courseId);
+  const matchedDemo = course ? findMatchingDemo(course, path) : null;
+  const fallbackDemo = course && course.demos.length ? course.demos[0] : null;
+  const demoTarget = matchedDemo || fallbackDemo;
+  const num = extractNumFromPath(path);
+  const demoTitle = matchedDemo && num
+    ? `第 ${num.padStart(2, '0')} 节代码示例`
+    : (fallbackDemo ? '本节代码示例' : '');
+  const demoJumpCard = demoTarget
+    ? `<div class="ex-card ex-card--demo"
+            data-demo="${escapeHtml(demoTarget.path)}"
+            title="跳转到对应代码示例">
+         <div class="ex-card-no">🐍</div>
+         <div class="ex-card-main">
+           <div class="ex-card-title">${escapeHtml(demoTitle)}</div>
+           <div class="ex-card-file">
+             <span class="badge py">PY</span>
+             <code>${escapeHtml(demoTarget.path)}</code>
+           </div>
+         </div>
+         <div class="ex-card-cta">在代码示例 tab 中打开 →</div>
+       </div>`
+    : '';
+
+  // 三栏布局
+  body.innerHTML = `
       <div class="lecture-layout">
         <aside class="toc" id="toc">
           <div class="toc-head">
@@ -248,7 +354,10 @@ async function renderLecture(path) {
           <div class="toc-list" id="toc-list"></div>
         </aside>
 
-        <article class="markdown" id="lecture-md">${html}</article>
+        <article class="markdown" id="lecture-md">
+          ${html}
+          ${demoJumpCard}
+        </article>
 
         <aside class="notes" id="notes">
           <div class="notes-head">
@@ -287,13 +396,100 @@ async function renderLecture(path) {
     // 高亮代码块
     highlightAll($('.markdown', body));
 
+    // 改造 markdown 里的「随堂练习」链接为卡片样式，并劫持跳转走 openFolderInIDE
+    //
+    // 为什么要在前端做、而不是改 markdown？
+    //   讲义里有 30+ 处 `🧪 [xxx](https://cnb.cool/.../exercises/<chapter>/<file or dir>)`
+    //   形式的链接，原本跳的是 CNB 仓库网页 —— **打不开云端 IDE、也定位不到目录**。
+    //   逐个改 markdown 工作量大且容易漏，所以统一在渲染后做 DOM 改写。
+    //
+    // 识别规则：链接 href 匹配 .../exercises/<rest> 即视为「练习链接」。
+    //   - 如果 <rest> 末尾是 .py，文件名作为 toast 提示，folder 取其父目录
+    //   - 否则 <rest> 直接作为目标目录
+    rewriteExerciseLinks($('.markdown', body));
+
     // 构建大纲 / 滚动联动
     buildTOC($('#lecture-md'), $('#toc-list'), $('#toc-count'));
     // 启用笔记
     setupNotes(path);
+
+    // 跨 tab 跳转：讲义末尾的「代码示例」卡片整体可点
+    const jumpLink = $('.ex-card--demo[data-demo]', body);
+    if (jumpLink) {
+      jumpLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const demoPath = jumpLink.dataset.demo;
+        if (demoPath && state.current.courseId) {
+          state.lastDemoPath = demoPath;
+          openPiece(state.current.courseId, 'demo', demoPath);
+        }
+      });
+    }
   } catch (e) {
     body.innerHTML = `<div class="markdown">加载失败：${escapeHtml(String(e))}</div>`;
   }
+}
+
+/**
+ * 把讲义 markdown 内的「随堂练习」链接改写为统一的 .ex-card 卡片。
+ *
+ * 识别规则：<a href> 里包含 `/exercises/<chapter>/<rest>` 子串（兼容 CNB 仓库
+ * URL 与相对路径两种来源）。匹配到后做两件事：
+ *   1) 用一个 <div class="ex-card"> 卡片替换 <a>，外观与随堂练习 tab 一致
+ *   2) 卡片 click 调 openFolderInIDE(targetDir, hintFilename) —— 让所有讲义内
+ *      练习入口都走与 tab 卡片相同的跳转路径（带 encodeURIComponent，能正确
+ *      定位到指定目录，不再依赖 CNB 仓库网页）
+ *
+ * 容错点：
+ *   - 仓库 URL 带前缀（cnb.cool/<owner>/<repo>/-/blob/<branch>/exercises/...
+ *     或 .../-/tree/<branch>/exercises/...）；用正则只抓 `/exercises/` 之后的
+ *     部分。
+ *   - 末尾 .py 的文件名作为 toast 「请在左侧打开 xxx」的提示，folder 取其父目录。
+ */
+function rewriteExerciseLinks(scope) {
+  if (!scope) return;
+  // 命中 .../exercises/<rest>，捕获 <rest>（去掉可能的 query/hash）
+  const RE = /\/exercises\/([^?#]+?)\/?(?:$|[?#])/;
+  $$('a[href]', scope).forEach((a) => {
+    const href = a.getAttribute('href') || '';
+    const m = href.match(RE);
+    if (!m) return;
+    const rest = m[1]; // 形如 "03-tools-and-agent-loop" 或 "03-tools-and-agent-loop/ex_2_1.py"
+    const parts = rest.split('/');
+    const last = parts[parts.length - 1];
+    const isFile = /\.[a-z0-9]+$/i.test(last);
+    const targetDir = isFile ? parts.slice(0, -1).join('/') : rest;
+    const hintFile = isFile ? last : null;
+
+    const label = (a.textContent || '').replace(/^🧪\s*/, '').trim() || (hintFile || targetDir);
+    const card = document.createElement('div');
+    card.className = 'ex-card ex-card--exercise';
+    card.dataset.targetDir = 'exercises/' + targetDir;
+    if (hintFile) card.dataset.hintFile = hintFile;
+    card.innerHTML = `
+      <div class="ex-card-no">🧪</div>
+      <div class="ex-card-main">
+        <div class="ex-card-title">${escapeHtml(label)}</div>
+        <div class="ex-card-file">
+          <span class="badge py">${escapeHtml(hintFile ? 'PY' : 'DIR')}</span>
+          <code>exercises/${escapeHtml(rest)}</code>
+        </div>
+      </div>
+      <div class="ex-card-cta">在云端 IDE 打开 →</div>
+    `;
+    card.addEventListener('click', () => {
+      openFolderInIDE(card.dataset.targetDir, card.dataset.hintFile || null);
+    });
+
+    // 如果原 <a> 单独占一段（外层是 <p> 且只有这一个有效子节点），直接替换段落，
+    // 这样卡片不会卡在 <p> 的行内排版里。否则就地替换 <a>。
+    const parent = a.parentElement;
+    if (parent && parent.tagName === 'P' && parent.childNodes.length === 1) {
+      parent.replaceWith(card);
+    } else {
+      a.replaceWith(card);
+    }
+  });
 }
 
 // 自动生成本节大纲，并接入滚动联动
@@ -514,16 +710,118 @@ async function renderDemos(course) {
     body.innerHTML = '<div class="markdown">本节没有可运行的 Python 示例。</div>';
     return;
   }
+
   const wrap = document.createElement('div');
   wrap.className = 'demos';
   body.innerHTML = '';
   body.appendChild(wrap);
 
+  // 决定展开哪一张：优先用 state.current.path（来自侧栏/跨 tab 跳转），
+  // 否则默认展开第一张
+  const targetPath = state.current && state.current.kind === 'demo'
+    ? state.current.path
+    : null;
+  let targetIdx = course.demos.findIndex((d) => d.path === targetPath);
+  if (targetIdx < 0) targetIdx = 0;
+
   course.demos.forEach((demo, idx) => {
-    const card = buildDemoCard(demo, idx + 1, wrap);
+    const card = buildDemoCard(demo, idx + 1, wrap, course);
     wrap.appendChild(card);
-    // 默认展开第一个 demo，便于一进来就看到完整源码
-    if (idx === 0) toggleCard(card, wrap, true);
+    if (idx === targetIdx) toggleCard(card, wrap, true);
+  });
+
+  // 滚动到展开的卡片
+  const openCard = $('.demo-card.open', wrap);
+  if (openCard && targetIdx > 0) {
+    setTimeout(() => openCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+  }
+}
+
+// ---------------- 随堂练习（独立 tab） ----------------
+// 渲染本章练习题：顶部一段说明 banner + 章节 README（题目介绍）+ 每题一张卡片。
+// 任何位置点击都跳云端 IDE 的练习目录（code-server 只能开目录，不能直接开单文件）。
+async function renderExercises(course) {
+  const body = $('#tab-body');
+  if (!course.exercises) {
+    body.innerHTML = '<div class="markdown">本章暂无练习题。</div>';
+    return;
+  }
+  const ex = course.exercises;
+
+  // 1) 加载本章 README（题目说明）
+  let readmeHtml = '';
+  if (ex.readme) {
+    try {
+      const data = await fetch('/api/file?path=' + encodeURIComponent(ex.readme)).then((r) => r.json());
+      readmeHtml = renderMarkdown(data.content || '');
+    } catch (e) {
+      readmeHtml = `<p class="ex-readme-err">README 加载失败：${escapeHtml(String(e))}</p>`;
+    }
+  }
+
+  // 2) 拼整体结构
+  body.innerHTML = `
+    <div class="exercises-layout">
+      <div class="ex-banner">
+        <div class="ex-banner-icon">📝</div>
+        <div class="ex-banner-text">
+          <div class="ex-banner-title">本章随堂练习</div>
+          <div class="ex-banner-sub">
+            目录 <code>${escapeHtml(ex.dir)}/</code> · 共 ${ex.items.length} 题 ·
+            点击任意题目跳到云端 IDE，补全 <code>TODO</code> 后运行看到 <code>✅ PASSED</code> 即完成
+          </div>
+        </div>
+        <button class="ex-open-all" data-act="open-dir">☁ 在云端 IDE 打开整个目录 →</button>
+      </div>
+
+      ${readmeHtml ? `<article class="markdown ex-readme">${readmeHtml}</article>` : ''}
+
+      <div class="ex-list">
+        ${ex.items.map((it, i) => `
+          <div class="ex-card" data-path="${escapeHtml(it.path)}">
+            <div class="ex-card-no">${String(i + 1).padStart(2, '0')}</div>
+            <div class="ex-card-main">
+              <div class="ex-card-title">${escapeHtml(it.title)}</div>
+              <div class="ex-card-file">
+                <span class="badge py">PY</span>
+                <code>${escapeHtml(it.path)}</code>
+              </div>
+            </div>
+            <div class="ex-card-cta">在云端 IDE 打开 →</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // 修复 README 里的相对图片路径（同 renderLecture 的处理）
+  if (ex.readme) {
+    const baseDir = ex.readme.split('/').slice(0, -1).join('/');
+    $$('.ex-readme img').forEach((img) => {
+      const src = img.getAttribute('src');
+      if (src && !/^https?:\/\//.test(src) && !src.startsWith('/')) {
+        img.src = '/api/asset?path=' + encodeURIComponent(`${baseDir}/${src}`);
+      }
+    });
+    highlightAll($('.ex-readme', body));
+  }
+
+  // 3) 交互：整目录按钮 + 每题卡片点击都跳 IDE
+  // 备注：CNB code-server 不支持 ?file= 打开单文件，所以每题点击实际也是打开目录，
+  // 用户在 IDE 左侧文件树里点对应 ex_*.py 即可。这里为提示精确度，toast 里带上文件名。
+  const dirBtn = $('[data-act=open-dir]', body);
+  if (dirBtn) {
+    dirBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openFolderInIDE(ex.dir);
+    });
+  }
+  $$('.ex-card', body).forEach((card) => {
+    card.addEventListener('click', () => {
+      const p = card.dataset.path;
+      // 用文件名作为「定位提示」，但 folder= 仍然传目录
+      openFolderInIDE(ex.dir, p ? p.split('/').pop() : null);
+    });
   });
 }
 
@@ -546,10 +844,25 @@ function toggleCard(card, scope, forceOpen) {
   }
 }
 
-function buildDemoCard(demo, indexNum, scope) {
+function buildDemoCard(demo, indexNum, scope, course) {
   // 从文件名抓出 demo_XX 的数字
   const m = demo.filename.match(/demo[_-]?(\d+)/i);
-  const numLabel = m ? m[1].padStart(2, '0') : String(indexNum).padStart(2, '0');
+  const demoNum = m ? m[1] : null;
+  const numLabel = demoNum ? demoNum.padStart(2, '0') : String(indexNum).padStart(2, '0');
+
+  // 找对应讲义：用 demo 数字匹配 lecture path 中的相同数字
+  let matchedLecture = null;
+  if (demoNum && course && course.lectures.length) {
+    const numStr = demoNum.replace(/^0+/, ''); // "06" → "6"
+    matchedLecture = course.lectures.find(l => {
+      const lm = l.path.match(/(\d+)/);
+      return lm && lm[1].replace(/^0+/, '') === numStr;
+    });
+  }
+
+  const jumpHTML = matchedLecture
+    ? `<a class="demo-jump-lecture" data-lecture="${escapeHtml(matchedLecture.path)}" title="跳转到第 ${numLabel} 节讲义">📚 讲义 第${numLabel}节</a>`
+    : '';
 
   const card = document.createElement('div');
   card.className = 'demo-card';
@@ -559,24 +872,18 @@ function buildDemoCard(demo, indexNum, scope) {
       <div class="live-pulse" title="运行状态"></div>
       <div class="demo-title">
         <div class="name">${escapeHtml(demo.title)}</div>
-        <div class="file">${escapeHtml(demo.path)}</div>
+        <div class="file">
+          ${escapeHtml(demo.path)}
+          ${jumpHTML}
+        </div>
       </div>
       <div class="demo-actions">
-        <button class="btn icon-btn" data-act="layout" title="切换源码与终端的并排/上下布局" aria-label="切换布局">⫴</button>
         <button class="btn primary" data-act="run" title="运行 (Cmd/Ctrl+Enter)">▶ <span class="btn-label">运行</span></button>
         <button class="btn danger" data-act="stop" style="display:none;" title="停止">■ <span class="btn-label">停止</span></button>
       </div>
       <div class="caret">›</div>
     </div>
     <div class="demo-body">
-      <div class="vscode-banner">
-        <div class="vsc-icon">VS</div>
-        <div class="vsc-text">
-          <b>想完整阅读这份代码？</b>
-          <small>切换到 VSCode 网页编辑器，享受跳转定义/全文搜索/Git diff</small>
-        </div>
-        <a class="vsc-cta" data-act="open-vscode">在 VSCode 中打开</a>
-      </div>
       <div class="demo-source">
         <div class="src-head">
           <span class="pyicon"></span>
@@ -613,7 +920,6 @@ function buildDemoCard(demo, indexNum, scope) {
   const head      = $('.demo-head', card);
   const btnRun    = $('[data-act=run]', card);
   const btnStop   = $('[data-act=stop]', card);
-  const btnLayout = $('[data-act=layout]', card);
   const srcWrap   = $('.demo-source', card);
   const srcHead   = $('.demo-source .src-head', card);
   const srcCode   = $('.demo-source code', card);
@@ -622,7 +928,6 @@ function buildDemoCard(demo, indexNum, scope) {
   const btnSave   = $('[data-act=save]',   card);
   const btnCancel = $('[data-act=cancel]', card);
   const btnReset  = $('[data-act=reset]',  card);
-  const btnVscode = $('[data-act=open-vscode]', card);
   const out      = $('.terminal-output', card);
   const status   = $('.terminal-head .status', card);
   const inputBar = $('.terminal-input', card);
@@ -636,9 +941,23 @@ function buildDemoCard(demo, indexNum, scope) {
 
   // ---- 头部点击 = 手风琴展开/收起 ----
   head.addEventListener('click', (e) => {
-    if (e.target.closest('.btn')) return;
+    if (e.target.closest('.btn, .demo-jump-lecture')) return;
     toggleCard(card, scope);
   });
+
+  // ---- 跳转到对应讲义 ----
+  const jumpLect = $('.demo-jump-lecture', card);
+  if (jumpLect) {
+    jumpLect.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const lectPath = jumpLect.dataset.lecture;
+      if (lectPath && state.current.courseId) {
+        state.lastLecturePath = lectPath;
+        openPiece(state.current.courseId, 'lecture', lectPath);
+      }
+    });
+  }
 
   // 展开时按需加载源码
   card.addEventListener('demo:opened', async () => {
@@ -750,13 +1069,6 @@ function buildDemoCard(demo, indexNum, scope) {
     markDirty(false);
   }
 
-  // ---- VSCode 引导 ----
-  btnVscode.addEventListener('click', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    openInVscode();
-  });
-
   // 收起时如果还在运行，发停止并清理
   card.addEventListener('demo:closed', () => {
     if (runId) {
@@ -860,30 +1172,7 @@ function buildDemoCard(demo, indexNum, scope) {
     inputBar.classList.add('disabled');
   }
 
-  // ---- 布局切换：单栏 / 并排 ----
-  const LAYOUT_KEY = 'vibe-demo-layout';
-  // 优先读偏好；否则在宽视口默认 split
-  const initialLayout =
-    localStorage.getItem(LAYOUT_KEY) ||
-    (window.innerWidth >= 1280 ? 'split' : 'stack');
-  applyLayout(initialLayout);
-
-  btnLayout.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const cur = card.classList.contains('split') ? 'split' : 'stack';
-    const next = cur === 'split' ? 'stack' : 'split';
-    applyLayout(next);
-    localStorage.setItem(LAYOUT_KEY, next);
-    // 全部 demo 卡片同步
-    $$('.demo-card', scope).forEach((c) => c.classList.toggle('split', next === 'split'));
-    toast(next === 'split' ? '已切换：源码 / 终端 并排' : '已切换：单栏布局', 'info', 1200);
-  });
-
-  function applyLayout(mode) {
-    card.classList.toggle('split', mode === 'split');
-    btnLayout.textContent = mode === 'split' ? '⫴' : '☰';
-    btnLayout.title = mode === 'split' ? '当前：并排 · 点击切换为单栏' : '当前：单栏 · 点击切换为并排';
-  }
+  // ---- 布局：固定为单栏（源码上 / 终端下），不再提供切换 ----
 
   return card;
 }
@@ -923,31 +1212,54 @@ function progress(active) {
   if (el) el.classList.toggle('active', !!active);
 }
 
-// ---------------- 切换到 VSCode 模式 ----------------
+// ---------------- 跳转到 CNB 云端 IDE ----------------
+// 顶栏「☁ 云端 IDE」按钮：打开整个工作区根。复用 openFolderInIDE("")，让所有跳转
+// 走同一个 URL 拼接逻辑（含 encodeURIComponent / 末尾斜杠归一化），避免两套实现走样。
 function openInVscode() {
-  // 在 CNB only-preview 模式下，运行时通常会注入这些环境变量；
-  // 浏览器侧无法直接读，但 CNB 工作区右上角有"启动远程开发"按钮可切。
-  // 我们尝试两种方式：
-  // 1) 如果 URL 包含 cnb only-preview 的 token，可以直接跳到 vscode 子路径
-  // 2) 否则提示用户手动点击"启动远程开发"
-  const host = location.host;
-  const isCNB = /cnb\.cool|cnb-rto|cnb\./.test(host);
-  if (isCNB) {
-    // CNB 会把 ?vscode=1 视为请求切换；不可识别则忽略，所以不会出错
-    const target = new URL(location.href);
-    target.searchParams.set('vscode', '1');
-    window.open(target.toString(), '_top');
-    toast('正在请求切换到 VSCode 远程开发…', 'info');
-  } else {
-    toast('请在 CNB 工作区右上角点击「启动远程开发」', 'info', 3500);
+  if (!state.env || !state.env.cnb_web_url) {
+    toast('当前不在 CNB 环境中，云端 IDE 入口不可用', 'warn', 3000);
+    return;
   }
+  openFolderInIDE('');
+}
+
+/**
+ * 在 CNB 云端 IDE（vscode-web / code-server）中打开仓库内的某个子目录。
+ *
+ * code-server 标准入口：<root>/?folder=<容器内绝对路径>
+ * CNB 把仓库挂载到容器内 /workspace，所以传 "exercises/03-..." 这种相对路径，
+ * 这里拼成 /workspace/exercises/03-...。
+ *
+ * 跳转 bug 关键修复点（之前点了 IDE 没切到指定目录）：
+ *   ① 必须 encodeURIComponent 路径 —— 反代层若不编码，参数可能在反向代理转发时被吞掉
+ *      或被切断（CNB 的 web URL 自带 /-/vscode-web/cnb-xxx-001/ 多级路径，未编码的
+ *      绝对路径里的 / 会跟反代规则冲突）
+ *   ② 拼 URL 前要把 root 末尾斜杠去净、再统一加一个 / 与 ?folder=，避免出现
+ *      "<root>//?folder=" 这种导致 code-server 404 或忽略参数的形态
+ *   ③ window.open 用 noopener，避免新窗口拿到 opener 引用
+ *
+ * @param {string} relPath   仓库相对目录，如 "exercises/03-tools-and-agent-loop"
+ * @param {string=} hintFile 仅用于 toast 提示「在左侧文件树点 xxx 打开」，不进 URL
+ */
+function openFolderInIDE(relPath, hintFile) {
+  const root = (state.env && state.env.cnb_web_url) || '';
+  if (!root) {
+    toast('当前不在 CNB 环境中，云端 IDE 入口不可用', 'warn', 3000);
+    return;
+  }
+  const clean = String(relPath || '').replace(/^\/+|\/+$/g, '');
+  // 容器内的绝对路径要整段 encode（含开头的斜杠），让反代层把它原样转给 code-server
+  const folderAbs = '/workspace/' + clean;
+  const target = `${root.replace(/\/+$/, '')}/?folder=${encodeURIComponent(folderAbs)}`;
+  window.open(target, '_blank', 'noopener');
+  const tip = hintFile
+    ? `已打开 ${clean}/，请在左侧文件树点 ${hintFile}`
+    : `已在云端 IDE 打开 ${clean}/`;
+  toast(tip, 'info', 2400);
 }
 
 // ---------------- 启动钩子 ----------------
 document.addEventListener('DOMContentLoaded', () => {
-  const heroVsc = document.getElementById('hero-vscode');
-  if (heroVsc) heroVsc.addEventListener('click', openInVscode);
-
   // pin 按钮：钉住/解除侧栏（写入 localStorage）
   const pinBtn = document.getElementById('pin-btn');
   const app = document.querySelector('.app');

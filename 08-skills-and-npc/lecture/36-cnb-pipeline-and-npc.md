@@ -109,3 +109,11 @@ npc:
 - `.cnb.yml` 定义 NPC 事件流水线（什么事件 → 跑什么镜像 → 跑什么脚本）
 - `npc-entrypoint.sh` 是容器内的粘合脚本（读事件 → 调 Agent → 回写评论）
 - 只需要：改名字 + 加 Secrets + push + 在 Issue 里 @ 就完成了
+
+---
+
+## 随堂练习
+
+> Pipeline 一定会出问题——**主动制造一次故障再把它修好**，才能真正掌握 NPC 排错链路（流水线日志 → 根因 → 修复）：
+>
+> 🧪 [作业 7.3 · NPC 故障排查](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/08-skills-and-npc/README.md)（README 中的 §7.3，要求产出 `troubleshooting.md`）

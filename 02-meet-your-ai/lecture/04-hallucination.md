@@ -158,6 +158,12 @@ prompt = f"""
 | 缓解 | RAG / 工具调用 / Prompt 约束 |
 | 现状 | 被对齐训练压制，但不当 prompt 可能让它复发 |
 
+## 随堂练习
+
+> 缓解幻觉的第一步是**能检测**。让 LLM 当"裁判"，判断另一段回答里有没有编造的内容——这就是工业上"LLM 自查"的最朴素版本：
+>
+> 🧪 [练习 1.3 · 幻觉检测器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-meet-your-ai/ex_1_3.py)
+
 ---
 
 下一节：模型不知道实时信息、会编造细节——能不能给它**接上外部支持**，让它真正"知道"？

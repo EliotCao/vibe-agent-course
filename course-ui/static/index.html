@@ -53,9 +53,12 @@
           <span id="crumb-piece" class="crumb-piece">课程学习中心</span>
         </div>
         <div class="topbar-actions">
-          <a class="ghost" target="_blank" rel="noreferrer"
+          <a class="ghost" target="_blank" rel="noreferrer" title="在 CNB 查看仓库"
              href="https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course"
-            >GitHub ›</a>
+            >CNB 仓库</a>
+          <a class="ghost" id="topbar-ide" title="在 CNB 云端 IDE 中打开当前工作区（/workspace）"
+             onclick="openInVscode()" style="cursor:pointer;"
+            >☁ 云端 IDE</a>
         </div>
       </header>
 
@@ -96,12 +99,6 @@
               <code>.env</code> 并配置 <code>BASE_URL</code> / <code>API_KEY</code> /
               <code>MODEL_ID</code>。
             </p>
-
-            <div class="hero-vscode" id="hero-vscode" title="切换到 VSCode 网页编辑器">
-              <span>想完整阅读源码？</span>
-              <span class="kbd">VSCode</span>
-              <span>用云原生开发打开 ›</span>
-            </div>
           </div>
         </div>
       </section>

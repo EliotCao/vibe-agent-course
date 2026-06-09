@@ -660,6 +660,8 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 .terminal {
   background: #1d1d1f;
   color: #f5f5f7;
+  display: flex; flex-direction: column;
+  overflow: hidden;
 }
 .terminal-head {
   display: flex; align-items: center; gap: 12px;
@@ -699,6 +701,7 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
   padding: 18px 22px;
   white-space: pre-wrap; word-break: break-word;
   max-height: 420px; min-height: 120px; overflow-y: auto;
+  flex: 1 1 auto;
 }
 .terminal-output .stderr  { color: #ff6961; }
 .terminal-output .meta    { color: #6e6e73; font-style: italic; }
@@ -931,62 +934,269 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 @keyframes toastIn  { from { opacity: 0; transform: translateX(-50%) translateY(10px); } }
 @keyframes toastOut { to   { opacity: 0; transform: translateX(-50%) translateY(10px); } }
 
-/* =========================================================================
-   "在 VSCode 中打开" 引导
-   ========================================================================= */
-.vscode-banner {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 18px; margin: 18px 0 0;
-  background: linear-gradient(135deg, rgba(0,113,227,0.06), rgba(94,92,230,0.04));
-  border: 1px solid rgba(0,113,227,0.15);
-  border-radius: 14px;
-  font-size: 13.5px; color: var(--c-text-2);
-  letter-spacing: -0.01em;
-}
-.vscode-banner .vsc-icon {
-  width: 32px; height: 32px; flex-shrink: 0;
-  display: grid; place-items: center;
-  background: var(--c-primary); color: #fff;
-  border-radius: 9px;
-  font-weight: 700; font-size: 14px;
-}
-.vscode-banner .vsc-text { flex: 1; }
-.vscode-banner .vsc-text b { color: var(--c-text); font-weight: 600; }
-.vscode-banner .vsc-text small {
-  display: block; font-size: 11.5px; color: var(--c-text-3); margin-top: 3px;
-  font-family: var(--font-mono);
-}
-.vscode-banner .vsc-cta {
-  flex-shrink: 0;
-  padding: 7px 16px; border-radius: 980px;
-  background: var(--c-text); color: #fff;
-  font-size: 12.5px; font-weight: 500;
-  text-decoration: none;
-  transition: opacity .15s var(--ease);
-}
-.vscode-banner .vsc-cta:hover { opacity: 0.85; text-decoration: none; }
-
-/* hero 内嵌的 VSCode 引导 */
-.hero-vscode {
-  display: inline-flex; align-items: center; gap: 8px;
-  margin-top: 24px;
-  font-size: 13px; color: var(--c-text-3);
+/* 讲义 ↔ Demo 跨标签跳转 */
+.cross-tab-jump {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 20px;
   padding: 8px 16px;
-  background: var(--c-bg-soft);
-  border-radius: 980px;
+  font-size: 13.5px; font-weight: 500; color: var(--c-primary);
+  background: rgba(0,113,227,0.06);
+  border: 1px solid rgba(0,113,227,0.15);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .15s var(--ease);
+  text-decoration: none;
+}
+.cross-tab-jump:hover {
+  background: rgba(0,113,227,0.12);
+  color: var(--c-primary);
+  text-decoration: none;
+}
+.cross-tab-jump.demo-jump { margin-top: 0; margin-bottom: 18px; }
+
+/* 「📝 本章练习」入口：绿色调以区别于讲义↔Demo 的蓝色跨 tab 跳转 */
+.cross-tab-jump.exercise-jump {
+  color: #1f9d55;
+  background: rgba(31,157,85,0.07);
+  border-color: rgba(31,157,85,0.18);
+}
+.cross-tab-jump.exercise-jump:hover {
+  color: #157a42;
+  background: rgba(31,157,85,0.14);
+  border-color: rgba(31,157,85,0.3);
+}
+
+/* =========================================================================
+   随堂练习 tab —— 独立视图
+   顶部 banner（绿色调，与跨 tab 跳转保持视觉一致性）+ 章节 README + 题目卡片列表。
+   卡片整体可点击，跳到云端 IDE 的练习目录。
+   ========================================================================= */
+.exercises-layout {
+  max-width: 1640px;
+  margin: 0 auto;
+  padding-bottom: 32px;
+}
+
+.ex-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, rgba(31,157,85,0.06), rgba(31,157,85,0.02));
+  border: 1px solid rgba(31,157,85,0.18);
+  border-radius: var(--radius-lg);
+}
+.ex-banner-icon {
+  font-size: 26px; line-height: 1;
+  flex-shrink: 0;
+}
+.ex-banner-text { flex: 1; min-width: 0; }
+.ex-banner-title {
+  font-size: 16px; font-weight: 600;
+  color: #157a42;
+  margin-bottom: 4px;
+}
+.ex-banner-sub {
+  font-size: 13px; color: var(--c-text-2);
+  line-height: 1.6;
+}
+.ex-banner-sub code {
+  background: rgba(31,157,85,0.10);
+  color: #157a42;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.ex-open-all {
+  flex-shrink: 0;
+  border: 1px solid rgba(31,157,85,0.35);
+  background: #fff;
+  color: #157a42;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   transition: all .15s var(--ease);
 }
-.hero-vscode:hover {
-  background: rgba(0,113,227,0.08); color: var(--c-primary);
+.ex-open-all:hover {
+  background: #1f9d55;
+  color: #fff;
+  border-color: #1f9d55;
+  transform: translateY(-1px);
 }
-.hero-vscode .kbd {
-  font-family: var(--font-mono); font-size: 11px;
-  padding: 2px 6px; border-radius: 4px;
-  background: #fff;
+
+.ex-readme {
+  margin-bottom: 28px;
+  padding: 22px 28px;
+  background: var(--c-bg-soft2);
   border: 1px solid var(--c-border-2);
-  border-bottom-width: 2px;
-  color: var(--c-text-2);
+  border-radius: var(--radius-lg);
+}
+/* README 里的标题缩小一档，避免抢掉 banner 标题的视觉权重 */
+.ex-readme h1 { font-size: 22px; margin-top: 0; }
+.ex-readme h2 { font-size: 17px; }
+.ex-readme h3 { font-size: 15px; }
+
+.ex-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.ex-card {
+  display: flex; align-items: center; gap: 18px;
+  padding: 16px 20px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-2);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all .18s var(--ease);
+}
+.ex-card:hover {
+  border-color: rgba(31,157,85,0.45);
+  box-shadow: 0 4px 14px rgba(31,157,85,0.10);
+  transform: translateY(-1px);
+}
+.ex-card-no {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  border-radius: 10px;
+  background: rgba(31,157,85,0.10);
+  color: #157a42;
+  font-family: var(--font-mono);
+  font-size: 13px; font-weight: 700;
+}
+.ex-card-main { flex: 1; min-width: 0; }
+.ex-card-title {
+  font-size: 15px; font-weight: 600;
+  color: var(--c-text);
+  margin-bottom: 4px;
+  /* 题目标题可能较长，溢出省略 */
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ex-card-file {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12.5px; color: var(--c-text-3);
+}
+.ex-card-file .badge {
+  font-family: var(--font-mono);
+  font-size: 10px; padding: 2px 6px; border-radius: 4px;
+  letter-spacing: 0.4px; font-weight: 700;
+  background: rgba(31,157,85,0.10);
+  color: #157a42;
+}
+.ex-card-file code {
+  font-family: var(--font-mono);
+  background: transparent;
+  padding: 0;
+  color: var(--c-text-3);
+}
+.ex-card-cta {
+  flex-shrink: 0;
+  font-size: 12.5px;
+  color: #1f9d55;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: all .18s var(--ease);
+}
+.ex-card:hover .ex-card-cta {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 窄屏：把 README 和卡片的左右内边距收紧一些 */
+@media (max-width: 768px) {
+  .ex-banner { flex-wrap: wrap; padding: 14px 16px; }
+  .ex-open-all { width: 100%; }
+  .ex-readme { padding: 16px 18px; }
+  .ex-card { padding: 14px 16px; gap: 12px; }
+  .ex-card-cta { display: none; }
+}
+
+/* -------------------------------------------------------------------------
+   讲义内嵌的 .ex-card —— 两个变体 + 留白
+   .ex-card--demo      蓝调：跳「代码示例」tab（讲义末尾追加的卡片）
+   .ex-card--exercise  绿调：跳云端 IDE 练习目录（markdown 内被改写的链接）
+   讲义里出现的卡片需要与上下段落拉开距离；放在 .markdown 容器内时也要兼容
+   markdown 的默认排版（不被 <p> 的行内规则吃掉）。
+   ------------------------------------------------------------------------- */
+.markdown .ex-card {
+  margin: 16px 0;
+}
+/* 讲义末尾「代码示例」卡片 —— 与上文留白更明显，视觉上做整段总结 */
+.markdown > .ex-card.ex-card--demo {
+  margin-top: 32px;
+}
+
+/* 蓝调（代码示例）：复用主题强调色 */
+.ex-card--demo .ex-card-no {
+  background: rgba(53, 114, 240, 0.10);
+  color: #2358c5;
+}
+.ex-card--demo:hover {
+  border-color: rgba(53, 114, 240, 0.45);
+  box-shadow: 0 4px 14px rgba(53, 114, 240, 0.10);
+}
+.ex-card--demo .ex-card-cta { color: #2358c5; }
+.ex-card--demo .badge.py {
+  background: rgba(53, 114, 240, 0.10);
+  color: #2358c5;
+}
+
+/* 绿调（练习）：与 .ex-card 默认色保持一致，写出来仅为语义清晰 */
+.ex-card--exercise { /* 默认色即绿调 */ }
+
+/* Demo 卡片内「返回讲义」小链接 */
+.demo-jump-lecture {
+  display: inline-flex; align-items: center; gap: 3px;
+  margin-left: 12px;
+  padding: 2px 8px;
+  font-size: 11px; font-weight: 500;
+  color: var(--c-primary);
+  background: rgba(0,113,227,0.06);
+  border: 1px solid rgba(0,113,227,0.12);
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all .15s var(--ease);
+}
+.demo-jump-lecture:hover {
+  background: rgba(0,113,227,0.12);
+  border-color: rgba(0,113,227,0.25);
+  color: var(--c-primary);
+  text-decoration: none;
+}
+
+/* 右上角 actions：CNB 仓库 + 云端 IDE */
+.topbar-actions { display: flex; align-items: center; gap: 6px; }
+.topbar-actions .ghost {
+  padding: 5px 12px;
+  font-size: 12.5px;
+  border-radius: 980px;
+  border: 1px solid var(--c-border-2);
+  background: transparent;
+  color: var(--c-text-3);
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.topbar-actions .ghost:hover {
+  background: var(--c-bg-soft);
+  color: var(--c-text);
+  border-color: var(--c-border);
+  text-decoration: none;
+}
+.topbar-actions #topbar-ide {
+  background: rgba(0,113,227,0.06);
+  border-color: rgba(0,113,227,0.2);
+  color: var(--c-primary);
+}
+.topbar-actions #topbar-ide:hover {
+  background: rgba(0,113,227,0.12);
 }
 
 /* 激活态指示线（侧栏左侧） */
@@ -1199,41 +1409,32 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 }
 
 /* =========================================================================
-   Demo 卡片：并排布局（split）
+   Demo 卡片：宽屏默认「源码 / 终端 并排」，窄屏自动堆叠（源码上、终端下）
    ========================================================================= */
-@media (min-width: 1100px) {
-  .demo-card.split.open .demo-body {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    grid-template-areas:
-      "banner   banner"
-      "source   terminal";
-  }
-  .demo-card.split .vscode-banner { grid-area: banner; }
-  .demo-card.split .demo-source   { grid-area: source;   border-bottom: 0; border-right: 1px solid var(--c-border-2); }
-  .demo-card.split .terminal      { grid-area: terminal; }
-  .demo-card.split .terminal-output { max-height: none; min-height: 320px; }
-  .demo-card.split .demo-source pre {
-    max-height: 600px; overflow: auto;
-  }
-  .demo-card.split .demo-source .editor {
-    max-height: 600px; min-height: 320px;
-  }
-}
-
-.btn.icon-btn {
-  width: 34px; height: 34px;
-  padding: 0;
-  font-size: 14px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 8px;
-}
 
 /* 让 demo 列表/欢迎页保持原有舒适宽度 */
 .welcome { max-width: 1100px; margin: 0 auto; }
 .demos   { max-width: 1640px; margin: 0 auto; }
 .course-head { max-width: 1640px; margin-left: auto; margin-right: auto; }
 .tabs        { max-width: 1640px; margin-left: auto; margin-right: auto; }
+
+/* 宽屏（≥1100px）：源码 + 终端 左右并排 */
+@media (min-width: 1100px) {
+  .demo-card.open .demo-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-areas: "source terminal";
+  }
+  .demo-source {
+    grid-area: source;
+    border-bottom: 0;
+    border-right: 1px solid var(--c-border-2);
+  }
+  .terminal { grid-area: terminal; }
+  .terminal-output { max-height: 460px; min-height: 320px; }
+  .demo-source pre        { max-height: 600px; overflow: auto; }
+  .demo-source .editor    { max-height: 600px; min-height: 320px; }
+}
 
 @media (max-width: 1099px) {
   .content { padding: 48px 36px 80px; }

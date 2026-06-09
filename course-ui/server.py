@@ -149,6 +149,33 @@ def scan_course(course_dir: Path) -> dict[str, Any]:
                 }
             )
 
+    # 练习题：约定章节目录名 ↔ exercises/<同名子目录> 一一对应
+    # （例如 04-agent-patterns 课对应 exercises/04-agent-patterns/）。
+    # 现在前端有独立「📝 随堂练习」tab，所以这里要返回完整结构：
+    #   - dir：练习目录的仓库相对路径，前端拼 CNB 云端 IDE 跳转 URL
+    #   - readme：本章练习总览（题目说明），渲染在 tab 顶部
+    #   - items：每题一项（filename + 从 docstring 抽出来的标题）
+    # 没有对应练习目录（如 01-vibecoding-intro）则为 None，前端隐藏 tab。
+    ex_dir = ROOT / "exercises" / name
+    if ex_dir.is_dir():
+        ex_readme = ex_dir / "README.md"
+        ex_items: list[dict[str, str]] = []
+        for f in sorted(ex_dir.glob("ex_*.py"), key=lambda p: _sort_key(p.name)):
+            ex_items.append(
+                {
+                    "title": _py_title(f),
+                    "path": f.relative_to(ROOT).as_posix(),
+                    "filename": f.name,
+                }
+            )
+        exercises = {
+            "dir": ex_dir.relative_to(ROOT).as_posix(),
+            "readme": ex_readme.relative_to(ROOT).as_posix() if ex_readme.exists() else None,
+            "items": ex_items,
+        }
+    else:
+        exercises = None
+
     return {
         "id": name,
         "title": COURSE_TITLES.get(name, name),
@@ -157,6 +184,9 @@ def scan_course(course_dir: Path) -> dict[str, Any]:
         "lab_readme": lab_readme,
         "lectures": lectures,
         "demos": demos,
+        # 兼容字段：旧前端仍在用 exercise_dir 显示绿色 banner，保留几个版本后再删
+        "exercise_dir": exercises["dir"] if exercises else None,
+        "exercises": exercises,
     }
 
 
@@ -258,9 +288,19 @@ def start_demo(rel_path: str) -> tuple[str, RunningProc, str]:
 class Handler(BaseHTTPRequestHandler):
     server_version = "VibeAgentCourseUI/1.0"
 
-    # 静默普通日志
+    # HTTP access log：默认静默（避免在 CNB WebIDE 终端里被静态资源请求刷屏）。
+    # 需要排查时设 DEBUG=1 即可看到完整请求日志；4xx/5xx 始终打印，方便发现问题。
     def log_message(self, format, *args):  # noqa: A002
-        sys.stderr.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
+        if os.environ.get("DEBUG") == "1":
+            sys.stderr.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
+            return
+        # args 形如 ('"GET / HTTP/1.1"', '200', '-')；第 2 个元素是 status code
+        try:
+            status = int(args[1]) if len(args) >= 2 else 0
+        except (ValueError, TypeError):
+            status = 0
+        if status >= 400:
+            sys.stderr.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
 
     # ---- 工具：发送 ----
     def _send_json(self, data: Any, status: int = 200) -> None:
@@ -313,7 +353,19 @@ class Handler(BaseHTTPRequestHandler):
             if path.startswith("/static/"):
                 return self._send_static(path[len("/static/") :])
             if path == "/api/courses":
-                return self._send_json({"courses": [scan_course(c) for c in COURSE_DIRS]})
+                # env 块用于把容器侧只有 server 才能读到的运行时信息暴露给前端，
+                # 目前包含：
+                #   - cnb_web_url：CNB WebIDE 根 URL（形如 https://cnb-xxx-001.cnb.space）
+                #     前端用它拼"打开云端 IDE"按钮的跳转地址 <root>/?folder=/workspace
+                #     非 CNB 环境（本地 dev）则为空串，前端据此降级提示
+                return self._send_json(
+                    {
+                        "courses": [scan_course(c) for c in COURSE_DIRS],
+                        "env": {
+                            "cnb_web_url": os.environ.get("CNB_VSCODE_WEB_URL", "").rstrip("/"),
+                        },
+                    }
+                )
             if path == "/api/file":
                 return self._handle_file(qs.get("path", ""))
             if path == "/api/asset":
@@ -562,10 +614,37 @@ def main() -> None:
         address_family = _socket.AF_INET
         allow_reuse_address = True
 
-    httpd = _IPv4HTTPServer((addr, port), Handler)
-    print(f"[course-ui] http://{addr}:{port}  (Ctrl+C 退出)")
-    print(f"[course-ui] 仓库根目录：{ROOT}")
-    print(f"[course-ui] 已扫描 {len(COURSE_DIRS)} 节课")
+    try:
+        httpd = _IPv4HTTPServer((addr, port), Handler)
+    except OSError as e:
+        # 端口冲突最常见场景：
+        #   1. 同一容器里 server.py 已经在跑（CNB only-preview 模式下 launch 被重试）
+        #   2. 用户在另一个终端窗口已经跑了 run.sh
+        # 这里给出明确指引，方便用户/讲师快速定位。
+        if getattr(e, "errno", None) in (48, 98):  # macOS EADDRINUSE=48, Linux=98
+            sys.stderr.write(
+                f"\n[course-ui] ❌ 端口 {port} 已被占用，无法启动。\n"
+                f"  · 排查：lsof -i :{port}    （或 fuser -v {port}/tcp）\n"
+                f"  · 释放：fuser -k {port}/tcp 后重试\n"
+                f"  · 或换端口：PORT=8765 bash course-ui/run.sh\n"
+                f"  · 提示：CNB 预览容器固定使用 8686；本地/IDE 推荐 8765。\n\n"
+            )
+            sys.exit(2)
+        raise
+
+    # 启动日志只保留一行「预览链接」，避免讲师/学员被多行噪音淹没。
+    # 优先用 CNB 官方推荐的独立子域名形态 —— 容器内注入了 CNB_VSCODE_PROXY_URI，
+    # 值形如 "https://<workspace_id>-{{port}}.cnb.run"，把 {{port}} 替换成实际端口
+    # 即得到外网可达的独立域名（如 https://jh5se5tst3-8765.cnb.run/）。
+    # 老的 CNB_VSCODE_WEB_URL + /-/proxy/<port>/ 是 vscode-web 内嵌反代形态，
+    # 链接又长又丑、且与 CNB 文档示例不一致，已弃用。
+    # 本地/非 CNB 环境（两个变量都没有）则退化为 127.0.0.1:port，保证总有一行可见。
+    proxy_tpl = os.environ.get("CNB_VSCODE_PROXY_URI", "").strip()
+    if proxy_tpl and "{{port}}" in proxy_tpl:
+        preview = proxy_tpl.replace("{{port}}", str(port)).rstrip("/") + "/"
+    else:
+        preview = f"http://127.0.0.1:{port}/"
+    print(f"[course-ui] 🔗 预览链接：{preview}  (⌘/Ctrl + 点击打开)")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

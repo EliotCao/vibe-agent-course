@@ -190,6 +190,12 @@ python demo_19_context_strategies.py
 | ③ 分层 | 关键事实独立抽出来，跨越任意压缩 |
 | ④ GSSC | 工程级 4 阶段流水线，工业 Agent 通用做法 |
 
+## 随堂练习
+
+> 把"摘要策略"亲手实现一遍——`compress_messages` 接收一段长 messages，用 LLM 把早期对话压缩成一段话再拼回去。**关键事实别丢、客套话别留**：
+>
+> 🧪 [练习 4.1 · 上下文压缩器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/05-context-and-memory/ex_4_1.py)
+
 ---
 
 下一节：上下文管理是"本次对话的事"。但用户的偏好、约束、习惯——**这些应该跨会话存活**。这就是 Memory 系统。

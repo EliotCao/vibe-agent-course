@@ -190,6 +190,16 @@ LLM 也是一样：
 | 涌现 | 规模够大时，能力突然出现 |
 | Temperature | 控制采样随机性：0=确定，高=随机 |
 
+## 随堂练习
+
+> 第 1 章一共 4 道练习，建议跟着每节往下做。看完本节先去摸一下整个练习清单：
+>
+> 🧪 [第 1 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/02-meet-your-ai)
+>
+> 与"逐 token 生成"最贴近的练习，是把流式输出 chunk 一片片接住——做完你就明白模型为什么"打字机般"吐字：
+>
+> 🧪 [练习 1.4 · 流式输出收集器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-meet-your-ai/ex_1_4.py)
+
 ---
 
 下一节：知道了 LLM 是个"概率预测机"，**怎么跟它对话**？→ 三种角色：system / user / assistant。

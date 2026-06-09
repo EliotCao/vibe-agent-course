@@ -143,6 +143,12 @@ python demo_13_plan_and_solve.py
 | 痛点 | 计划错了就废了，工业版要做 Replan |
 | 适合 | 步骤多但流程明确 / token 预算紧的任务 |
 
+## 随堂练习
+
+> Planner 写得好不好，看它能不能**稳定输出 JSON 数组**。这道题让你把"复杂问题 → 有序步骤列表"这一环节落到代码上：
+>
+> 🧪 [练习 3.2 · Plan-and-Solve 的 Planner](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/04-agent-patterns/ex_3_2.py)
+
 ---
 
 下一节：ReAct 和 Plan-and-Solve 都是"一次性"给答案。如果让模型**自己回头检查一遍**，会不会更准？→ Reflection。

@@ -93,6 +93,12 @@ python demo_18_context_explosion.py
 | 最贵的角色 | tool 消息（一次返回几万 token 不奇怪） |
 | 不管的代价 | 30 轮内必崩 |
 
+## 随堂练习
+
+> 既然"撞窗口"是第一痛点，那 Agent 得知道**什么时候**该触发压缩。这道题让你写一个最朴素的决策器：基于 token 数阈值判断 messages 该不该压：
+>
+> 🧪 [练习 4.3 · 上下文管理决策器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/05-context-and-memory/ex_4_3.py)
+
 ---
 
 下一节：四种典型上下文管理策略——**截断 / 摘要 / 分层 / GSSC** —— 各自适合什么场景。

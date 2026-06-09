@@ -24,7 +24,10 @@ from __future__ import annotations
 
 import json
 
+from _env import chat as llm_chat
 from toy_agent_base import TASKS, make_llm, registry
+
+client, MODEL = make_llm()
 
 
 # ============================================================
@@ -49,9 +52,7 @@ PLANNER_PROMPT = """你是一个任务规划器。把用户的问题拆成一个
 
 
 def make_plan(question: str) -> list[str]:
-    client, MODEL = make_llm()
-    resp = client.chat.completions.create(
-        model=MODEL,
+    msg = llm_chat(
         messages=[
             {
                 "role": "user",
@@ -62,8 +63,10 @@ def make_plan(question: str) -> list[str]:
             }
         ],
         temperature=0,
+        client=client,
+        model=MODEL,
     )
-    raw = resp.choices[0].message.content or "[]"
+    raw = msg.content or "[]"
     # 容错：模型可能用 ```json ``` 包裹
     raw = raw.strip()
     if raw.startswith("```"):
@@ -85,8 +88,6 @@ def make_plan(question: str) -> list[str]:
 # ============================================================
 def execute_step(step_desc: str, prior_results: list[str], max_iters: int = 4) -> str:
     """执行一个子任务，返回字符串结果。复用 第2章 的最小 Agent Loop。"""
-    client, MODEL = make_llm()
-
     context = (
         "前面步骤的结果（供你参考）：\n" + "\n".join(f"- {r}" for r in prior_results)
         if prior_results
@@ -105,14 +106,14 @@ def execute_step(step_desc: str, prior_results: list[str], max_iters: int = 4) -
     ]
 
     for _ in range(max_iters):
-        resp = client.chat.completions.create(
-            model=MODEL,
+        msg = llm_chat(
             messages=messages,
             tools=registry.to_schemas(),
             tool_choice="auto",
             temperature=0,
+            client=client,
+            model=MODEL,
         )
-        msg = resp.choices[0].message
 
         if not msg.tool_calls:
             return msg.content or ""
@@ -155,14 +156,14 @@ AGG_PROMPT = """以下是某个用户问题的多步骤执行结果，请基于�
 
 
 def aggregate(question: str, plan: list[str], results: list[str]) -> str:
-    client, MODEL = make_llm()
     summary = "\n".join(f"步骤 {i+1}: {p}\n  结果: {r}" for i, (p, r) in enumerate(zip(plan, results)))
-    resp = client.chat.completions.create(
-        model=MODEL,
+    msg = llm_chat(
         messages=[{"role": "user", "content": AGG_PROMPT.format(question=question, steps_summary=summary)}],
         temperature=0,
+        client=client,
+        model=MODEL,
     )
-    return resp.choices[0].message.content or ""
+    return msg.content or ""
 
 
 # ============================================================

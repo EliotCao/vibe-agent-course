@@ -307,6 +307,12 @@ python demo_20_memory.py
 | 余弦相似度 | 衡量两个向量"语义有多近" |
 | 用法 | 每轮按 query 召回 top-k 事实，塞 system；对话结束提炼新事实写回 |
 
+## 随堂练习
+
+> 把"向量记忆"的最小实现亲手写一遍——`add` 存入（文本→向量）、`search` 用余弦相似度找 top-k。**第 5 章的核心代码就这十几行**：
+>
+> 🧪 [练习 4.2 · 向量记忆存取](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/05-context-and-memory/ex_4_2.py)
+
 ---
 
 理论部分到此结束。下面 lab：

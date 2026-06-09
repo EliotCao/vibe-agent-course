@@ -230,6 +230,12 @@ print(f"每天审查 50 个文件: ¥{cost_per_call * 50:.2f}")
 | 计费单位 | 按 token 计费，不是按字符 |
 | 经验法则 | 中文 1 字 ≈ 1-1.5 token，英文 1 词 ≈ 1 token |
 
+## 随堂练习
+
+> 拿 `tiktoken` 实测一段文本到底多少 token——以后估成本、估窗口都靠它。**估算 Coding Agent 一天烧多少钱前，先把这个工具拧到手里**：
+>
+> 🧪 [练习 1.1 · Token 计数器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-meet-your-ai/ex_1_1.py)
+
 ---
 
 下一节：模型挺能聊的，但**它有时候会编**——这就是幻觉。为什么会发生？怎么防？

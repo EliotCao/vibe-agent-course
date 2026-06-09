@@ -178,6 +178,13 @@ python demo_25_design_philosophy.py
 | bash 4 道闸门 | 防仓库被删 / 输出爆 / 死循环 |
 | 失败返回字符串 | 防 Agent Loop 崩溃，让模型自己纠错 |
 
+## 随堂练习
+
+> 本节讲的"写类工具严防死守"和"bash 四道闸门"，正好对应下面两道——前者把 `write` 的"默认拒绝覆盖"落到代码上，后者把超时+黑名单的安全闸门亲手装一遍：
+>
+> 🧪 [练习 5.2 · write_file 工具](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/06-coding-agent-tools/ex_5_2.py)
+> 🧪 [练习 5.3 · bash 工具（带安全闸门）](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/06-coding-agent-tools/ex_5_3.py)
+
 ---
 
 理论结束。下面 lab：

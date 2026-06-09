@@ -161,6 +161,12 @@ python demo_14_reflection.py
 | 适用 | 写代码、写报告、做推理这类"质量优先"任务 |
 | 代价 | token 大约翻倍 |
 
+## 随堂练习
+
+> 把"起草 → 评审 → 修订"的闭环亲手敲一遍——尤其要踩一次"评审员对自己太宽容"的坑，再用"假装挑刺"的 trick 把它压回去：
+>
+> 🧪 [练习 3.3 · Reflection 评审循环](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/04-agent-patterns/ex_3_3.py)
+
 ---
 
 理论部分到此结束。下面 lab：

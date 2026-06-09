@@ -64,3 +64,15 @@ NPC 流水线运行时，CNB 会自动注入这些环境变量：
 - 触发链路：评论 @ → CNB 事件 → 流水线 → Docker 容器 → Agent 处理 → 回写评论
 - 需要 5 个文件配合：Agent + Dockerfile + entrypoint.sh + .cnb.yml + settings.yml
 - 本章后面的 3 节就是依次搞定 Docker + Pipeline + 实操
+
+---
+
+## 随堂练习
+
+> NPC 配好之后，**得真的让它干 3 件事**才算上线成功。这道必做题就是在你自己的仓库 Issue 里跟 NPC 走 3 个回合，检验链路是否真的通：
+>
+> 🧪 [作业 7.2 · 让 NPC 回复 3 次不同的问题](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/08-skills-and-npc/README.md)（README 中的 §7.2）
+>
+> 进阶选做：让 NPC 不只回评论，还能读 PR diff 给 Review 意见——把 NPC 从"问答机"升级成"代码审查员"：
+>
+> 🧪 [作业 7.5 ★ 让 NPC 支持 PR Review](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/08-skills-and-npc/README.md)（README 中的 §7.5）

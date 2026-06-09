@@ -8,6 +8,17 @@
 
 ![Chatbot 单次问答 vs Agent 多轮循环用工具](./images/06-chatbot-vs-agent.png)
 
+## 时序对比：信息流走过几个回合
+
+上面那张概念图给你直觉。下面这张**时序图**把"几条消息、谁在等谁"一刀切开——
+**Chatbot 永远只走 4 步，Agent 在中间多了一个 `loop`**。
+
+![Chatbot vs Agent 时序泳道图：左侧 Chatbot 4 步直走，右侧 Agent 在 loop 里反复调工具](./images/06-chatbot-vs-agent-swimlane.png)
+
+注意两处关键差异：
+- **Chatbot 的箭头永远只有 1 个来回**（步骤 ②③），不管模型多强、prompt 多复杂；
+- **Agent 在 `loop` 框里同一个 LLM 可能被调 N 次**，每次 `messages` 都比上一次更长（因为追加了 `tool_calls` 和 `role=tool` 的工具结果）。
+
 ## 同一个问题，两种命运
 
 > "请帮我抓取 https://example.com 的内容，告诉我它有多少字节，并把这个字节数除以 7。"
@@ -110,6 +121,12 @@ python demo_06_chatbot_vs_agent.py
 | Agent | 多次 LLM 调用 + 工具调度 + 循环边界 |
 | 关键拐点 | 2023 年 OpenAI Function Calling，把"调工具"做成协议 |
 | 升级路径 | Chatbot + 工具调用 + while 循环 = Agent |
+
+## 随堂练习
+
+> 看完讲义和 demo，趁热把循环骨架自己敲一遍。本章三道练习连起来就是一个最小 Agent，本节先看入口：
+>
+> 🧪 [第 3 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/03-tools-and-agent-loop)
 
 ---
 
