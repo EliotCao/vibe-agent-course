@@ -21,7 +21,9 @@ Demo 19 · ContextManager：四种上下文管理策略对比
 
 from __future__ import annotations
 
-from _env import get_model_id, make_client
+from prettytable import PrettyTable
+
+from _env import chat
 
 
 # ============================================================
@@ -77,8 +79,7 @@ def strategy_summary(messages: list[dict], keep_last: int = 6) -> list[dict]:
         return sys_msgs + recent
 
     # 调一次 LLM 把中间生成摘要
-    client = make_client()
-    MODEL = get_model_id()
+    # 注意：当前接口仅支持流式，统一走 _env.chat()（内部强制 stream=True 后拼回完整文本）
     middle_text = "\n".join(
         f"{m['role']}: {m['content']}" for m in middle
     )
@@ -86,14 +87,12 @@ def strategy_summary(messages: list[dict], keep_last: int = 6) -> list[dict]:
         "请把下面这段对话压缩成一段 100 字以内的中文摘要，"
         "**特别保留任何用户偏好、约束、关键事实**：\n\n" + middle_text
     )
-    summary = (
-        client.chat.completions.create(
-            model=MODEL,
-            messages=[{"role": "user", "content": summary_prompt}],
-            temperature=0,
-            max_tokens=300,
-        ).choices[0].message.content or ""
+    msg = chat(
+        [{"role": "user", "content": summary_prompt}],
+        temperature=0,
+        stream=True,
     )
+    summary = msg.content or ""
 
     return (
         sys_msgs
@@ -122,11 +121,12 @@ def extract_key_facts(messages: list[dict]) -> list[str]:
 
 def strategy_hierarchical(messages: list[dict], keep_last: int = 6) -> list[dict]:
     sys_msgs = [m for m in messages if m["role"] == "system"]
-    facts = extract_key_facts(messages)
 
     # 中间用摘要替代
     summarized = strategy_summary(messages, keep_last)
+
     # 在 system 之后插入"关键事实"
+    facts = extract_key_facts(messages)
     fact_block = "\n".join(f"- {f}" for f in facts)
     if fact_block:
         return (
@@ -167,15 +167,28 @@ def main() -> None:
         "④ HIERARCHICAL（关键事实 + 摘要 + 最近 6 轮）": strategy_hierarchical(history, keep_last=6),
     }
 
-    print(f"{'策略':<45s} {'条数':>6s} {'字符数':>8s} {'有过敏':>8s} {'有预算':>8s}")
-    print("-" * 80)
+    # 用 prettytable 打印对比表（无边框）
+    table = PrettyTable()
+    table.field_names = ["策略", "条数", "字符数", "有过敏", "有预算"]
+    table.border = False       # 去掉所有边框线
+    table.align["策略"] = "l"  # 左对齐
+    table.align["条数"] = "r"
+    table.align["字符数"] = "r"
+    table.align["有过敏"] = "c"
+    table.align["有预算"] = "c"
+
     for name, msgs in strategies.items():
         s = stats(msgs)
         has_aller, has_budget = fact_check(msgs)
-        print(
-            f"{name:<45s} {s['count']:>6d} {s['chars']:>8d} "
-            f"{'✅' if has_aller else '❌':>8s} {'✅' if has_budget else '❌':>8s}"
-        )
+        table.add_row([
+            name,
+            s["count"],
+            s["chars"],
+            "✅" if has_aller else "❌",
+            "✅" if has_budget else "❌",
+        ])
+
+    print(table)
 
     print("\n💡 重点观察：")
     print("  - ② 截断：最省字符，但可能把'过敏'这个早期重要事实砍掉")

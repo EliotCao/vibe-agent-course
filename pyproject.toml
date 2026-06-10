@@ -9,6 +9,7 @@ dependencies = [
     "openai>=1.0.0",
     "python-dotenv>=1.0.0",
     "tiktoken>=0.7.0",
+    "prettytable>=3.10.0",
 ]
 
 # 根项目本身不构建为包，仅作为 workspace 容器
