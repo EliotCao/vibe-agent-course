@@ -1,8 +1,8 @@
 # 第 20 节 · 记忆系统：短期 / 长期 / 工作记忆
 
-## 一句话回答
+**ContextManager 是“本次对话怎么压缩”，Memory 是“跨会话怎么记住事实并按需召回”。** 二者协作让 Agent 像人一样“既不爆窗也不忘事”。
 
-> **ContextManager 是"本次对话怎么压缩"，Memory 是"跨会话怎么记住事实并按需召回"。** 二者协作让 Agent 像人一样"既不爆窗也不忘事"。
+
 
 ## 三种记忆，分别管什么
 
@@ -19,18 +19,33 @@
 - 工作：当前任务相关的代码片段、上次工具结果
 - 长期：用户的常用风格 / 项目的代码规范 / Skills
 
+
+
 ## 长期记忆要解决什么问题
 
-```
-第 1 次会话：用户说"我对花粉过敏"
-↓
-第 2 次会话：用户说"帮我安排周末户外"
-↓
-理想结果：Agent 自动记起"过敏"这个事实，避开花季景点
-现实结果（没有 Memory）：Agent 一无所知，推荐花海公园
+```mermaid
+flowchart TD
+    S1["<b>第 1 次会话</b><br/>━━━━━━━━━━━━<br/>用户：我对花粉过敏<br/>Agent：好的，已记住"]
+
+    S1 --> CHOICE{"下一次会话<br/>有没有 Memory ？"}
+
+    CHOICE -->|没有| S2["<b>第 2 次会话（❌ 无 Memory）</b><br/>━━━━━━━━━━━━━━━━━━<br/>用户：帮我安排周末户外<br/>Agent：推荐花海公园<br/>用户过敏发作 😷"]
+
+    CHOICE -->|有| S3["<b>第 2 次会话（✅ 有 Memory）</b><br/>━━━━━━━━━━━━━━━━━━<br/>用户：帮我安排周末户外<br/>↳ 召回事实：用户过敏<br/>Agent：避开花季，推荐博物馆"]
+
+    classDef base fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e40af
+    classDef bad  fill:#fef2f2,stroke:#ef4444,stroke-width:2px,color:#991b1b
+    classDef good fill:#f0fdf4,stroke:#22c55e,stroke-width:2px,color:#166534
+    classDef ctrl fill:#fef9c3,stroke:#eab308,stroke-width:2px,color:#854d0e
+    class S1 base
+    class S2 bad
+    class S3 good
+    class CHOICE ctrl
 ```
 
-**没有长期记忆 = 每次会话用户都得重复说自己。**
+**没有长期记忆 = 每次会话都是「第一次见面」。**
+
+
 
 ## 怎么实现：向量检索
 
