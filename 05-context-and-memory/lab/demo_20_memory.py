@@ -4,17 +4,17 @@ Demo 20 · Memory：用 embedding API 做语义检索
 
 配套：第 20 节《记忆系统：短期 / 长期 / 工作记忆》
 
-Memory 跟 ContextManager 的区别：
-  - ContextManager：管"本次对话的 messages 列表"（短期工作记忆）
-  - Memory：管"跨会话持久化的事实库"（长期记忆）
+Memory 与 ContextManager 的分工：
+  - ContextManager：管理"本次对话的 messages 列表"（短期 + 工作记忆）
+  - Memory：管理"跨会话持久化的事实库"（长期记忆）
 
 本 demo 实现一个最小 Memory：
-  ① add(text)         —— 把一条记忆调 embedding API 存进去
-  ② search(query, k)  —— 把 query 也 embed，按余弦相似度返回 top-k
+  ① add(text)         —— 调用 embedding API 编码文本，存入记忆库
+  ② search(query, k)  —— 将查询也编码为向量，按余弦相似度返回 top-k
 
-用纯 numpy 算余弦相似度，不引入向量数据库（learn first，库以后再换）。
+核心只用 numpy 计算余弦相似度，暂不引入向量数据库（先用最简方式把流程跑通，后续章节再换专业库）。
 
-跑法：
+运行方式：
     python demo_20_memory.py
 """
 
@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from _env import get_api_key, get_base_url
+from _env import get_api_key, get_base_url, chat
 from openai import OpenAI
 
 
@@ -38,13 +38,68 @@ EMBEDDING_MODEL = "hunyuan-embedding"
 
 
 def embed(text: str) -> np.ndarray:
-    """把一段文本调 embedding 接口，返回单条向量。"""
+    """调用 embedding API 将文本转换为语义向量。
+
+    通过 OpenAI 兼容的 embeddings 接口，将任意自然语言文本编码为
+    一个固定维度的浮点向量。该向量捕捉了文本的语义信息，语义相近的
+    文本在向量空间中距离更近（余弦相似度更高）。
+
+    Args:
+        text: 待编码的文本内容，长度不限（由 API 端点的上下文窗口决定）。
+
+    Returns:
+        np.ndarray: 形状为 `(d,)` 的 float32 向量，其中 `d` 是
+        embedding 模型的输出维度（取决于具体模型，例如 768 或 1536）。
+
+    Raises:
+        openai.BadRequestError: 若文本过长或模型不支持。
+        openai.APIError: 网络异常或服务端错误。
+
+    Example:
+        >>> v = embed("我喜欢喝拿铁。")
+        >>> v.shape
+        (768,)
+        >>> v.dtype
+        dtype('float32')
+    """
     resp = _emb_client.embeddings.create(model=EMBEDDING_MODEL, input=text)
     return np.array(resp.data[0].embedding, dtype=np.float32)
 
 
 def cosine(a: np.ndarray, b: np.ndarray) -> float:
-    """余弦相似度，范围 [-1, 1]，越接近 1 越相似。"""
+    """计算两个向量之间的余弦相似度。
+
+    余弦相似度衡量的是向量在方向上的接近程度，与向量的长度（模）无关。
+    在 embedding 语义检索场景中，值越接近 1.0 表示两段文本语义越相似。
+
+    计算公式：
+        cos(a, b) = (a · b) / (|a| × |b|)
+
+    其中 `a · b` 是向量点积，`|a|` 是 a 的模。
+
+    分母加了 `1e-9` 防止零向量导致的除零错误。
+
+    Args:
+        a: 第一个向量，形状为 `(d,)` 的 float32 ndarray。
+        b: 第二个向量，形状必须与 a 相同。
+
+    Returns:
+        float: 余弦相似度，范围 [-1.0, 1.0]。
+        1.0 表示方向完全相同（语义完全一致），
+        0 表示正交（无关），
+        -1.0 表示方向完全相反（语义对立）。
+
+    Example:
+        >>> import numpy as np
+        >>> a = np.array([1.0, 0.0], dtype=np.float32)
+        >>> b = np.array([1.0, 0.0], dtype=np.float32)
+        >>> cosine(a, b)
+        1.0
+        >>> c = np.array([0.0, 1.0], dtype=np.float32)
+        >>> cosine(a, c)
+        0.0
+    """
+
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-9))
 
 
@@ -53,46 +108,148 @@ def cosine(a: np.ndarray, b: np.ndarray) -> float:
 # ============================================================
 @dataclass
 class MemoryEntry:
+    """一条长期记忆条目。
+
+    用于 Memory 管理器的内部存储单元，包含原始文本、对应的向量编码
+    以及可选的业务元数据。核心用途是为余弦相似度检索提供数据载体。
+
+    Attributes:
+        text: 记忆的原始文本内容。
+        vec: 由 embedding API 生成的语义向量，类型为形状 (d,) 的 float32 数组，
+            用于余弦相似度计算。
+        meta: 附加元数据字典，由 add(..., **meta) 传入的任意键值对组成。
+            可用于存储时间戳、来源、标签等辅助信息。
+
+    Note:
+        - vec 的类型是 `np.ndarray`（numpy 的多维数组），
+          不是一个普通的 Python list 或 tuple，因此无法直接序列化到 JSON。
+          持久化时通过 `.tolist()` 转为 Python 内置的 list 存入，
+          还原时用 `np.array(list, dtype=np.float32)` 从 list 重建为 ndarray。
+        - meta 默认空字典，避免多个实例共享同一个可变对象。
+    """
     text: str
     vec: np.ndarray
     meta: dict = field(default_factory=dict)
 
 
 class Memory:
-    """最小可用 Memory：内存里 list + 余弦相似度。
+    """基于向量的长期记忆管理器。
 
-    生产环境换成 pgvector / qdrant / milvus，接口保持不变。
+    在内存中维护一个记忆条目列表，通过 embedding API 将文本编码为向量，
+    检索时用余弦相似度计算查询与每条记忆的匹配度，返回 top-k 最相关结果。
+
+    设计原则：
+        - 接口简洁：add / search / save / load 四个方法覆盖完整生命周期
+        - 存储无关：当前使用内存 list + numpy，可无缝替换为 pgvector / qdrant / milvus
+        - 读写分离：_entries 为私有属性，外部通过 entries 属性仅可读取不可变副本
+
+    Examples:
+        >>> mem = Memory()
+        >>> mem.add("我喜欢喝拿铁。")
+        >>> results = mem.search("用户的饮品偏好", k=2)
+        >>> for score, entry in results:
+        ...     print(f"[{score:.3f}] {entry.text}")
     """
 
     def __init__(self) -> None:
-        self.entries: list[MemoryEntry] = []
+        self._entries: list[MemoryEntry] = []
+
+    @property
+    def entries(self) -> tuple[MemoryEntry, ...]:
+        """只读属性：返回当前所有记忆条目的不可变拷贝。
+
+        Returns:
+            tuple[MemoryEntry, ...]: 所有记忆条目的元组，外部无法修改内部列表。
+
+        Note:
+            返回的是 tuple 而非 list，防止调用方直接 append / remove。
+        """
+        return tuple(self._entries)
 
     def add(self, text: str, **meta) -> None:
+        """添加一条新记忆到记忆库中。
+
+        自动调用 embedding API 将文本编码为向量，与原文及元数据一起存储。
+
+        Args:
+            text: 要存储的记忆文本内容。
+            **meta: 可选的附加元数据，会存入 MemoryEntry.meta 字典中。
+
+        Example:
+            >>> mem.add("我每天预算 500 元。", category="budget", priority=1)
+        """
         v = embed(text)
-        self.entries.append(MemoryEntry(text=text, vec=v, meta=meta))
+        self._entries.append(MemoryEntry(text=text, vec=v, meta=meta))
 
     def search(self, query: str, k: int = 3) -> list[tuple[float, MemoryEntry]]:
-        """返回 (相似度, entry) 列表，从高到低排序。"""
-        if not self.entries:
+        """按语义相似度检索最相关的 top-k 条记忆。
+
+        将查询文本编码为向量，与所有记忆的向量逐一计算余弦相似度，
+        按相似度降序返回前 k 条。
+
+        Args:
+            query: 查询文本，任意自然语言描述。
+            k: 返回的最大条目数量，默认为 3。
+
+        Returns:
+            list[tuple[float, MemoryEntry]]:
+                按相似度从高到低排序的 (相似度分数, 记忆条目) 列表。
+                相似度范围 [-1.0, 1.0]，越接近 1.0 表示语义越相关。
+                若记忆库为空则返回空列表。
+
+        Example:
+            >>> results = mem.search("用户喜欢什么饮品", k=2)
+            >>> for score, entry in results:
+            ...     print(f"{score:.2f} | {entry.text}")
+        """
+        if not self._entries:
             return []
         q = embed(query)
-        scored = [(cosine(q, e.vec), e) for e in self.entries]
+        scored = [(cosine(q, e.vec), e) for e in self._entries]
         scored.sort(key=lambda x: x[0], reverse=True)
         return scored[:k]
 
     def save(self, path: str) -> None:
-        """把记忆持久化到 JSON（vec 转成 list 存）。"""
+        """将当前所有记忆持久化到 JSON 文件。
+
+        向量数据从 numpy array 转为 Python list 后存入 JSON，
+        可通过 load() 完整还原。
+
+        Args:
+            path: JSON 文件的保存路径（含文件名）。
+
+        Raises:
+            IOError: 若文件写入失败（如路径不存在或权限不足）。
+
+        Example:
+            >>> mem.save("data/memory_backup.json")
+        """
         data = [
             {"text": e.text, "vec": e.vec.tolist(), "meta": e.meta}
-            for e in self.entries
+            for e in self._entries
         ]
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
     def load(self, path: str) -> None:
+        """从 JSON 文件加载记忆，替换当前内存中的所有条目。
+
+        将 JSON 中存储的 list 还原为 numpy array，恢复完整的 MemoryEntry 列表。
+
+        Args:
+            path: 由 save() 生成的 JSON 文件路径。
+
+        Raises:
+            FileNotFoundError: 若指定路径的文件不存在。
+            json.JSONDecodeError: 若文件内容不是合法 JSON。
+
+        Example:
+            >>> mem.load("data/memory_backup.json")
+        """
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        self.entries = [
+
+        self._entries = [
             MemoryEntry(
                 text=d["text"],
                 vec=np.array(d["vec"], dtype=np.float32),
@@ -106,11 +263,41 @@ class Memory:
 # 演示一：基本召回
 # ============================================================
 def demo_basic_search() -> None:
+    """演示语义记忆的基本召回能力。
+
+    本函数模拟一个典型的使用场景：用户提供了多条关于自身的个人事实（偏好、限制、
+    计划等），系统将其逐条存入 Memory；随后用多个不同语义方向的查询进行检索，
+    验证 embedding + 余弦相似度方案是否能将"语义上相关但措辞不同"的事实正确召回。
+
+    工作流程：
+        1. 创建一个空的 Memory 实例。
+        2. 将 5 条中文用户事实调用 memory.add() 逐一存入，每条事实自动经
+           embedding API 编码为语义向量。
+        3. 用 4 个语义方向各异的查询（饮食偏好、健康限制、出行计划、金钱约束）
+           分别调用 memory.search(query, k=2)，输出每条 top-2 匹配结果的
+           相似度分数和原文。
+
+    输出解读：
+        - 每个查询打印一个 `[分数] 原文` 列表，分数为余弦相似度，范围 [-1.0, 1.0]，
+          越接近 1.0 表示语义越匹配。
+        - 观察分数可以帮助判断：哪些查询得到了高置信度匹配（分数 > 0.8），
+          哪些查询因缺少相关记忆导致所有候选得分都偏低。
+        - 例如，"用户的饮食喜好"应高分命中"我喜欢喝拿铁"；
+          "金钱有没有约束"应高分命中"我每天预算 500 元"。
+
+    Note:
+        - 本函数仅打印结果，无返回值，也不做断言；用于教学演示而非自动化测试。
+        - 实际 embedding 结果受模型版本影响，分数可能略有波动，但相对排序应保持稳定。
+        - Memory.search() 的参数 k=2 表示只取相似度最高的前 2 条结果。
+
+    Examples:
+        >>> demo_basic_search()
+    """
     print("=" * 60)
     print("【演示一：基本语义召回】")
     print("=" * 60)
 
-    mem = Memory()
+    memory = Memory()
     facts = [
         "我对花粉过敏，户外活动需要避开花期。",
         "我每天预算 500 元。",
@@ -120,7 +307,7 @@ def demo_basic_search() -> None:
     ]
     for f in facts:
         print(f"  + 添加: {f}")
-        mem.add(f)
+        memory.add(f)
 
     queries = [
         "用户的饮食喜好是什么",
@@ -129,9 +316,9 @@ def demo_basic_search() -> None:
         "金钱方面有没有约束",
     ]
 
-    for q in queries:
-        print(f"\n查询: {q}")
-        for score, e in mem.search(q, k=2):
+    for query in queries:
+        print(f"\n查询: {query}")
+        for score, e in memory.search(query, k=2):
             print(f"  [{score:.3f}] {e.text}")
 
 
@@ -176,21 +363,16 @@ def demo_with_context_injection() -> None:
     print(system_prompt)
     print()
 
-    # 真去调一次 LLM
-    from _env import get_model_id, make_client
-
-    client = make_client()
-    resp = client.chat.completions.create(
-        model=get_model_id(),
+    # 真去调一次 LLM（使用 stream 模式的 chat 封装，API 端点只支持流式）
+    resp = chat(
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": question},
         ],
         temperature=0,
-        max_tokens=400,
     )
     print("=== Agent 回答 ===")
-    print(resp.choices[0].message.content)
+    print(resp.content)
     print()
     print("👀 观察回答里有没有体现：预算 500、避花粉、博物馆偏好。")
 

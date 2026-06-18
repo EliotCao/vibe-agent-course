@@ -319,6 +319,72 @@ class Foo:
 
 
 
+#### default_factory
+
+控制字段默认值的生成方式。当默认值必须是**可变对象**（如 `list`、`dict`、`set`）或**带副作用的表达式**（如 `datetime.now()`、`uuid.uuid4()`）时，不能用直接赋值，必须用 `default_factory`。
+
+**为什么必须用 `default_factory`？**
+
+Python 的默认参数只在**函数定义时**求值一次，之后所有调用共享同一个对象。这会导致两个问题：
+
+1. **可变对象被共享**：多个实例操作同一个列表
+
+   ```python
+   from dataclasses import dataclass, field
+
+   @dataclass
+   class BadBag:
+       items: list[str] = []          # ❌ 所有实例共享同一个 list！
+
+   bag1 = BadBag()
+   bag2 = BadBag()
+   bag1.items.append("a")
+   print(bag2.items)  # ['a']  ← 被污染了
+   ```
+
+2. **静态值不会更新**：每个实例拿到的是同一时刻的值
+
+   ```python
+   from datetime import datetime
+
+   @dataclass
+   class BadLog:
+       created_at: datetime = datetime.now()  # ❌ 永远是模块加载那一刻
+
+   import time
+   log1 = BadLog()
+   time.sleep(5)
+   log2 = BadLog()
+   print(log1.created_at == log2.created_at)  # True ← 时间戳完全一样
+   ```
+
+**正确写法：**
+
+```python
+from dataclasses import dataclass, field
+from datetime import datetime
+
+@dataclass
+class GoodClass:
+    items: list[str] = field(default_factory=list)              # ✅ 每个实例独立 list
+    tags: dict = field(default_factory=dict)                    # ✅ 每个实例独立 dict
+    created_at: datetime = field(default_factory=datetime.now)  # ✅ 每次创建取当前时间
+
+if __name__ == '__main__':
+    bag1 = GoodClass()
+    bag2 = GoodClass()
+    bag1.items.append("a")
+    print(bag2.items)  # []  ← 不受影响
+```
+
+`default_factory` 接收一个**零参数可调用对象**，每次创建新实例时都会调用它来生成默认值。
+
+> [!NOTE]
+>
+> 除了 `None`，dataclass 字段的默认值**不能**是可变对象或带副作用的调用。这条规则和普通函数的默认参数完全一样，只是 dataclass 提供了 `field(default_factory=...)` 这个解决方案。
+
+
+
 #### init
 
 控制是否出现在 `__init__` 参数里。默认为 `True`。
