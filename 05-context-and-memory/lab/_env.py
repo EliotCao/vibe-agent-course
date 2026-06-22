@@ -73,6 +73,7 @@ def chat(
     messages: list[dict],
     *,
     temperature: float = 0,
+    max_tokens: int | None = None,
     tools: list[dict] | None = None,
     tool_choice: str | dict | None = None,
     stream: bool = False,
@@ -107,7 +108,10 @@ def chat(
         "messages": messages,
         "temperature": temperature,
         "stream": True,  # 强制流式（接口限制）
+        "stream_options": {"include_usage": True},
     }
+    if max_tokens is not None:
+        kwargs["max_tokens"] = max_tokens
     if tools:
         kwargs["tools"] = tools
     if tool_choice is not None:
@@ -129,8 +133,11 @@ def _collect_stream(response, print_content: bool = False) -> "Message":
     """流式收集所有 chunk，拼装为完整的 Message 对象。"""
     content_parts: list[str] = []
     tool_calls_map: dict[int, dict] = {}
+    usage = None  # 最后一个 chunk 可能携带 usage 信息
 
     for chunk in response:
+        if hasattr(chunk, "usage") and chunk.usage:
+            usage = chunk.usage
         if not chunk.choices:
             continue
         delta = chunk.choices[0].delta
@@ -168,6 +175,7 @@ def _collect_stream(response, print_content: bool = False) -> "Message":
             )
             for i in sorted(tool_calls_map)
         ] if tool_calls_map else None,
+        usage=usage,
     )
 
 
@@ -197,9 +205,11 @@ class ToolCall:
 
 class Message:
     """模拟 ChatCompletionMessage"""
-    def __init__(self, content: Optional[str], tool_calls: Optional[list] = None):
+    def __init__(self, content: Optional[str], tool_calls: Optional[list] = None,
+                 usage=None):
         self.content = content
         self.tool_calls = tool_calls
+        self.usage = usage
 
     def __repr__(self):
         if self.tool_calls:

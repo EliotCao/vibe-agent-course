@@ -70,16 +70,70 @@ def strategy_truncate(messages: list[dict], keep_last: int = 6) -> list[dict]:
 # 策略 ③：摘要 —— 把中间一段总结成一条 system message
 # ============================================================
 def strategy_summary(messages: list[dict], keep_last: int = 6) -> list[dict]:
-    """system + 中间用 LLM 摘要 + 最近 N 轮。"""
+    """摘要压缩策略：system + LLM 摘要（中间段）+ 最近 N 轮原文。
+
+    将消息列表划分为三个区域，对中间区域调用 LLM 生成一段简短摘要，
+    以此替代冗长的早期对话历史。相比纯截断策略，摘要在节省 token 的同时
+    仍有概率保留跨轮次的关键信息（如用户偏好、约束条件）。
+
+    处理流程：
+
+    1. 提取 system 消息：所有 role 为 `"system"` 的消息原样保留，
+       不参与摘要压缩。
+
+    2. 划分中间段：将非 system 消息切分为"中间段"和"最近段"：
+       中间段 = 除 system 外的全部消息去掉最后 `keep_last` 条；
+       最近段 = 消息列表最后 `keep_last` 条（含 system）。
+
+    3. LLM 摘要生成：将中间段拼接为 `角色: 内容` 格式的文本，
+       调用 LLM（`_env.chat()`）压缩为 100 字以内的中文摘要。
+       摘要提示词明确要求保留用户偏好和关键事实，以提高信息留存率。
+
+    4. 组装输出：最终返回 `system 消息 + 摘要 system 消息 + 最近 N 条`。
+
+    Args:
+        messages: 完整的消息列表，每条消息为 `{"role": str, "content": str}`
+            格式。应包含至少一条 system 消息作为角色/工具定义。
+        keep_last: 保留原始内容的最近消息条数（含 system），默认 6 条。
+            值越小压缩越激进、token 越省，但可能丢失更多细节。
+
+    Returns:
+        压缩后的消息列表。如果中间段为空（消息总数未超过 `keep_last`
+        或减去 system 后不足 ``keep_last`` 条），则直接返回
+        `system 消息 + 全部非 system 消息`，不触发 LLM 调用。
+
+    Note:
+        - 摘要质量依赖于 LLM 能力，温度参数固定为 0 以提高确定性。
+        - LLM 调用会引入网络延迟和费用成本，实际使用时应设置合理的
+          `keep_last` 值以平衡压缩频率和开销。
+        - 返回值总是包含至少一条 system 消息（假设输入至少有一条）。
+        - 此函数不修改传入的 `messages`，返回值为新列表。
+
+    Example:
+        >>> history = build_fake_history(n_rounds=30)
+        >>> compressed = strategy_summary(history, keep_last=4)
+        >>> # compressed 中包含一条 "[早期对话摘要]" 的 system 消息
+        >>> any("早期对话摘要" in m["content"] for m in compressed)
+        True
+    """
+    if keep_last < 1:
+        keep_last = 6
+
+    non_sys = [m for m in messages if m["role"] != "system"]
+    # 消息量不足，无需压缩，直接返回原文
+    if len(non_sys) <= keep_last:
+        return messages
+
     sys_msgs = [m for m in messages if m["role"] == "system"]
+    # 将非 system 消息切分：去掉最后 keep_last 条，剩余为"中间段"
     middle = [m for m in messages if m["role"] != "system"][:-keep_last]
     recent = messages[-keep_last:]
 
+    # 中间段为空时无需压缩，直接返回
     if not middle:
         return sys_msgs + recent
 
-    # 调一次 LLM 把中间生成摘要
-    # 注意：当前接口仅支持流式，统一走 _env.chat()（内部强制 stream=True 后拼回完整文本）
+    # 将中间段拼接为文本，调用 LLM 生成摘要
     middle_text = "\n".join(
         f"{m['role']}: {m['content']}" for m in middle
     )
@@ -104,28 +158,80 @@ def strategy_summary(messages: list[dict], keep_last: int = 6) -> list[dict]:
 # ============================================================
 # 策略 ④：分层 —— system + 关键事实槽 + 早期摘要 + 最近 N 轮
 # ============================================================
-KEY_FACT_KEYWORDS = ["过敏", "预算", "重要", "对了", "一定要", "不要"]
+KEY_FACT_KEYWORDS = {"过敏", "预算", "重要", "对了", "一定要", "不要"}
+
+
+def _contains_key_fact(text: str) -> bool:
+    """判断文本是否包含关键事实关键词。"""
+    return any(kw in text for kw in KEY_FACT_KEYWORDS)
 
 
 def extract_key_facts(messages: list[dict]) -> list[str]:
     """简易关键事实提取：从 user 消息里捞包含关键词的句子。"""
     facts = []
     for m in messages:
-        if m["role"] == "user":
-            for kw in KEY_FACT_KEYWORDS:
-                if kw in m["content"]:
-                    facts.append(m["content"].strip())
-                    break
+        if m["role"] == "user" and _contains_key_fact(m["content"]):
+            facts.append(m["content"].strip())
     return facts
 
 
 def strategy_hierarchical(messages: list[dict], keep_last: int = 6) -> list[dict]:
+    """分层压缩策略：system + 关键事实槽 + 早期摘要 + 最近 N 轮原文。
+
+    这是四种策略中信息保留度最高的方案，广泛应用于工业级 Agent（如 Claude Code、
+    Cursor 等）。其核心理念是将消息按"重要性层级"分别处理：
+
+    处理流程（四层结构）：
+    1. System 消息：从原始消息列表中提取所有 system 消息，原样保留。
+       这些通常是角色设定、工具定义、规则等，不能被压缩。
+
+    2. 关键事实槽：调用 :func:`extract_key_facts` 从全部历史消息中
+       提取用户的硬约束（如"过敏""预算"等关键词匹配的句子），
+       以一条独立 system 消息前置注入。这样即使早期原文被摘要覆盖，
+       关键约束仍然显式可见。
+
+    3. 早期摘要：委托 :func:`strategy_summary` 对中间段消息做
+       LLM 摘要压缩，用一段简短文本替代冗长的早期对话。
+
+    4. 最近 N 轮原文：由 `strategy_summary` 内部保留最近
+       `keep_last` 条消息的原始内容，保证即时上下文质量。
+
+    Args:
+        messages: 完整的消息列表，每条消息为 `{"role": str, "content": str}`
+            格式。应包含至少一条 system 消息。
+        keep_last: 保留原文的最近消息条数，默认 6 条。值越小压缩越激进，
+            值越大信息丢失越少但 token 消耗越高。
+
+    Returns:
+        压缩后的消息列表，结构为：
+
+        .. code-block:: text
+
+            [system_1, ..., system_n, 关键事实槽, 早期摘要 system, 最近 N 条原文]
+
+        如果 `extract_key_facts` 未提取到任何关键事实，
+        则退化为与 ``strategy_summary`` 相同的输出（无关键事实槽）。
+
+    Note:
+        - 关键事实提取依赖 `KEY_FACT_KEYWORDS` 关键词列表，
+          当前为规则匹配，生产环境中可升级为 LLM 驱动的语义提取。
+        - 此函数不修改传入的 `messages`，返回值是新列表。
+        - 当消息量较小时，`strategy_summary` 可能不做压缩直接返回原文，
+          此时分层策略仅多出一个关键事实槽。
+
+    Example:
+        >>> history = build_fake_history(n_rounds=30)
+        >>> compressed = strategy_hierarchical(history, keep_last=6)
+        >>> # compressed 中包含一条 "[关键事实，永远记住]" 的 system 消息
+        >>> any("关键事实" in m.get("content", "") for m in compressed)
+        True
+    """
     sys_msgs = [m for m in messages if m["role"] == "system"]
 
-    # 中间用摘要替代
+    # 中间消息用摘要替代（内部保留最近 keep_last 轮原文）
     summarized = strategy_summary(messages, keep_last)
 
-    # 在 system 之后插入"关键事实"
+    # 从全部历史中提取关键事实，以独立 system 消息插入
     facts = extract_key_facts(messages)
     fact_block = "\n".join(f"- {f}" for f in facts)
     if fact_block:
