@@ -1,14 +1,22 @@
-# 第 4 章 · 上下文与记忆
+<p align="center">
+    <img src="../assets/banner-05-context-memory.svg" alt="Context & Memory">
+</p>
 
-> 本章目标：解决"聊久了爆炸"和"下次忘了"两个问题。
-> 产出：`my-agent/context.py` + `my-agent/memory.py`。
+# 第 5 章 · 上下文与记忆
 
-## 你将学到
+本章目标：解决 Agent 的两个关键问题 —— 对话过长导致上下文爆炸（token 超限）、会话结束后遗忘用户偏好（无长期记忆）。
+产出：`my-agent/context.py`（上下文管理器）和 `my-agent/memory.py`（向量记忆系统）。
 
-- 为什么上下文会爆炸（token 线性增长）
-- 上下文管理策略：keep_last + 摘要压缩
-- 向量记忆：embedding + 余弦相似度检索
-- Agent v2：接入 Context + Memory
+
+
+## 本章要点
+
+- 上下文爆炸的根源：每轮对话追加 user + assistant 消息，token 数线性增长，迟早超出模型上限
+- 三层上下文管理策略：system prompt 常驻、`keep_last` 保留最近原文、中间段用 LLM 摘要压缩
+- 向量记忆系统：用 embedding 将事实转为向量，通过余弦相似度检索相关长期记忆
+- Agent v2 实战整合：将 `ContextManager` 和 `Memory` 接入 Agent Loop，实现跨会话记忆
+
+
 
 ## 内容结构
 
@@ -19,7 +27,11 @@
 | 20 | Memory 系统 | [20-memory-types.md](./lecture/20-memory-types.md) | `demo_20_memory.py` |
 | 21 | Agent v2（整合） | — | `demo_21_agent_v2.py` |
 
-## 运行 Demo
+
+
+## 运行示例
+
+在云原生开发环境中执行：
 
 ```bash
 cd 05-context-and-memory/lab
@@ -29,15 +41,19 @@ python demo_20_memory.py
 python demo_21_agent_v2.py
 ```
 
+
+
 ## 本章产出
 
-补全 [`my-agent/context.py`](../my-agent/context.py) 和 [`my-agent/memory.py`](../my-agent/memory.py)，让测试通过：
+补全 [`my-agent/context.py`](../my-agent/context.py) 和 [`my-agent/memory.py`](../my-agent/memory.py)，在云原生开发环境中执行以下命令，让测试通过：
 
 ```bash
 cd my-agent
 python tests/test_context.py
 python tests/test_memory.py
 ```
+
+
 
 ## 配套练习
 
