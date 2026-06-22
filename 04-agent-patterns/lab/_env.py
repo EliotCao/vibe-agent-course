@@ -11,7 +11,9 @@
 from __future__ import annotations
 
 import os
-from typing import Optional
+from typing import List, Optional
+
+from pydantic import BaseModel
 
 try:
     from dotenv import load_dotenv
@@ -157,10 +159,12 @@ def _collect_stream(response, print_content: bool = False) -> "Message":
         print()  # 换行
 
     return Message(
+        role="assistant",
         content="".join(content_parts) if content_parts else None,
         tool_calls=[
             ToolCall(
                 id=tool_calls_map[i]["id"],
+                type="function",
                 function=Function(
                     name=tool_calls_map[i]["name"],
                     arguments=tool_calls_map[i]["arguments"],
@@ -172,36 +176,27 @@ def _collect_stream(response, print_content: bool = False) -> "Message":
 
 
 # ============================================================
-# 数据类：模拟 OpenAI 非流式响应的 message 结构
+# 数据类：用 pydantic 模拟 OpenAI 非流式响应的 message 结构。
+# 用 BaseModel 而非普通类，使 msg 可被 SDK 自动序列化，
+# 从而直接 messages.append(msg)，无需手动转 dict。
+# 属性访问（msg.content / msg.tool_calls[0].id 等）与普通类一致。
 # ============================================================
 
-class Function:
+class Function(BaseModel):
     """tool_call.function"""
-    def __init__(self, name: str, arguments: str):
-        self.name = name
-        self.arguments = arguments
-
-    def __repr__(self):
-        return f"Function(name={self.name!r}, arguments={self.arguments!r})"
+    name: str
+    arguments: str
 
 
-class ToolCall:
+class ToolCall(BaseModel):
     """单个 tool_call"""
-    def __init__(self, id: str, function: Function):
-        self.id = id
-        self.function = function
-
-    def __repr__(self):
-        return f"ToolCall(id={self.id!r}, function={self.function!r})"
+    id: str
+    type: str = "function"
+    function: Function
 
 
-class Message:
+class Message(BaseModel):
     """模拟 ChatCompletionMessage"""
-    def __init__(self, content: Optional[str], tool_calls: Optional[list] = None):
-        self.content = content
-        self.tool_calls = tool_calls
-
-    def __repr__(self):
-        if self.tool_calls:
-            return f"Message(content={self.content!r}, tool_calls={self.tool_calls!r})"
-        return f"Message(content={self.content!r})"
+    role: str = "assistant"
+    content: Optional[str] = None
+    tool_calls: Optional[List[ToolCall]] = None

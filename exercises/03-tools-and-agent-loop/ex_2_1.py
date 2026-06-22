@@ -15,10 +15,11 @@
 
 import json
 import os
+import re
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../02-meet-your-ai/lab"))
-from _env import get_model_id, make_client
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../03-tools-and-agent-loop/lab"))
+from _env import chat, get_model_id, make_client
 
 client = make_client()
 MODEL = get_model_id()
@@ -60,11 +61,7 @@ def run_tool_call(question: str) -> str:
     messages = [{"role": "user", "content": question}]
 
     # TODO Step 1: 第一次调 API（带 tools 参数），让模型决定是否调用工具
-    #   resp = client.chat.completions.create(
-    #       model=MODEL, messages=messages, tools=TOOLS
-    #   )
-    #   msg = resp.choices[0].message
-    raise NotImplementedError("请从这里开始补全")
+    #   msg = chat(messages, tools=TOOLS, client=client, model=MODEL)
 
     # TODO Step 2: 检查 msg.tool_calls 是否存在
     #   如果没有 tool_calls，说明模型直接回答了，返回 msg.content
@@ -83,10 +80,8 @@ def run_tool_call(question: str) -> str:
     #   })
 
     # TODO Step 5: 第二次调 API，拿到最终回答
-    #   resp2 = client.chat.completions.create(
-    #       model=MODEL, messages=messages, tools=TOOLS
-    #   )
-    #   return resp2.choices[0].message.content
+    # msg2 = chat(messages, tools=TOOLS, client=client, model=MODEL)
+     # return msg2.content
 
 
 # ============================================================
@@ -95,11 +90,11 @@ def run_tool_call(question: str) -> str:
 if __name__ == "__main__":
     # 测试 1：简单计算
     answer = run_tool_call("请帮我算一下 123 乘以 456 等于多少")
-    assert "56088" in answer, f"123×456=56088，但模型回答: {answer}"
+    assert "56088" in re.sub(r"\D", "", answer), f"123×456=56088，但模型回答: {answer}"
 
     # 测试 2：返回类型
     answer2 = run_tool_call("7 + 8 等于多少？")
     assert isinstance(answer2, str), "返回值应该是字符串"
-    assert "15" in answer2, f"7+8=15，但模型回答: {answer2}"
+    assert "15" in re.sub(r"\D", "", answer2), f"7+8=15，但模型回答: {answer2}"
 
     print("✅ PASSED: run_tool_call 全部测试通过")
