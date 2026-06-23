@@ -28,6 +28,12 @@ cd 08-skills-and-npc/lab
 python demo_33_skills.py
 ```
 
+## 作业指引
+
+本章 Skills / NPC / 大作业在你**自己的 Agent 仓库**中完成（作业仓库的 `exercises/` 第 8 章待更新）。
+
+> 📦 作业仓库（参考与后续更新）：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
+
 ## 本章产出
 
 1. 给你的 Agent 写至少 1 个自定义 Skill（`SKILL.md`）
@@ -51,4 +57,4 @@ python demo_33_skills.py
 
 ## 配套练习
 
-[`exercises/08-skills-and-npc/`](../exercises/08-skills-and-npc/)
+作业仓库的 `exercises/08-skills-and-npc/`（待更新）。

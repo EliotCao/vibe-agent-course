@@ -26,6 +26,14 @@ cd 01-vibecoding-intro/lab
 python demo_01_guess_game.py
 ```
 
+## 作业指引
+
+本章为动手 Lab，配套作业仓库中**无填空练习**（标注为「无填空题」）。
+
+> 📦 **作业仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
+
+本章产出（你 vibe 出的小游戏）推送到**你个人的 CNB 仓库**并跑起来，不进入作业仓库的 CI 测评。
+
 ## 本章产出
 
 1. 用 AI vibe 出一个能玩的小游戏（猜数字 / 贪吃蛇 / 2048 任选）

@@ -30,9 +30,17 @@ python demo_08_tool_registry.py
 python demo_09_mini_agent.py
 ```
 
+## 作业指引
+
+本章作业在配套作业仓库中完成：
+
+> 📦 **作业仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
+
+**流程**：Fork 作业仓库 → 在 `my-agent/`（核心产出）与 `exercises/`（配套填空）中完成本章任务 → 提交 PR，CI 流水线（`.cnb.yml`）自动测评，全绿即通过。
+
 ## 本章产出
 
-补全 [`my-agent/tools.py`](../my-agent/tools.py) 中的 `ToolRegistry` 类，让测试通过：
+在作业仓库中补全 `my-agent/tools.py` 的 `ToolRegistry` 类，让测试通过：
 
 ```bash
 cd my-agent
@@ -41,4 +49,4 @@ python tests/test_tools.py
 
 ## 配套练习
 
-[`exercises/03-tools-and-agent-loop/`](../exercises/03-tools-and-agent-loop/) — 3 道代码填空题
+作业仓库的 `exercises/03-tools-and-agent-loop/` — 3 道代码填空题（运行 `python exercises/03-tools-and-agent-loop/ex_*.py` 看到 ✅ PASSED 即通过）。

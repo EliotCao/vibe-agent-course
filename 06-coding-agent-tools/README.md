@@ -36,9 +36,17 @@ python demo_26_end_to_end.py
 
 
 
+## 作业指引
+
+本章作业在配套作业仓库中完成：
+
+> 📦 **作业仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
+
+**流程**：Fork 作业仓库 → 在 `my-agent/`（核心产出）与 `exercises/`（配套填空）中完成本章任务 → 提交 PR，CI 流水线（`.cnb.yml`）自动测评，全绿即通过。
+
 ## 本章产出
 
-补全 [`my-agent/coding_tools/`](../my-agent/coding_tools/) 下的 5 个工具文件，让测试通过：
+在作业仓库中补全 `my-agent/coding_tools/` 下的 5 个工具文件，让测试通过：
 
 ```bash
 cd my-agent
@@ -49,4 +57,4 @@ python tests/test_coding_tools.py
 
 ## 配套练习
 
-[`exercises/06-coding-agent-tools/`](../exercises/06-coding-agent-tools/) — 3 道代码填空题
+作业仓库的 `exercises/06-coding-agent-tools/` — 3 道代码填空题（运行 `python exercises/06-coding-agent-tools/ex_*.py` 看到 ✅ PASSED 即通过）。

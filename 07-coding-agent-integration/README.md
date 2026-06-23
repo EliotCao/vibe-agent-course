@@ -24,9 +24,19 @@ python demo_30_integration_walkthrough.py
 python demo_31_three_tasks.py
 ```
 
+## 作业指引
+
+本章作业在配套作业仓库中完成：
+
+> 📦 **作业仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
+
+**流程**：Fork 作业仓库 → 在 `my-agent/` 中完成本章整合任务 → 提交 PR，CI 流水线（`.cnb.yml`）自动测评，全绿即通过。
+
+> 说明：作业仓库的 `exercises/` 第 7 章待更新，本章聚焦 `my-agent/main.py` 的整合与端到端运行。
+
 ## 本章产出
 
-打开 [`my-agent/main.py`](../my-agent/main.py)，把所有模块接好，跑通：
+在作业仓库中打开 `my-agent/main.py`，把所有模块接好，跑通：
 
 ```bash
 cd my-agent
