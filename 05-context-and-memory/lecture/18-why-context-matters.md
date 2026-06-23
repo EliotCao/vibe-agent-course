@@ -47,6 +47,8 @@
 
 ## 对症下药：三个痛点，三条解法
 
+![three-pains-three-solutions](images/18-three-pains-three-solutions.svg)
+
 | 痛点 | 工程解法 |
 |---|---|
 | 撞窗口 | 设定 token 阈值，触发后主动压缩消息 |
