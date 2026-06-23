@@ -1,26 +1,3 @@
-# =====================================================================
-# CNB 流水线配置
-#
-# 1) main.push:   构建并推送 NPC 运行时镜像（04-my-agent/Dockerfile）
-# 2) NPC 事件:    @当前仓库(角色名) 时触发，跑 my-agent --solo exec
-#                 然后用 git-cnb 把回答以"工作模式"回写到 Issue/PR 评论
-#                 → 评论提交者会显示为 NPC 角色名
-# 3) CI 验证:     通过 include 引入独立 CI 仓库的各章节验证流水线
-#
-# 镜像地址约定：
-#   - main.push 用 ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
-#   - NPC 事件用 ${CNB_DOCKER_REGISTRY}/${CNB_NPC_SLUG_LOWERCASE}:latest
-#   两者在本仓库下取值一致。
-# =====================================================================
-
-# ---- 作业验证流水线（从 CI 仓库引入） ----
-include:
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter1.yml
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter2.yml
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter3.yml
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter4.yml
-  - https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course-ci/-/blob/main/chapter5.yml
-
 # ---- NPC 事件流水线锚点（issue / pull_request 评论触发） ----
 # 插件任务写法：stage 只写 image，不写 script，CNB 直接跑镜像 ENTRYPOINT。
 # ENTRYPOINT 是 /usr/local/bin/npc-entrypoint（见 Dockerfile），逻辑见
@@ -61,7 +38,6 @@ $:
       stages:
         - name: uv sync
           script: |
-            cd /root && npx skills add https://cnb.cool/cnb/skills/cnb-skill.git --agent codebuddy -y
             cd /workspace && uv sync --all-packages
 
 # ---- 默认分支推送：构建并推送镜像 ----
@@ -70,27 +46,6 @@ main:
     - services:
         - docker
       stages:
-        - name: docker build
-          script: |
-            cd examples/04-my-agent
-            docker build \
-              -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest \
-              -f Dockerfile .
-        - name: docker push
-          script: |
-            docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
-        - name: smoke test
-          script: |
-            # ENTRYPOINT 是 npc-entrypoint，没 CNB_EVENT 直接跑会进 NPC 流程并报错；
-            # 所以这里只验证关键文件都在镜像里、可执行。
-            docker run --rm --entrypoint bash ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest -c '
-              set -e
-              test -x /usr/local/bin/my-agent       && echo "my-agent OK"
-              test -x /usr/local/bin/git-cnb        && echo "git-cnb OK"
-              test -x /usr/local/bin/npc-entrypoint && echo "npc-entrypoint OK"
-              /usr/local/bin/my-agent --help >/dev/null
-              /usr/local/bin/git-cnb  --help >/dev/null
-              '
         - name: build knowledge base
           type: knowledge:update
           options:
