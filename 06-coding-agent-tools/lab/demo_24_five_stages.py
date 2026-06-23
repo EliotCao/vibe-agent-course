@@ -1,19 +1,19 @@
 """
-Demo 24 · 五阶段工作流：手动跑一遍 Coding Agent 的"思考路径"
+Demo 24 · 五阶段工作流：手动走一遍 Coding Agent 的"思考路径"
 ============================================================
 
 配套：第 24 节《Coding Agent 的工作模式》
 
-让你**不用 LLM 也能感受 Agent 写代码的步骤**。
-我们手动按"浏览 → 定位 → 理解 → 修改 → 验证"五步，调用 5 个工具，
-完成一个真实任务："给 demo_xxx.py 加一句开场打印"。
+无需 LLM，也能亲身体验 Agent 写代码的完整步骤。
+我们手动按"浏览 → 定位 → 理解 → 修改 → 验证"五个阶段，依次调用 5 个工具，
+完成一个真实任务：给 main.py 加一句开场打印。
 
 这个 demo 的目的：
-  - 让你看到：每一步对应的是哪个工具
-  - 让你看到：工具的输出长什么样、模型怎么基于它决定下一步
-  - 第 25 节会讲清这些工具背后的设计哲学
+  - 看清每一步分别对应哪个工具
+  - 看清工具的输出长什么样，以及模型如何基于它决定下一步
+  - 为第 25 节讲解工具背后的设计哲学打下直观基础
 
-跑法：
+运行方式：
     python demo_24_five_stages.py
 """
 
@@ -34,8 +34,8 @@ def main() -> None:
     print(f"📁 工作区: {workspace}\n")
 
     # 写两个示例文件
-    write(os.path.join(workspace, "main.py"), "def greet():\n    print('hello')\n\ngreet()\n")
-    write(os.path.join(workspace, "utils.py"), "def add(a, b):\n    return a + b\n")
+    write(os.path.join(workspace, "main.py"), "def greet() -> None:\n    print('hello')\n\ngreet()\n")
+    write(os.path.join(workspace, "utils.py"), "def add(a: int, b: int) -> int:\n    return a + b\n")
 
     # ============================================================
     # 阶段 ① 浏览：用 list_dir 看看项目里有什么
@@ -61,8 +61,8 @@ def main() -> None:
     print("=" * 60)
     result = edit(
         os.path.join(workspace, "main.py"),
-        old_content="def greet():\n    print('hello')",
-        new_content="def greet():\n    print('=== Demo ===')\n    print('hello')",
+        old_content="def greet() -> None:\n    print('hello')",
+        new_content="def greet() -> None:\n    print('=== Demo ===')\n    print('hello')",
     )
     print(result)
 
