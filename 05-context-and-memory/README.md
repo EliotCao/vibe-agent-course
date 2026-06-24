@@ -45,11 +45,20 @@ python demo_21_agent_v2.py
 
 ## 作业指引
 
-本章作业在配套作业仓库中完成：
+本章作业需要在配套仓库中完成，按以下步骤操作：
 
+> [!TIP]
+>
 > 📦 **作业仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
 
-**流程**：Fork 作业仓库 → 在 `my-agent/`（核心产出）与 `exercises/`（配套填空）中完成本章任务 → 提交 PR，CI 流水线（`.cnb.yml`）自动测评，全绿即通过。
+**操作流程**：
+
+1. **Fork** 作业仓库到自己的账号下
+2. 在 `my-agent/` 目录中完成核心代码产出，在 `exercises/` 目录中完成配套填空题
+3. **提交 PR**，CI 流水线（`.cnb.yml`）会自动运行测评
+4. 全部测试通过（全绿）即视为作业通过检测 ✅，作业完成
+
+
 
 ## 本章产出
 
