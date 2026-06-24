@@ -14,8 +14,6 @@
   - 完全沙箱化（容器 / Firejail）
 """
 
-from __future__ import annotations
-
 import os
 import re
 import subprocess
@@ -23,14 +21,14 @@ import subprocess
 
 # 一些"明显危险"的模式，命中就直接拒绝
 DANGER_PATTERNS = [
-    r"\brm\s+-rf\s+/",          # 整盘删除
-    r"\bsudo\b",                # 提权
-    r"\bdd\s+if=",              # 写盘
-    r"\b(curl|wget)\s+.*\|\s*(sh|bash)",   # 远程脚本下载执行
-    r":\s*\(\s*\)\s*\{\s*:",    # fork 炸弹
-    r"\bmkfs\b",
-    r"\bshutdown\b",
-    r"\breboot\b",
+    r"\brm\s+-[rf]+\s+[/~*]",          # rm -rf / 删除根目录
+    r"\bsudo\b",                # sudo 提权执行
+    r"\bdd\s+if=",              # dd 写盘 / 擦除磁盘
+    r"\b(curl|wget)\s+.*\|\s*(sh|bash)",   # curl/wget 下载远程脚本并管道给 shell 执行
+    r":\s*\(\s*\)\s*\{\s*:",    # Fork 炸弹 :() { :|:& };:
+    r"\bmkfs\b",                # mkfs 格式化文件系统
+    r"\bshutdown\b",            # shutdown 关机
+    r"\breboot\b",              # reboot 重启
 ]
 
 

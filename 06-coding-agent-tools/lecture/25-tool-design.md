@@ -203,7 +203,7 @@ sequenceDiagram
 
 ## 动手验证
 
-运行演示脚本：
+在云原生开发环境中，运行演示脚本：
 
 ```bash
 python demo_25_design_philosophy.py
