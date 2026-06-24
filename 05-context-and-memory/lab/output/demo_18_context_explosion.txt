@@ -1,0 +1,54 @@
+[第  1 轮] prompt=   32 tokens · total=  432 tokens · messages 字符数=43
+[第  2 轮] prompt=  467 tokens · total=  867 tokens · messages 字符数=751
+[第  3 轮] prompt=  901 tokens · total= 1301 tokens · messages 字符数=1460
+[第  4 轮] prompt= 1336 tokens · total= 1736 tokens · messages 字符数=2172
+[第  5 轮] prompt= 1771 tokens · total= 2171 tokens · messages 字符数=2863
+[第  6 轮] prompt= 2206 tokens · total= 2606 tokens · messages 字符数=3556
+[第  7 轮] prompt= 2641 tokens · total= 3041 tokens · messages 字符数=4249
+[第  8 轮] prompt= 3076 tokens · total= 3476 tokens · messages 字符数=4961
+[第  9 轮] prompt= 3511 tokens · total= 3911 tokens · messages 字符数=5654
+[第 10 轮] prompt= 3946 tokens · total= 4346 tokens · messages 字符数=6347
+[第 11 轮] prompt= 4381 tokens · total= 4781 tokens · messages 字符数=7040
+[第 12 轮] prompt= 4816 tokens · total= 5216 tokens · messages 字符数=7749
+[第 13 轮] prompt= 5251 tokens · total= 5651 tokens · messages 字符数=8458
+[第 14 轮] prompt= 5686 tokens · total= 6086 tokens · messages 字符数=9167
+[第 15 轮] prompt= 6121 tokens · total= 6521 tokens · messages 字符数=9876
+[第 16 轮] prompt= 6556 tokens · total= 6956 tokens · messages 字符数=10585
+[第 17 轮] prompt= 6991 tokens · total= 7391 tokens · messages 字符数=11294
+[第 18 轮] prompt= 7426 tokens · total= 7826 tokens · messages 字符数=12003
+[第 19 轮] prompt= 7861 tokens · total= 8261 tokens · messages 字符数=12712
+[第 20 轮] prompt= 8296 tokens · total= 8696 tokens · messages 字符数=13421
+
+============================================================
+📈 prompt_tokens 随轮次的增长（横向 ASCII 图）
+============================================================
+第  1 轮 [   32 tk]
+第  2 轮 [  467 tk] ██
+第  3 轮 [  901 tk] ████
+第  4 轮 [ 1336 tk] ██████
+第  5 轮 [ 1771 tk] ████████
+第  6 轮 [ 2206 tk] ██████████
+第  7 轮 [ 2641 tk] ████████████
+第  8 轮 [ 3076 tk] ██████████████
+第  9 轮 [ 3511 tk] ████████████████
+第 10 轮 [ 3946 tk] ███████████████████
+第 11 轮 [ 4381 tk] █████████████████████
+第 12 轮 [ 4816 tk] ███████████████████████
+第 13 轮 [ 5251 tk] █████████████████████████
+第 14 轮 [ 5686 tk] ███████████████████████████
+第 15 轮 [ 6121 tk] █████████████████████████████
+第 16 轮 [ 6556 tk] ███████████████████████████████
+第 17 轮 [ 6991 tk] █████████████████████████████████
+第 18 轮 [ 7426 tk] ███████████████████████████████████
+第 19 轮 [ 7861 tk] █████████████████████████████████████
+第 20 轮 [ 8296 tk] ████████████████████████████████████████
+
+💡 关键观察
+  - 起始 prompt：32 tokens
+  - 最终 prompt：8296 tokens
+  - 增长倍率：259.2x
+
+  第4章 后面要解决的问题：
+    1. 上下文窗口虽然 128K，但不能任由它涨
+    2. token 是按用量计费的，全量塞回去成本飙升
+    3. Lost in the Middle：长上下文里中间的信息会被忽略（第1章 第 3 节讲过）

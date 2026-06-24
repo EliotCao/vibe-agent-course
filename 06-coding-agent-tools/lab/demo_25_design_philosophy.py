@@ -17,8 +17,8 @@ Demo 25 · 工具设计哲学：3 个对比演示
 核心思想：工具不仅要"能干活"，更要主动帮 LLM 避开常见陷阱。
 
 运行方式：
-source /workspace/.venv/bin/activate
-python demo_25_design_philosophy.py
+    source /workspace/.venv/bin/activate
+    python demo_25_design_philosophy.py
 """
 
 import os

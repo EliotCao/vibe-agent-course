@@ -1,22 +1,22 @@
 """
-Demo 18 · 上下文爆炸：跑一个 20 轮的任务感受失控
-=============================================
+Demo 18 · 上下文爆炸：跑一个 30 轮的任务，亲眼看着它失控
+====================================================
 
-配套：第 18 节《上下文工程：为什么要管、什么时候爆》
+配套：第 18 节《上下文工程：为什么必须管，不管会怎样》
 
-效果：直观展示——
-  - 不做任何上下文管理时，messages 列表怎么膨胀
-  - token 消耗如何指数级飙升
-  - 最终怎么撞到上下文窗口上限
+不做任何上下文管理，让你直观看到三件事同时发生：
+  - messages 列表如何随轮次不断膨胀
+  - prompt_tokens 如何飙升
+  - 按这个趋势，多少轮就会撞上上下文窗口上限
 
-我们让一个简单 Agent 反复回答"用一段话总结之前的对话"+ "再给我一个新建议"，
-每轮的回复都全量塞回历史，跑 30 轮，画一张 token 增长曲线。
+做法：让一个简单的旅行规划 Agent 反复执行同一个任务——
+「总结之前讨论的所有要点 + 再补充 3 个新建议」，每轮回复都全量塞回历史，
+连跑 30 轮，最后画一张 token 增长曲线。
 
-跑法：
+运行方式：
+    source /workspace/.venv/bin/activate
     python demo_18_context_explosion.py
 """
-
-from __future__ import annotations
 
 from _env import get_model_id, make_client
 
@@ -30,6 +30,8 @@ FOLLOW_UP = (
 
 
 def main(rounds: int = 30) -> None:
+    rounds = rounds if rounds > 0 else 30
+
     client = make_client()
 
     messages = [

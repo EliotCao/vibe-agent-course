@@ -1,25 +1,32 @@
 """
-Demo 19 · ContextManager：四种上下文管理策略对比
-================================================
+Demo 19 · 四种上下文管理策略对比
+================================
 
 配套：第 19 节《上下文管理策略：截断 / 摘要 / 分层 / GSSC》
 
-跑同一个 30 轮对话历史，分别用 4 种策略处理，对比：
-  - 处理后的 messages 长度（条数 / 字符数）
-  - 信息保留度（早期重要信息有没有保住）
+承接 18 节示例暴露的"上下文爆炸"问题，这里给出解法并横向对比。
+
+实验设计：构造同一段 30 轮对话历史，故意埋两个"重要事实"——
+  - 早期事实：第 2 轮的"花粉过敏"（容易被截断/摘要丢掉）
+  - 晚期事实：倒数第二轮的"每天预算 500 元"（一般都能保住）
+再用 4 种策略分别处理，对比三个维度：
+  - 处理后的 messages 规模（条数 / 字符数）
+  - 信息保留度（两个埋点事实还在不在）
   - 实现复杂度
 
-策略：
-  ① RAW           —— 不做任何处理（baseline）
-  ② TRUNCATE      —— 保留 system + 最近 N 轮，中间砍掉
-  ③ SUMMARY       —— system + 早期摘要 + 最近 N 轮原文
-  ④ HIERARCHICAL  —— system + 关键长期事实 + 早期摘要 + 最近 N 轮
+四种策略（keep_last 默认保留最近 6 轮）：
+  ① RAW           —— 不做任何处理，作为对照基线（baseline）
+  ② TRUNCATE      —— 保留 system + 最近 N 轮，中间直接砍掉
+  ③ SUMMARY       —— system + 中间段 LLM 摘要 + 最近 N 轮原文
+  ④ HIERARCHICAL  —— system + 关键事实槽 + 早期摘要 + 最近 N 轮原文
 
-跑法：
+注：讲稿里的第四种策略 GSSC 是工程级流水线，本 demo 不实现，
+    这里的"④ 分层"对应讲稿中的"③ 分层"。
+
+运行方式：
+    source /workspace/.venv/bin/activate
     python demo_19_context_strategies.py
 """
-
-from __future__ import annotations
 
 from prettytable import PrettyTable
 
