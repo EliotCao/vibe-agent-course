@@ -28,7 +28,7 @@
 
 
 
-## <img src="https://docs.cnb.cool/images/logo/svg/Symbol-Color.svg" alt="⏩" style="zoom:10%;" /> 运行示例
+## 运行 Demo
 
 在云原生开发环境中执行：
 
