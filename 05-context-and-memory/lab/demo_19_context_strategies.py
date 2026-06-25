@@ -37,7 +37,56 @@ from _env import chat
 # 模拟历史：30 轮对话（包含 1 个早期重要事实 + 1 个晚期重要事实）
 # ============================================================
 def build_fake_history(n_rounds: int = 30) -> list[dict]:
-    """生成一段假对话，把'重要事实'埋在第 2 轮和第 28 轮。"""
+    """构造一段模拟的多轮对话历史，用于测试不同上下文管理策略的效果。
+
+    该函数生成一个结构化的消息列表，模拟用户与旅行助手之间的完整对话。
+    对话中故意埋入两个"重要事实"，分布在对话早期的不同位置，
+    用以考察各策略（截断、摘要、分层）在压缩上下文时对关键信息的保留能力。
+
+    对话结构：
+        1. system 消息：设定角色为旅行助手。
+        2. 第 1-2 轮（早期重要事实）：用户透露关键偏好——
+           `"重要：我对花粉过敏，户外活动要避开花期。"`
+           此事实位于对话前段，容易被截断策略丢弃、或被摘要策略压缩丢失。
+        3. 中间填充轮：由预定义的 25 组问答模板循环填充，生成
+           `n_rounds - 5` 轮真实感的旅行话题对话（如门票、交通、美食等），
+           模拟对话中大量"噪音"信息。
+        4. 倒数第二轮（晚期重要事实）：用户补充关键约束——
+           `"对了，我的预算是每天 500 元。"`
+           此事实位于对话末尾附近，通常能被所有策略保留，
+           作为对照组验证策略是否正常保留了近期信息。
+
+    Args:
+        n_rounds: 期望生成的对话轮数，默认 30。每轮包含一条 user 消息
+            和一条 assistant 消息（共 2 条）。取值应不小于 6，
+            否则中间填充轮数不足，返回值长度过短。
+
+    Returns:
+        扁平的消息列表，格式为 `[{"role": str, "content": str}, ...]`，
+        可直接传入 OpenAI Chat Completions API 的 `messages` 参数。
+        总条数为 `1（system）+ 4（对话早期事实）+ n_rounds * 2 + 2（对话晚期重要事实）`，
+        实际条数可能因取整略有偏差。
+
+    Note:
+        - 返回的列表是全新构造的，每次调用都会创建独立副本。
+        - 中间填充轮使用取模循环，当 `n_rounds` 较大时，
+          同一组问答会重复出现，这不会影响策略对比实验。
+        - 两个埋点事实分别以 `"过敏"` 和 `"预算"` 为关键词，
+          便于在 :func:`fact_check` 中通过简单子串匹配做检测。
+
+    Example:
+        >>> history = build_fake_history(n_rounds=30)
+        >>> len(history)
+        67
+        >>> history[0]["role"]
+        'system'
+        >>> "花粉过敏" in history[6]["content"]  # 第 2 轮 user 消息
+        True
+        >>> "500 元" in history[-2]["content"]    # 倒数第二轮 user 消息
+        True
+    """
+    n_rounds = n_rounds if n_rounds > 0 else 30
+
     msgs = [{"role": "system", "content": "你是个旅行助手。"}]
 
     # 第 1-2 轮：用户透露一个关键偏好（早期重要事实）
@@ -48,11 +97,39 @@ def build_fake_history(n_rounds: int = 30) -> list[dict]:
         {"role": "assistant", "content": "明白，会注意避开花季景点。"},
     ]
 
-    # 中间一堆灌水
-    for i in range(n_rounds - 5):
+    # 中间是一段真实感的旅行对话（每轮一问一答，约 25 轮）
+    _filler_qa = [
+        ("故宫门票需要提前预约吗？", "建议提前在官网预约，现场票经常售罄，尤其旺季。"),
+        ("从故宫到颐和园怎么走方便？", "地铁 4 号线直达北宫门站，大约 40 分钟。"),
+        ("北京 6 月天气怎么样？", "6 月已经偏热，白天 30°C 左右，注意防晒补水。"),
+        ("有没有适合拍照的胡同？", "南锣鼓巷、杨梅竹斜街都不错，建议早上去人少。"),
+        ("长城哪个段落人少一点？", "慕田峪比八达岭人少很多，景色也更好。"),
+        ("天坛几点开门？", "公园 6:00 开门，祈年殿等核心景点 8:00 开放。"),
+        ("北京烤鸭哪家好？", "全聚德、便宜坊是老字号，四季民福性价比也不错。"),
+        ("需要带现金吗？", "基本不用，手机支付覆盖几乎所有场景。"),
+        ("798 艺术区值得去吗？", "喜欢当代艺术的话很推荐，周末还有各种展览和集市。"),
+        ("早晚高峰地铁挤吗？", "8-9 点和 17-19 点非常拥挤，建议错峰出行。"),
+        ("什刹海晚上有什么玩的？", "可以坐游船、逛酒吧街，夏天夜晚很热闹。"),
+        ("国家博物馆需要身份证吗？", "是的，需要身份证或护照，提前预约可以走快速通道。"),
+        ("簋街有什么推荐菜？", "麻辣小龙虾是招牌，很多店营业到凌晨。"),
+        ("从大兴机场到市区怎么走？", "乘坐地铁最实惠，非高峰期最快；打车约 100-400 元，看路况和车型。"),
+        ("圆明园和颐和园选一个？", "颐和园更完整更好逛，圆明园偏历史遗迹感。"),
+        ("有没有免费的景点？", "奥林匹克公园、前门大街、琉璃厂都免费，值得逛。"),
+        ("北京的出租车好打吗？", "路边招手不容易，建议用打车软件。"),
+        ("王府井小吃街还值得去吗？", "本地人很少去，更推荐牛街或护国寺小吃。"),
+        ("后海白天好看还是晚上好看？", "各有味道，白天安静看景，晚上热闹泡吧。"),
+        ("香山现在有红叶吗？", "6 月没有红叶，夏天爬山看绿野也不错。"),
+        ("鸟巢可以进去参观吗？", "可以的，买票进内部参观，水立方也挨在一起。"),
+        ("北京的公共交通用什么卡？", "亿通行 App 扫码就行，地铁公交都能用。"),
+        ("景山公园值得爬吗？", "很值得！山顶俯瞰故宫全景是经典机位。"),
+        ("北大清华能进去逛吗？", "需要预约，一般提前在公众号上申请参观名额。"),
+        ("回程想带点特产，推荐什么？", "稻香村糕点、张一元茶叶、内联升布鞋都挺有特色。"),
+    ]
+    for index in range(n_rounds - 5):
+        question, answer = _filler_qa[index % len(_filler_qa)]
         msgs += [
-            {"role": "user", "content": f"再给我推荐 1 个第 {i+3} 天的活动。"},
-            {"role": "assistant", "content": f"第 {i+3} 天可以考虑..."},
+            {"role": "user", "content": question},
+            {"role": "assistant", "content": answer},
         ]
 
     # 倒数第二轮再透露一个关键约束（晚期重要事实）
@@ -64,18 +141,28 @@ def build_fake_history(n_rounds: int = 30) -> list[dict]:
     return msgs
 
 
-# ============================================================
-# 策略 ②：截断 —— 保留 system + 最近 N 轮
-# ============================================================
 def strategy_truncate(messages: list[dict], keep_last: int = 6) -> list[dict]:
+    """截断策略：保留所有 system 消息 + 最近 N 轮对话。
+
+    先从完整消息列表中提取所有 system 消息，再取末尾 `keep_last`
+    条非 system 消息，最后拼接返回。这样无论 `keep_last` 多大，
+    也不会导致 system 消息重复出现。
+
+    Args:
+        messages: 完整的消息列表。
+        keep_last: 保留的最近消息条数（不含 system），默认 6。
+
+    Returns:
+        截断后的消息列表。
+    """
+    keep_last = keep_last if keep_last > 0 else 6
+
     sys_msgs = [m for m in messages if m["role"] == "system"]
-    recent = messages[-keep_last:]
+    non_sys = [m for m in messages if m["role"] != "system"]
+    recent = non_sys[-keep_last:] if keep_last < len(non_sys) else non_sys
     return sys_msgs + recent
 
 
-# ============================================================
-# 策略 ③：摘要 —— 把中间一段总结成一条 system message
-# ============================================================
 def strategy_summary(messages: list[dict], keep_last: int = 6) -> list[dict]:
     """摘要压缩策略：system + LLM 摘要（中间段）+ 最近 N 轮原文。
 
@@ -123,8 +210,7 @@ def strategy_summary(messages: list[dict], keep_last: int = 6) -> list[dict]:
         >>> any("早期对话摘要" in m["content"] for m in compressed)
         True
     """
-    if keep_last < 1:
-        keep_last = 6
+    keep_last = keep_last if keep_last > 0 else 6
 
     non_sys = [m for m in messages if m["role"] != "system"]
     # 消息量不足，无需压缩，直接返回原文
@@ -132,9 +218,9 @@ def strategy_summary(messages: list[dict], keep_last: int = 6) -> list[dict]:
         return messages
 
     sys_msgs = [m for m in messages if m["role"] == "system"]
-    # 将非 system 消息切分：去掉最后 keep_last 条，剩余为"中间段"
-    middle = [m for m in messages if m["role"] != "system"][:-keep_last]
-    recent = messages[-keep_last:]
+    # 将非 system 消息切分为中间段和最近段（两者无重叠、无遗漏）
+    middle = non_sys[:-keep_last]
+    recent = non_sys[-keep_last:]
 
     # 中间段为空时无需压缩，直接返回
     if not middle:
@@ -162,9 +248,6 @@ def strategy_summary(messages: list[dict], keep_last: int = 6) -> list[dict]:
     )
 
 
-# ============================================================
-# 策略 ④：分层 —— system + 关键事实槽 + 早期摘要 + 最近 N 轮
-# ============================================================
 KEY_FACT_KEYWORDS = {"过敏", "预算", "重要", "对了", "一定要", "不要"}
 
 
@@ -174,7 +257,46 @@ def _contains_key_fact(text: str) -> bool:
 
 
 def extract_key_facts(messages: list[dict]) -> list[str]:
-    """简易关键事实提取：从 user 消息里捞包含关键词的句子。"""
+    """基于关键词匹配从历史消息中提取用户的关键事实（硬约束）。
+
+    遍历所有消息，筛选出 `role == "user"` 且内容包含预定义关键词
+    （由模块常量 `KEY_FACT_KEYWORDS` 定义，当前为 `{"过敏", "预算",
+    "重要", "对了", "一定要", "不要"}`）的句子，提取后作为"关键事实槽"
+    注入到上下文中，确保这些硬约束在上下文压缩后仍然显式可见。
+
+    这是分层策略（strategy_hierarchical）的核心组件之一：即便早期对话
+    被 LLM 摘要压缩后丢失了部分细节，通过关键词预先"打捞"出的关键事实
+    仍会以独立 system 消息的形式保留在上下文中。
+
+    Args:
+        messages: 完整的消息列表，每条消息为 `{"role": str, "content": str}`
+            格式。仅检查 `role == "user"` 的消息，system 和 assistant
+            消息会被跳过。
+
+    Returns:
+        提取到的关键事实列表，每个元素是一条 user 消息的完整 `content`
+        文本（已去首尾空白）。顺序保持原消息的出现顺序。如果没有任何消息
+        命中关键词，返回空列表 `[]`。
+
+    Note:
+        - 当前实现是纯规则匹配（关键词子串查找），而非语义理解。
+          生产环境中可升级为 LLM 驱动的语义提取，以识别隐式约束
+          （如"我不能吃辣"虽不含关键词，但同样属于硬约束）。
+        - 关键词集合 `KEY_FACT_KEYWORDS` 是模块级常量，可根据业务
+          场景增删，无需修改函数逻辑。
+        - 返回的每条事实可能与原始 user 消息完全相同（包含整句话），
+          而非仅提取关键词所在的子句。
+
+    Example:
+        >>> msgs = [
+        ...     {"role": "user", "content": "我对花粉过敏"},
+        ...     {"role": "assistant", "content": "好的"},
+        ...     {"role": "user", "content": "今天天气不错"},
+        ...     {"role": "user", "content": "预算是每天 500 元"},
+        ... ]
+        >>> extract_key_facts(msgs)
+        ['我对花粉过敏', '预算是每天 500 元']
+    """
     facts = []
     for m in messages:
         if m["role"] == "user" and _contains_key_fact(m["content"]):
@@ -235,7 +357,8 @@ def strategy_hierarchical(messages: list[dict], keep_last: int = 6) -> list[dict
     """
     sys_msgs = [m for m in messages if m["role"] == "system"]
 
-    # 中间消息用摘要替代（内部保留最近 keep_last 轮原文）
+    # 委托 strategy_summary 做中间段压缩 + 保留最近 N 轮原文
+    # strategy_summary 的返回值结构为：sys_msgs + [摘要] + recent
     summarized = strategy_summary(messages, keep_last)
 
     # 从全部历史中提取关键事实，以独立 system 消息插入
@@ -263,7 +386,7 @@ def stats(messages: list[dict]) -> dict:
 # ============================================================
 def fact_check(messages: list[dict]) -> tuple[bool, bool]:
     text = " ".join(m["content"] for m in messages)
-    return ("过敏" in text, "预算" in text)
+    return "过敏" in text, "预算" in text
 
 
 # ============================================================
@@ -271,24 +394,25 @@ def fact_check(messages: list[dict]) -> tuple[bool, bool]:
 # ============================================================
 def main() -> None:
     history = build_fake_history(n_rounds=30)
-    print(f"原始 messages: {len(history)} 条 / {sum(len(m['content']) for m in history)} 字符\n")
+    print(f"历史 messages: {len(history)} 条 / {sum(len(m['content']) for m in history)} 字符\n")
 
+    keep_last = 6
     strategies = {
-        "① RAW（不处理）": history,
-        "② TRUNCATE（最近 6 轮）": strategy_truncate(history, keep_last=6),
-        "③ SUMMARY（摘要 + 最近 6 轮）": strategy_summary(history, keep_last=6),
-        "④ HIERARCHICAL（关键事实 + 摘要 + 最近 6 轮）": strategy_hierarchical(history, keep_last=6),
+        "① RAW (not process)": history,
+        f"② TRUNCATE (Last {keep_last} rounds)": strategy_truncate(history, keep_last=keep_last),
+        f"③ SUMMARY (summary + Last {keep_last} rounds)": strategy_summary(history, keep_last=keep_last),
+        f"④ HIERARCHICAL (Key Facts + summary + Last {keep_last} rounds)": strategy_hierarchical(history, keep_last=keep_last),
     }
 
     # 用 prettytable 打印对比表（无边框）
     table = PrettyTable()
-    table.field_names = ["策略", "条数", "字符数", "有过敏", "有预算"]
+    table.field_names = ["Strategy", "Item", "Character", "Allergy", "Budget"]
     table.border = False       # 去掉所有边框线
-    table.align["策略"] = "l"  # 左对齐
-    table.align["条数"] = "r"
-    table.align["字符数"] = "r"
-    table.align["有过敏"] = "c"
-    table.align["有预算"] = "c"
+    table.align["Strategy"] = "l"  # 左对齐
+    table.align["Item"] = "r"
+    table.align["Character"] = "r"
+    table.align["Allergy"] = "c"
+    table.align["Budget"] = "c"
 
     for name, msgs in strategies.items():
         s = stats(msgs)
