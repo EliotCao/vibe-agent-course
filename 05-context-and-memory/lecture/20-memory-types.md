@@ -424,7 +424,7 @@ flowchart TD
 
 ## 动手实践
 
-运行配套演示脚本，直观感受 Memory 的召回效果：
+在云原生开发环境中运行配套演示脚本，直观感受 Memory 的召回效果：
 
 ```bash
 python demo_20_memory.py
