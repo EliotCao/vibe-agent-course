@@ -1,21 +1,24 @@
 """
-Demo 21 · Agent v2：第3章 的 Agent 接上 ContextManager + Memory
-==============================================================
+Demo 21 · Agent v2：将最小 Agent Loop 接入 ContextManager + Memory
+==================================================================
 
-把 第2章 / 第3章 的最小 Agent Loop 升级成 v2：
-  ① 每轮调 LLM 前，用 ContextManager 把 messages 压缩到合理长度
-  ② 把 Memory 召回的相关长期事实注入到 system
-  ③ 对话结束时，用 LLM 提炼"值得记住的事实"写进 Memory
+把 第 3/4 章的朴素 Agent Loop 升级为 v2，接入第 5 章的两大组件：
 
-跑一个 30 轮的真实任务，对比：
-  - 第3章 朴素 Agent vs 第4章 v2 Agent 的 token 消耗
-  - 关键事实（早期透露的过敏 / 预算）有没有保住
+  ① ContextManager
+     —— 每轮调 LLM 前自动压缩 messages，防止上下文爆炸
 
-跑法：
+  ② Memory
+     —— 每轮自动召回相关长期事实，注入 system prompt
+     —— 对话结束时由 LLM 提炼关键事实，写入长期记忆
+
+跑 12 轮旅行规划任务，直观对比：
+  - v1 朴素 Agent 与 v2 Agent 的 token 消耗差异
+  - 关键事实（早期透露的过敏 / 预算）在 Memory 加持下是否被保住
+
+运行方式：
+    source /workspace/.venv/bin/activate
     python demo_21_agent_v2.py
 """
-
-from __future__ import annotations
 
 from _env import get_model_id, chat
 from demo_19_context_strategies import strategy_hierarchical
@@ -44,7 +47,7 @@ class ContextManager:
         max_messages (int): 触发压缩的阈值，当消息总数超过此值时会启动压缩流程。
 
     Note:
-        - 实际压缩逻辑委托给外部函数 `strategy_hierarchical()`，
+        - 实际压缩逻辑委托给外部函数 `strategy_hierarchical`，
           本类只作为配置容器和门面（Facade）。
         - 压缩阈值应小于模型真实上下文上限，为当前轮次的新消息留出空间。
 
@@ -63,8 +66,16 @@ class ContextManager:
             max_messages: 触发压缩的消息总数阈值，默认 20 条。
                 当消息列表长度超过此值时，`should_compress()` 返回 True。
         """
-        self.keep_last = keep_last if keep_last > 0 else 6
-        self.max_messages = max_messages if max_messages > 0 else 20
+        self._keep_last = keep_last if keep_last > 0 else 6
+        self._max_messages = max_messages if max_messages > 0 else 20
+
+    @property
+    def keep_last(self) -> int:
+        return self._keep_last
+
+    @property
+    def max_messages(self) -> int:
+        return self._max_messages
 
     def should_compress(self, messages: list[dict]) -> bool:
         """判断当前消息列表是否需要压缩。
@@ -87,7 +98,7 @@ class ContextManager:
     def compress(self, messages: list[dict]) -> list[dict]:
         """对消息列表执行分层压缩，返回压缩后的消息列表。
 
-        压缩策略由 `strategy_hierarchical()` 实现。
+        压缩策略由 `strategy_hierarchical` 函数 实现。
 
         Args:
             messages: 待压缩的完整消息列表。调用方应确保传入的是当前对话的
@@ -118,7 +129,7 @@ DISTILL_PROMPT = """阅读下面的对话，提炼出**值得长期记住的用�
 """
 
 
-def distill_to_memory(messages: list[dict], memory: Memory):
+def distill_to_memory(messages: list[dict], memory: Memory) -> None:
     """将完整对话记录提炼为长期事实，并写入 Memory 持久化存储。
 
     本函数在「对话会话结束时」调用，利用 LLM 从本轮对话中自动抽取
@@ -195,7 +206,7 @@ def distill_to_memory(messages: list[dict], memory: Memory):
 class AgentV2:
     """增强版 Agent，整合了上下文压缩与长期记忆能力。
 
-    相比第 3 章的朴素 Agent Loop，v2 新增以下能力：
+    相比第 4 章的朴素 Agent Loop，v2 新增以下能力：
 
     1. 上下文压缩：当消息列表超过阈值时，通过 ContextManager 自动压缩
        （截断 / 摘要 / 分层），避免 token 浪费。
@@ -210,7 +221,7 @@ class AgentV2:
 
     Note:
         `system_prompt` 是只读属性，内部存储为 `_system_prompt`，
-        且 `chat()` 构建注入消息时直接复用 `self.messages[0]`，
+        且 `chat` 函数构建注入消息时直接复用 `self.messages[0]`，
         确保两处始终一致。
 
     Examples:
@@ -290,7 +301,7 @@ class AgentV2:
             print(f"  ⚙️  消息超过 {self.ctx.max_messages} 条，触发压缩")
             injected = self.ctx.compress(injected)
 
-        # 4. 调 LLM（chat() 内部强制流式，适配接口限制）
+        # 4. 调 LLM（chat 函数内部强制流式，适配接口限制）
         msg = chat(
             messages=injected,
             temperature=0.3,
@@ -310,7 +321,7 @@ class AgentV2:
 
 
 # ============================================================
-# 跑一个 12 轮对话，把 第1章 vs 第4章 的 token 消耗对比一下
+# 跑一个 12 轮对话，把 第 2 章 vs 第 5 章 的 token 消耗对比一下
 # ============================================================
 def run_comparison() -> None:
     print("=" * 60)
@@ -364,11 +375,11 @@ if __name__ == "__main__":
     run_comparison()
 
     print("\n\n" + "=" * 60)
-    print("🎯 v2 Agent 跟 第3章 朴素版的区别")
+    print("🎯 v2 Agent 跟 第 4 章 朴素版的区别")
     print("=" * 60)
     print("  ① ContextManager：messages 超过阈值时主动压缩（截断/摘要/分层）")
     print("  ② Memory 召回：每轮用 user_input 检索相关长期事实，注入到 system")
     print("  ③ Memory 提炼：对话结束时用 LLM 提炼新事实，写回 Memory")
     print()
     print("  这三件事加在一起，让你的 Agent 第一次有了'跨会话的记忆'。")
-    print("  下一步（第 5/6 章）要做的：把这些组件接进真实的 Coding Agent。")
+    print("  下一步（第 6/7 章）要做的：把这些组件接进真实的 Coding Agent。")
