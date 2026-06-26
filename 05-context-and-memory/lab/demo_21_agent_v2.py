@@ -22,7 +22,12 @@ Demo 21 · Agent v2：将最小 Agent Loop 接入 ContextManager + Memory
 
 from _env import get_model_id, chat
 from demo_19_context_strategies import strategy_hierarchical
-from demo_20_memory import Memory
+from demo_20_memory import (
+    Memory,
+    MemoryEntry,
+    embed,
+    cosine,
+)
 
 
 # ============================================================
@@ -114,6 +119,92 @@ class ContextManager:
         return strategy_hierarchical(messages, keep_last=self.keep_last)
 
 
+class MemoryV2(Memory):
+    """生产增强版记忆库，在 `Memory` 基础上增加了去重能力。
+
+    与父类 `Memory` 的唯一区别在于 `add` 方法：`Memory.add` 直接追加条目，不做任何
+    去重检查；而 `MemoryV2.add` 在写入前会先执行精确匹配和语义相似度双重去重，
+    避免记忆库中出现重复或高度冗余的条目。
+
+    去重策略（三步）：
+        1. 精确文本匹配：若新文本与已有记忆的文本完全一致则直接跳过；
+        2. 语义相似度检查：计算新文本与所有已有记忆的余弦相似度，
+           若最高相似度超过阈值（默认 0.92），则用新文本替换最相似的那条记忆
+           （而非简单跳过），因为新文本通常更完整或更准确；
+        3. 正常添加：若以上两步均未命中，则作为全新记忆条目追加。
+
+    适用场景：
+        - 长期运行的 Agent，记忆会随时间累积，需要防止膨胀；
+        - 多次调用 `distill_to_memory` 时，LLM 可能提炼出语义相似的事实；
+        - 用户反复表达相同意图但措辞不同的场景。
+
+    Note:
+        语义去重阈值 0.92 为经验值，可根据业务场景调整。阈值越高越严格（容忍的
+        相似度范围越窄），阈值越低则越容易将"不同但有关联"的记忆误判为重复。
+
+    Example:
+        >>> mem = MemoryV2()
+        >>> mem.add("我每天预算 500 元。")
+        >>> mem.add("我每天预算 500 元。")           # 精确重复，跳过
+        >>> mem.add("我的日常预算是 500 块。")       # 语义重复，更新旧条目
+        >>> len(mem.entries)
+        1
+    """
+
+    def add(self, text: str, **meta) -> None:
+        """添加一条新记忆到记忆库中（带去重检查）。
+
+        先将文本编码为向量，然后依次执行精确文本匹配和语义相似度双重去重，
+        确认不是重复记忆后再写入。具体逻辑与父类 `Memory.add` 的差异见下方 Note。
+
+        Args:
+            text: 要存储的记忆文本内容，通常来源于 LLM 从对话中提炼的事实。
+            **meta: 可选的附加元数据，会存入 MemoryEntry.meta 字典中。
+                例如 `category="budget"`、`priority=1` 等。
+
+        Note:
+            与 `Memory.add` 的核心差异：
+
+            - 精确去重：若已有记忆的 `text` 与参数完全相同，则跳过不写入；
+            - 语义去重：将新文本与所有已有记忆逐一计算余弦相似度，若存在
+              相似度 > 0.92 的条目，则用新文本替换该条目（而非追加），
+              以保证记忆库中始终保留最新版本的表述；
+            - 无重复时追加：若以上两步均未命中，行为与 `Memory.add` 一致，
+              直接追加新条目。
+
+            另外，`Memory.add` 不做去重（用于教学演示最简实现），而 `MemoryV2.add`
+            面向生产场景，适合记忆持续累积的长期运行 Agent。
+
+        Example:
+            >>> mem = MemoryV2()
+            >>> mem.add("用户偏好靠窗座位。", category="seating")
+            >>> mem.add("用户偏好靠窗座位。")  # 精确重复，跳过
+            >>> mem.add("用户喜欢坐窗边。")    # 语义相似 > 0.92，更新旧条目
+        """
+        # ① 精确文本匹配：文本完全相同则跳过
+        for entry in self._entries:
+            if entry.text == text:
+                return
+
+        v = embed(text)
+
+        # ② 语义相似度检查：计算与所有已有记忆的余弦相似度
+        if self._entries:
+            similarities = [cosine(v, e.vec) for e in self._entries]
+            max_sim = max(similarities)
+            if max_sim > 0.92:
+                # ③ 去重命中：用新文本替换相似度最高的旧条目
+                # 新文本通常更完整或更准确，因此选择"替换"而非"跳过"
+                print(f"🔄 检测到高相似度记忆（{max_sim:.3f}），更新现有条目")
+                max_idx = similarities.index(max_sim)
+                self._entries[max_idx] = MemoryEntry(text=text, vec=v, meta=meta)
+                return
+
+        # ④ 无重复，正常追加
+        self._entries.append(MemoryEntry(text=text, vec=v, meta=meta))
+        return
+
+
 # ============================================================
 # Memory 提炼：用 LLM 从对话里提炼"值得长期记的事实"
 # ============================================================
@@ -144,17 +235,19 @@ def distill_to_memory(messages: list[dict], memory: Memory) -> None:
       3. 清洗 LLM 输出：对返回文本按行拆分，去除空行，
          并去除每行开头可能存在的 `- ` 列表符号及首尾空白。
       4. 写入 Memory：遍历清洗后的事实列表，逐条调用 `memory.add()`
-         持久化。注意：`Memory.add()` 不做去重，若同一事实被多次提炼，
-         会在 `memory.entries` 中出现重复条目。
+         持久化。若传入的是 `MemoryV2` 实例，`add()` 会自动做精确匹配
+         和语义相似度双重去重，避免重复条目；若传入的是 `Memory` 实例，
+         则不做去重，多次提炼相同事实会产生重复。
 
     Args:
         messages: 完整对话消息列表，通常来自 `agent.messages`。
             列表元素为 `{"role": str, "content": str}` 格式的字典。
             函数内部会自动过滤 `role == "system"` 的消息，
             仅将用户与助手的对话内容提供给 LLM 进行提炼。
-        memory: 长期记忆实例（`Memory` 类），用于持久化存储提炼后的事实。
-            函数会直接修改该实例（调用 `memory.add()`），
-            调用方无需额外处理返回值即可获得更新后的记忆。
+        memory: 长期记忆实例（`Memory` 或其子类如 `MemoryV2`），
+            用于持久化存储提炼后的事实。函数会直接修改该实例
+            （调用 `memory.add()`），调用方无需额外处理返回值
+            即可获得更新后的记忆。推荐传入 `MemoryV2` 以获得自动去重能力。
 
     Note:
         - LLM 调用参数 `temperature=0` 确保输出确定性，
@@ -162,9 +255,10 @@ def distill_to_memory(messages: list[dict], memory: Memory) -> None:
         - `max_tokens=300` 限制提炼输出长度，防止单次提炼消耗过多 token。
         - 清洗逻辑 `line.strip("- ").strip()` 可同时处理
           `- 事实内容`` 和 ``事实内容` 两种 LLM 输出格式。
-        - `Memory.add()` 不做去重，若多次调用 `distill_to_memory`（或
-          手动多次 `add()` 同一内容），`memory.entries` 中会出现重复条目。
-          生产环境中可在 `add()` 前做相似度比对，或定期做记忆合并。
+        - `Memory.add()` 不做去重，若传入的是 `Memory` 实例且多次调用
+          `distill_to_memory`（或手动多次 `add()` 同一内容），
+          `memory.entries` 中会出现重复条目。若传入的是 `MemoryV2` 实例，
+          则 `add()` 内置精确匹配 + 语义相似度双重去重，可有效避免重复。
 
     Example:
         >>> memory = Memory()
@@ -194,7 +288,8 @@ def distill_to_memory(messages: list[dict], memory: Memory) -> None:
     facts = [line.strip("- ").strip() for line in raw.splitlines() if line.strip()]
 
     # 第 4 步：将提炼出的事实逐条写入 Memory
-    # 注意：Memory.add() 不做去重，重复调用会导致 entries 中出现重复条目
+    # 注意：若 memory 是 MemoryV2 实例，add() 会自动去重；
+    #       若 memory 是 Memory 实例，则不做去重，可能产生重复条目。
     for f in facts:
         memory.add(f)
     return
@@ -243,12 +338,13 @@ class AgentV2:
         Args:
             system_prompt: 系统提示词，决定 Agent 的角色与行为准则。
                 默认值：`"你是一个有用的助手。"`
-            memory: 长期记忆实例。传 `None` 时自动创建空的 `Memory()`。
+            memory: 长期记忆实例。传 `None` 时自动创建空的 `MemoryV2()`
+                （带去重能力）。可传入 `Memory` 实例以获得无去重的原始行为。
             ctx_manager: 上下文压缩管理器。传 `None` 时使用默认
                 `ContextManager(keep_last=6, max_messages=20)`。
         """
         self._system_prompt = system_prompt
-        self.memory = memory or Memory()
+        self.memory = memory or MemoryV2()
         self.ctx = ctx_manager or ContextManager()
         self.messages: list[dict] = [{"role": "system", "content": system_prompt}]
 

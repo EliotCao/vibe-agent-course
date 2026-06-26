@@ -43,9 +43,10 @@
 
 ```text
 ① ContextManager       把 demo_19 的分层压缩策略包成类，提供 should_compress / compress 方法
-② distill_to_memory    用 LLM 从完整对话中提炼长期事实，写入 Memory（纯函数）
-③ AgentV2              组合 ContextManager + Memory 的增强 Agent，核心是 chat 方法
-④ run_comparison       跑 12 轮旅行规划对话，观察 token 消耗 + 压缩触发 + 最终记忆提炼
+② MemoryV2             增强版 Memory，在父类基础上增加精确匹配 + 语义相似度双重去重
+③ distill_to_memory    用 LLM 从完整对话中提炼长期事实，写入 Memory（纯函数）
+④ AgentV2              组合 ContextManager + MemoryV2 的增强 Agent，核心是 chat 方法
+⑤ run_comparison       跑 12 轮旅行规划对话，观察 token 消耗 + 压缩触发 + 最终记忆提炼
 ```
 
 > [!TIP]
@@ -171,6 +172,14 @@ def distill_to_memory(messages: list[dict], memory: Memory) -> None:
 
 > [!IMPORTANT]
 >
+> ⚠️ `distill_to_memory` 的参数类型是 `Memory`（而非 `MemoryV2`），这意味着它**不关心**传入的是哪种 Memory 实例——`Memory.add()` 和 `MemoryV2.add()` 都实现了相同的接口，只是后者多了去重逻辑。利用多态，你可以：
+> - 传入 `Memory` 实例 → 简单追加，无去重（适合教学演示）
+> - 传入 `MemoryV2` 实例 → 自动做精确匹配 + 语义相似度去重（适合生产环境）
+>
+> 在 `AgentV2` 中，默认创建的是 `MemoryV2()`，因此 `distill_to_memory` 写入时会自动触发去重，避免 LLM 提炼出的重复事实污染记忆库。
+
+> [!IMPORTANT]
+>
 > ⚠️ **调用时机说明**：`distill_to_memory` 在整个对话**全部结束后只调用一次**（`run_comparison` 末尾），而不是在每轮 `agent.chat(q)` 之后调用。换句话说：**12 轮对话中不会触发任何 Memory 写入，写完 12 轮才统一提炼**。
 >
 > **为什么这样设计？**
@@ -264,6 +273,8 @@ def chat(self, user_input):
 > [!WARNING]
 >
 > 方案 B 的最大隐患不是 token 成本，而是**重复事实**。第 3 轮提炼出"用户预算 500 元"，第 5 轮又从同一段历史中提炼出"预算约 500 元"——如果没有去重逻辑，Memory 会被同义事实污染，影响召回质量。
+>
+> 💡 **`MemoryV2` 正是为解决这一问题而设计的**：它的 `add()` 方法内置精确匹配 + 语义相似度去重（阈值 0.92），LLM 提炼出的语义重复事实会被自动更新（而非重复追加）到记忆库中。如果你使用方案 B，务必搭配 `MemoryV2`。
 
 
 
@@ -343,7 +354,7 @@ class AgentV2:
 | Token 总成本 | 低 | 极高 | 中 |
 | 崩溃丢失量 | 全部 | 0~1 轮 | 至多 N-1 轮 |
 | 下一轮可用新记忆 | ❌ | ✅ | ✅（有延迟） |
-| 记忆重复风险 | 低 | 高 | 中（需去重） |
+| 记忆重复风险 | 低 | 高 | 中（可用 `MemoryV2` 去重） |
 | 推荐场景 | Demo / 短会话 | 高安全场景 | **生产环境标配** |
 
 > [!TIP]
@@ -358,7 +369,7 @@ class AgentV2:
 class AgentV2:
     def __init__(self, system_prompt, memory=None, ctx_manager=None):
         self._system_prompt = system_prompt        # 只读
-        self.memory = memory or Memory()            # 长期记忆
+        self.memory = memory or MemoryV2()          # 长期记忆（默认带去重）
         self.ctx = ctx_manager or ContextManager()  # 上下文压缩
         self.messages = [{"role": "system", "content": system_prompt}]
 ```
@@ -530,6 +541,10 @@ def run_comparison() -> None:
 
 **对话中用户没有说"请记住我预算 3500"，更没有说"我偏好舒适轻松"——是 LLM 从 12 轮对话中自己推断、提炼出来的。** 而且这是全部对话跑完后**一次性**提炼的结果，不是每轮后增量写入。这就是 `distill_to_memory` 的核心价值：自动化记忆沉淀。
 
+> [!NOTE]
+>
+> 💡 `AgentV2` 的默认 memory 是 `MemoryV2()`，因此 `distill_to_memory` 写入时会自动做去重检查（精确匹配 + 语义相似度）。即使 LLM 提炼出了"用户每日预算 500 元"（和预存事实完全相同）或"总预算约 3500 元"（和已提炼事实高度相似），`MemoryV2.add()` 也会跳过（精确匹配）或更新（语义相似 > 0.92）而非重复追加，保证记忆库始终保持干净。
+
 
 
 ## ContextManager + Memory 如何协同工作
@@ -586,6 +601,7 @@ demo_20（Memory）
   ▼
 demo_21（Agent v2） ← 你在这里
   │ 把前两个组件接入 Agent Loop，形成完整的"智能体记忆架构"
+  │ 新增：MemoryV2 → 在 Memory 基础上增加双重去重能力（精确 + 语义）
   ▼
 第 6/7 章
   │ 把这些组件接进真实的 Coding Agent
