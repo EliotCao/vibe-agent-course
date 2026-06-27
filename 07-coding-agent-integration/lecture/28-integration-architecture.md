@@ -136,6 +136,19 @@ my_coding_agent/
 ## 一个最小可跑的 Agent 类骨架
 
 ```python
+SYSTEM_PROMPT = """你是一个编程助手 Agent，运行在用户的项目目录里。
+
+工作方式：
+- 你可以调用工具来读写文件、执行命令、检索代码，不要凭空假设文件内容。
+- 需要信息时先用工具查证，再回答；不要编造不存在的文件或 API。
+- 修改代码前先读取相关文件，改动保持最小、可运行。
+- 每步说明你要做什么，遇到不确定的地方主动向用户确认。
+
+约束：
+- 破坏性操作（删除文件、执行危险命令）必须先征得用户同意。
+- 回答简洁、直接，用中文。
+"""
+
 class CodingAgent:
     def __init__(self, workdir: str):
         self.llm = LLM()                              # 第1章
@@ -176,10 +189,6 @@ class CodingAgent:
 
         return "⚠️ 达到最大工具调用轮次"
 ```
-
-**整个 Agent 类不到 50 行**——因为重活全在 5 个零件里。
-
-> 完整版在 [`lab/my_coding_agent/agent/agent.py`](../lab/my_coding_agent/agent/agent.py)，本章 lab 你的目标就是**把骨架填成完整版**。
 
 ## 整合 ≠ 复制粘贴
 
