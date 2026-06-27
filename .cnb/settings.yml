@@ -1,12 +1,14 @@
-# =====================================================================
-# CNB 仓库 NPC 角色定义
-#   触发方式（在本仓库的 Issue / PR 评论里）:
-#     @<owner>/<repo>(小光) 帮我总结一下 README
-#
-#   流水线见根目录 .cnb.yml 的 NPC 事件配置：
-#   会用打包好的 my-agent 二进制（基于 04-my-agent/main.py）执行任务，
-#   再把结果用 CNB OpenAPI 回写到当前评论。
-# =====================================================================
+workspace:
+  launch:
+    button:
+      name: 知行合一
+      description: 理论为舟，实践为帆
+      hoverImage: .cnb/acnb.png
+    autoOpenWebIDE: true
+fork:
+    button:
+      description: 学习使我快乐📚✨📖
+      hoverImage: .cnb/nezha.png
 
 npc:
   defaultRole: 小光
