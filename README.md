@@ -8,6 +8,16 @@
 
 ---
 
+## 📦 如何使用本仓库
+
+推荐「**先 Fork，再用云原生开发环境学习实践**」：
+
+1. **Fork** 到自己的命名空间（点右上角「Fork」），笔记与进度都存在你自己的仓库里。
+2. 在你的仓库点 **「云原生开发」**，拉起云端 VSCode（首次自动 `uv sync`），无需本地配环境。
+3. 在云端 IDE 里读讲义、跑 Demo、做笔记，改完直接提交回仓库。
+
+---
+
 ## 🚀 课程学习中心 · 在浏览器里读讲义 + 一键跑 Demo
 
 | | |
@@ -49,80 +59,19 @@ bash course-ui/run.sh
 | 模块 | 主题 | 知识点 | 你的产出 |
 |------|------|--------|---------|
 | 01 | [VibeCoding 入门](./01-vibecoding-intro/) | VibeCoding 是什么 · 跟 AI 协作的节奏 · vibe 一个小游戏 · 推到 CNB · 云原生开发环境运行 | 一个你 vibe 出来、跑在 CNB 上的小游戏 |
-| 02 | [认识你的 AI](./02-meet-your-ai/)（老师负责理论部分） | Next-token prediction · Token 与向量 · Messages 协议（system/user/assistant） · 上下文窗口与成本 · 幻觉 | `my-agent/llm.py` — LLMClient 类 |
-| 03 | [Function Calling 与最小 Agent](./03-tools-and-agent-loop/)（老师负责理论部分） | Chatbot vs Agent · Function Calling 协议 · ToolRegistry（自动生成 JSON schema） · 最小 Agent Loop | `my-agent/tools.py` — ToolRegistry 类 |
-| 04 | [Agent 范式](./04-agent-patterns/)（老师负责理论部分） | ReAct（边想边做） · Plan-and-Solve（先规划再执行） · Reflection（起草→评审→修订） · 范式选型 | `my-agent/agent.py` — Agent 主循环 |
-| 05 | [上下文与记忆](./05-context-and-memory/)（老师负责理论部分） | 上下文爆炸问题 · 管理策略（keep_last + 摘要压缩） · 向量记忆（Embedding + 余弦相似度） · Agent v2 整合 | `my-agent/context.py` + `memory.py` |
+| 02 | [认识你的 AI](./02-meet-your-ai/) | Next-token prediction · Token 与向量 · Messages 协议（system/user/assistant） · 上下文窗口与成本 · 幻觉 | `my-agent/llm.py` — LLMClient 类 |
+| 03 | [Function Calling 与最小 Agent](./03-tools-and-agent-loop/) | Chatbot vs Agent · Function Calling 协议 · ToolRegistry（自动生成 JSON schema） · 最小 Agent Loop | `my-agent/tools.py` — ToolRegistry 类 |
+| 04 | [Agent 范式](./04-agent-patterns/) | ReAct（边想边做） · Plan-and-Solve（先规划再执行） · Reflection（起草→评审→修订） · 范式选型 | `my-agent/agent.py` — Agent 主循环 |
+| 05 | [上下文与记忆](./05-context-and-memory/) | 上下文爆炸问题 · 管理策略（keep_last + 摘要压缩） · 向量记忆（Embedding + 余弦相似度） · Agent v2 整合 | `my-agent/context.py` + `memory.py` |
 | 06 | [Coding Agent 工具集](./06-coding-agent-tools/) | 5 阶段工作流（理解→定位→修改→验证→汇报） · 工具设计哲学 · 5 个核心工具（read/write/edit/list_dir/bash） | `my-agent/coding_tools/` — 5 个工具 |
 | 07 | [整合：完整 Coding Agent](./07-coding-agent-integration/) | 模块协作架构 · REPL 交互界面 · 端到端调试 · 真实任务闭环 | `my-agent/main.py` — 零件拼装 |
 | 08 | [Skills 扩展 + NPC 上线 + 大作业](./08-skills-and-npc/) | Skills 系统（SKILL.md） · NPC 概念 · Docker 打包 · CNB Pipeline + NPC 部署 · 结课大作业 | 自定义 Skills + 仓库 NPC + 大作业 |
 
-## 核心产出：my-agent
+## 动手练习
 
-逐步实现各模块，最终在模块 07 拼装成完整 Agent：
+各模块的代码填空（`my-agent/` 各文件 + 自动化测试）与配套练习已迁移到独立的**练习仓库**，按章节完成实践：
 
-```
-my-agent/
-├── llm.py              # 模块02：LLM 客户端
-├── tools.py            # 模块03：ToolRegistry
-├── agent.py            # 模块04：Agent 主循环
-├── context.py          # 模块05：ContextManager
-├── memory.py           # 模块05：Memory
-├── coding_tools/       # 模块06：5 个工具实现
-├── main.py             # 模块07：组装入口
-└── tests/              # 各模块的自动化测试
-```
-
-搭建路线：
-
-```
-01: VibeCoding 入门（先玩起来，建立兴趣）
-        ↓
-02: LLMClient           ─┐
-03: ToolRegistry         ─┤
-04: Agent Loop           ─┤──→  07 拼装成完整 Agent  ──→  08 加 Skills + 挂 NPC + 大作业
-05: Context + Memory     ─┤
-06: Coding Tools × 5     ─┘
-```
-
-## 目录结构
-
-```
-.
-├── 01-vibecoding-intro/          # 讲义 + Demo（先玩起来）
-├── 02-meet-your-ai/              # 讲义 + Demo
-├── 03-tools-and-agent-loop/      # 讲义 + Demo
-├── 04-agent-patterns/            # 讲义 + Demo
-├── 05-context-and-memory/        # 讲义 + Demo
-├── 06-coding-agent-tools/        # 讲义 + Demo
-├── 07-coding-agent-integration/  # 讲义 + Demo
-├── 08-skills-and-npc/            # 讲义 + Demo + 大作业
-├── my-agent/                       # ★ 你的核心产出（逐步填空各模块）
-├── exercises/                      # 配套练习题（代码填空 + 自动验证）
-├── examples/                       # 完整参考实现
-└── assets/                         # 封面与全局资源
-```
-
-## 学习工作流
-
-```bash
-# 1. 看讲义（lecture/）
-# 2. 跑 Demo（lab/）
-# 3. 补全 my-agent/ 里对应的模块
-# 4. 跑测试验证
-cd my-agent && python tests/test_llm.py    # 模块02
-cd my-agent && python tests/test_tools.py  # 模块03
-# ...
-```
-
-## 环境准备
-
-本项目使用 [uv](https://docs.astral.sh/uv/) 管理 Python 环境与依赖。
-
-```bash
-# 在仓库根目录执行一次，安装所有依赖
-uv sync --all-packages
-```
+> 📦 **练习仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
 
 ## 先修要求
 
@@ -130,4 +79,15 @@ uv sync --all-packages
 - 命令行基本使用（`cd` / `ls` / `cat` / 环境变量）
 - 一台能联网的电脑
 
-不需要提前会：Git、Docker、Agent、提示词工程——这些都会从零讲起。
+## 补充基础知识（Git / Docker）
+
+本课程会用到 Git 协作与 Docker 交付。如果这两块还不熟，推荐先过一遍这份从零讲起的配套教程：
+
+> 📚 **参考教程**：<https://cnb.cool/whut1/ai-engineering-course>
+
+| 章节 | 内容 | 你会学到 |
+|------|------|---------|
+| [Git 原理与使用](https://cnb.cool/whut1/ai-engineering-course) | 版本控制思想 · Git 对象模型 · 分支与远程协作 | 独立完成一次完整的分支协作流程 |
+| [Docker 与 Dockerfile](https://cnb.cool/whut1/ai-engineering-course) | 镜像/容器概念 · Dockerfile 编写 · 端口映射 | 编写 Dockerfile 并构建运行自己的镜像 |
+
+> 💡 这两块都从零讲起、无需提前掌握；遇到不懂的概念随时回来查阅即可。
