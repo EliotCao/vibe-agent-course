@@ -1,23 +1,21 @@
 # 第 1 章 · 实操：综合 LLM 客户端
 
-> 80 分钟 · 实操（第 6 节，理论 5 节后的总实操）
+> 65 分钟 · 实操（第 5 节，理论 4 节后的总实操）
 
 ## 前提
 
-前 5 节里已经**跑过 5 个 demo**，分别看到：
+前 4 节里已经**跑过 4 个 demo**，分别看到：
 - LLM 在猜下一个词（demo_01）
 - 三种 system prompt 三种人格（demo_02）
 - 不同语言的 tokenization + 撑爆窗口（demo_03）
-- 主动诱发幻觉 + LLM 自查（demo_04）
-- 加工具 / 加上下文 = 答对（demo_05）
+- 加工具 / 加上下文 = 答对（demo_04）
 
 本节把这些能力**整合成自己的小工具**：
 
 ```
 01/
 ├── 01_llm.py          # 流式对话 REPL（包含 system prompt 切换）
-├── count_tokens.py      # token 计数小工具
-└── hallucination_log.md # 幻觉实验记录
+└── count_tokens.py      # token 计数小工具
 ```
 
 ## 时间分配
@@ -27,8 +25,7 @@
 | A | 10min | 环境配置 + 验证连通 |
 | B | 25min | Step 1：流式对话脚本 `01_llm.py` |
 | C | 20min | Step 2：token 计数工具 `count_tokens.py` |
-| D | 15min | Step 3：完成 `hallucination_log.md` |
-| E | 10min | Q&A + Checkpoint 提交 |
+| D | 10min | Q&A + Checkpoint 提交 |
 
 ---
 
@@ -255,51 +252,7 @@ if __name__ == "__main__":
 
 ---
 
-## 阶段 D · Step 3：幻觉实验日志（15min）
-
-回到 `demo_04_hallucinate.py`：
-
-1. 跑一遍 4 个内置案例
-2. **自己设计 2 个新案例**：
-   - 一个你认为模型一定不知道的事
-   - 一个故意诱导越狱的 prompt
-3. 把所有 6 个案例的回答 + 你的判断 + LLM 自查结果整理成 `hallucination_log.md`
-
-### `hallucination_log.md` 模板
-
-```markdown
-# 幻觉实验日志
-
-## 案例 1：（标题）
-
-**问题**：
-```
-（你输入的 prompt）
-```
-
-**模型回答**：
-```
-（模型输出）
-```
-
-**你的判断**：
-- 幻觉等级：□ 高 □ 中 □ 低 □ 无
-- 编造点：（具体哪些）
-
-**LLM 自查结果**：
-（demo 跑出来的）
-
-**反思**：
-（为什么这个案例触发了幻觉，对应第 4 节哪种"触发器"）
-
----
-
-## 案例 2 ...
-```
-
----
-
-## 阶段 E · Q&A + Checkpoint（10min）
+## 阶段 D · Q&A + Checkpoint（10min）
 
 ### 提交清单
 
@@ -307,15 +260,14 @@ if __name__ == "__main__":
 01-checkpoint/
 ├── 01_llm.py             # 流式对话 REPL
 ├── count_tokens.py         # token 计数工具
-├── hallucination_log.md    # 6 个幻觉案例日志
 └── reflection.md           # 100-200 字反思
 ```
 
 ### 反思要求
 
 `reflection.md` 必须包含：
-- 第1章五节里你觉得最反常识的一点
-- 你跑 demo_04 时哪个案例最离谱
+- 第1章四节里你觉得最反常识的一点
+- 你跑 demo 时哪个案例最离谱
 - 你最有把握/最没把握的概念
 - 一个下一章（第2章）你想看到的东西
 
@@ -325,7 +277,6 @@ if __name__ == "__main__":
 
 - [ ] `01_llm.py` 真的流式（逐字出现，不是整段才出）
 - [ ] `count_tokens.py` 既能接文件也能接字符串
-- [ ] `hallucination_log.md` 有自己设计的案例（不是只跑内置 4 个）
 - [ ] reflection 不是水文，至少有一个具体观察
 
 ## 参考资产（卡住时参考）

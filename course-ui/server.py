@@ -46,7 +46,7 @@ COURSE_TITLES: dict[str, str] = {
 }
 COURSE_SUBTITLES: dict[str, str] = {
     "01-vibecoding-intro": "vibe 一个游戏 · 推到 CNB · 云原生运行",
-    "02-meet-your-ai": "Next-token · Tokens · Roles · 幻觉",
+    "02-meet-your-ai": "Next-token · Tokens · Roles · 工具与上下文",
     "03-tools-and-agent-loop": "Function Calling · ToolRegistry · Agent Loop",
     "04-agent-patterns": "ReAct · Plan-and-Solve · Reflection",
     "05-context-and-memory": "上下文管理 · 向量记忆 · Agent v2",

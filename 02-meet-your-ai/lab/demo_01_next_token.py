@@ -118,5 +118,5 @@ if __name__ == "__main__":
     for title, prefix in PREFIXES:
         print(f"\n{title}")
         # 同一个输入跑两种模式，对比下一个 token 分布
-        show_top_candidates(prefix, mode="chat")
+        # show_top_candidates(prefix, mode="chat")
         show_top_candidates(prefix, mode="complete")
