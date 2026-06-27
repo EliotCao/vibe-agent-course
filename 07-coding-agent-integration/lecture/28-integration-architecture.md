@@ -1,216 +1,146 @@
-# 第 28 节 · 整合架构：模块边界与数据流
+# 第 28 节 · 整合架构：用已有的类组装一个 Agent
 
 ## 一句话回答
 
-> **第2章-第5章你已经把零件全部车好了。今天不是写新代码，是把这些零件**按一条清晰的数据流**拼装成一台能干真活的机器。**
+> **第1章-第5章你已经把每个类都写好了。本章不写新功能，只做一件事：把这些类按一条数据流拼成一个能干活的 Agent。**
 
-## 我们手上有什么零件
+## 先回顾：我们手上有哪些类
 
-把第2章-第5章的产物在桌面上铺平，长这样：
+第1章-第5章的产物，本质就是下面这几个类。它们的接口都定义在 [`my-agent/interfaces.py`](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise/-/blob/main/my-agent/interfaces.py) 里——这个文件不用改，只是接口参考。
 
-![第2章-第5章已经车好的 6 个零件](./images/28-architecture.png)
+![第1章-第5章已经写好的几个类](./images/28-architecture.png)
 
-| 来自哪章 | 零件 | 一句话职责 |
-|---|---|---|
-| 第2章 第 8 节 | `ToolRegistry` | 装饰器注册函数 → 自动 schema → 按名调度 |
-| 第2章 第 9 节 | Agent Loop | "调 LLM → 看 tool_calls → 执行 → 回灌"的最小循环 |
-| 第3章 任一范式 | 驾驶模式 | ReAct / Plan-and-Solve / Reflection 三选一 |
-| 第4章 第 19 节 | `ContextManager` | 分层策略压 messages |
-| 第4章 第 20 节 | `Memory` | embedding + 余弦做语义召回 |
-| 第5章 五个工具 | `coding_tools/` | read / list_dir / write / edit / bash |
+| 来自 | 类 | 核心方法 | 职责一句话 |
+|---|---|---|---|
+| 第1章 | `LLMClient` | `chat` / `chat_stream` / `count_tokens` | 跟模型对话、数 token |
+| 第2章 | `ToolRegistry` | `register` / `to_schemas` / `invoke` | 注册工具、生成 schema、按名调用 |
+| 第3章 | `Agent` | `run(user_message)` | **持有 agent loop**：调 LLM → 执行工具 → 回灌 |
+| 第4章 | `ContextManager` | `should_compress` / `compress` | 对话太长时压缩 messages |
+| 第4章 | `Memory` | `add` / `search` | 存长期事实、按语义召回 |
+| 第5章 | 编程工具 | `read_file` / `list_dir` / `write_file` / `edit_file` / `run_bash` | 真正读写文件、跑命令 |
 
-**今天没有任何"新概念"**——全是组装。
-
-## 一条主线数据流
-
-整合不是"把 6 个文件丢进同一个目录"。整合是**把它们排成一条单向的数据流**：
-
-![Coding Agent 主线数据流](./images/28-dataflow.png)
-
-```
-用户输入
-    ↓
-Memory.search(input)         ← 第4章 召回长期事实
-    ↓
-ContextBuilder.build()       ← 第4章 拼 messages（system + 事实 + 历史）
-    ↓
-LLM.chat(messages, tools)    ← 第2章 协议
-    ↓
-有 tool_calls？
-   是 → ToolRegistry.invoke() ← 第5章 工具实际跑（read/edit/bash...）
-       → 结果回灌到 messages
-       → 回到 LLM.chat
-   否 → 给用户最终回答
-        ↓
-Memory.distill()              ← 第4章 提炼新事实写回
-```
-
-**注意单向性**：数据只往一个方向流。这条线一旦理顺，整套 Agent 就跑得通。
-
-## 模块边界：谁该管什么
-
-整合最容易翻车的是**职责越界**。比如：
-
-- ❌ 在 ToolRegistry 里写 `len(messages) > 20 就压缩` —— 工具注册表不应该懂 messages
-- ❌ 在 ContextManager 里写 `if user_input contains '过敏' 就 ...` —— 上下文管理器不该懂业务关键词
-- ❌ 在 Agent 类里写 `def read_file(...)` —— 工具不该塞回 Agent 主体
-
-正确的边界长这样：
-
-![模块边界：每个零件只做自己的事](./images/28-module-boundary.png)
-
-| 模块 | 它该懂 | 它不该懂 |
-|---|---|---|
-| `LLM`（第1章）| 怎么发请求、怎么处理流式 | 业务、工具、记忆 |
-| `ToolRegistry`（第2章）| 怎么把函数变 schema、怎么按名分发 | messages、用户身份、对话历史 |
-| `coding_tools/`（第5章）| 怎么安全地读/写/跑命令 | 谁在调它、调用次数、上下游是谁 |
-| `ContextManager`（第4章）| 怎么压 messages 不丢关键事实 | 工具、LLM 的具体协议 |
-| `Memory`（第4章）| 怎么 embed、怎么余弦召回 | 当前对话状态、压缩策略 |
-| `Agent`（本章）| 怎么把上面 5 个**编排**起来 | 任何一个零件的内部实现 |
-
-**Agent 类是"指挥家"，不是"乐手"。**指挥家不亲自吹小号。
-
-## 接口契约：6 个零件之间怎么"对话"
-
-接口是整合的水龙头——拧紧了不漏水，拧不紧到处都是 bug。
-
-![6 个零件之间的接口契约](./images/28-interface-contract.png)
+把这几个类的接口签名摆在一起看：
 
 ```python
-# Agent 看到的 6 个接口（核心方法签名）
+# 来自 interfaces.py（节选）
 
-class LLM:
-    def chat(messages: list[dict], tools: list[dict] | None) -> Message:
-        """返回 OpenAI 风格 Message 对象（content + tool_calls）"""
+class BaseLLMClient:
+    def chat(self, messages: list[dict], **kwargs) -> str: ...
+    def chat_stream(self, messages: list[dict], **kwargs): ...   # 逐 chunk yield
+    def count_tokens(self, text: str) -> int: ...
 
-class ToolRegistry:
-    def to_schemas() -> list[dict]: ...
-    def invoke(name: str, args: dict) -> str: ...
+class BaseToolRegistry:
+    def register(self, func): ...                 # 装饰器，注册一个工具
+    def to_schemas(self) -> list[dict]: ...        # OpenAI tools 格式
+    def invoke(self, name: str, args: dict) -> str: ...
 
-class ContextManager:
-    def should_compress(messages) -> bool: ...
-    def compress(messages) -> list[dict]: ...
+class BaseAgent:
+    def __init__(self, llm, tools, system_prompt: str = ""): ...
+    def run(self, user_message: str, max_iterations: int = 10) -> str: ...
 
-class Memory:
-    def search(query: str, k: int) -> list[tuple[float, Entry]]: ...
-    def add(text: str) -> None: ...
+class BaseContextManager:
+    def should_compress(self, messages: list[dict]) -> bool: ...
+    def compress(self, messages: list[dict]) -> list[dict]: ...
+
+class BaseMemory:
+    def add(self, text: str) -> None: ...
+    def search(self, query: str, k: int = 3) -> list[tuple[float, str]]: ...
 ```
 
-**重点**：所有零件之间**只通过这些方法说话**，不互相 import 内部数据结构。这一条做到了，**任何一个零件以后都能独立替换**——比如把 numpy Memory 换成 pgvector，Agent 一行代码不用改。
+**关键认知**：`Agent.run()` 内部就是第2章那套 agent loop。所以「调 LLM → 看工具调用 → 执行 → 回灌」这件事**第3章已经替你封好了**，本章不用再手写。
 
-## 整合后的目录结构
+## 怎么把它们组装成一个 Agent
+
+整合就是**把这些类按一条单向数据流串起来**：
+
+![组装后的数据流](./images/28-dataflow.png)
 
 ```
-my_coding_agent/
-├── llm/
-│   └── llm.py              # 把第1章的 OpenAI 客户端封装成类
-├── tools/
-│   ├── registry.py         # 第2章的 ToolRegistry
-│   └── coding_tools/       # 第5章的 5 个工具
-├── context/
-│   └── context_manager.py  # 第4章的 ContextManager
-├── memory/
-│   └── memory.py           # 第4章的 Memory
-├── agent/
-│   └── agent.py            # 本章写的：把上面 5 个编排起来
-├── ui/
-│   └── repl.py             # 第 29 节：交互模式
-└── main.py                 # 入口
+用户输入 → (Memory 召回事实，拼进 system prompt) → Agent.run() → 最终回答
+                                                      │
+                                            内部 loop：LLM ⇄ 工具
 ```
 
-每个目录就是一个"独立可测的零件"。这就是为什么第2章-第5章的零件**早就按这个目录形状准备好了**——本章复制 + 改少量代码就行。
+### 第一步：三件套就能跑（LLM + Tools + Agent）
 
-## 整合的"接口对不齐"是最常见 bug
-
-新手第一次整合，95% 的 bug 出在**接口对不齐**。比如：
-
-| 翻车现象 | 根因 | 修法 |
-|---|---|---|
-| `TypeError: argument of type 'NoneType' is not iterable` | `Memory.search()` 在 Memory 为空时返回 `None` 不是 `[]` | 在零件源头返回空列表 |
-| LLM 一直循环不停 | 工具失败时 raise 了，没转成字符串 | 第5章第 25 节早就讲了，回去看 |
-| `messages` 越来越多直到超 token 限制 | 忘了在 chat 循环里调 `should_compress` | Agent.chat 里加一行 |
-| 工具被调了，但 LLM 看不到结果 | 工具结果以 `role=assistant` 加进 messages 而不是 `role=tool` | 严守第2章第 7 节的 4 角色协议 |
-
-**调试技巧**：加日志 + 打印每一步 messages 长度。99% 的整合 bug 看一眼 messages 就能找出来。
-
-## 一个最小可跑的 Agent 类骨架
+只用第1、2、3、5 章的类，已经是一个能读写代码的 Agent：
 
 ```python
+from llm import LLMClient
+from tools import ToolRegistry
+from agent import Agent
+from coding_tools import read_file, list_dir, write_file, edit_file, run_bash
+
 SYSTEM_PROMPT = """你是一个编程助手 Agent，运行在用户的项目目录里。
-
-工作方式：
-- 你可以调用工具来读写文件、执行命令、检索代码，不要凭空假设文件内容。
-- 需要信息时先用工具查证，再回答；不要编造不存在的文件或 API。
-- 修改代码前先读取相关文件，改动保持最小、可运行。
-- 每步说明你要做什么，遇到不确定的地方主动向用户确认。
-
-约束：
-- 破坏性操作（删除文件、执行危险命令）必须先征得用户同意。
-- 回答简洁、直接，用中文。
+- 需要信息时先用工具查证，不要凭空假设文件内容或编造 API。
+- 改代码前先读相关文件，改动保持最小、可运行。
+- 破坏性操作（删文件、跑危险命令）先征得用户同意。
+- 回答简洁，用中文。
 """
 
-class CodingAgent:
-    def __init__(self, workdir: str):
-        self.llm = LLM()                              # 第1章
-        self.tools = build_registry()                 # 第2章 + 第5章
-        self.ctx = ContextManager()                   # 第4章
-        self.memory = Memory()                        # 第4章
-        self.messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+# 1) 建好 LLM 和工具注册表
+llm = LLMClient()
+tools = ToolRegistry()
 
-    def chat(self, user_input: str) -> str:
-        # 1. Memory 召回相关长期事实
-        relevant = self.memory.search(user_input, k=3)
-        if relevant:
-            self.messages.append({"role": "system",
-                                  "content": _format_facts(relevant)})
+# 2) 把第5章的 5 个编程工具注册进去
+for fn in (read_file, list_dir, write_file, edit_file, run_bash):
+    tools.register(fn)
 
-        # 2. 加用户输入
-        self.messages.append({"role": "user", "content": user_input})
+# 3) 交给 Agent，loop 由它内部负责
+agent = Agent(llm, tools, system_prompt=SYSTEM_PROMPT)
 
-        # 3. 检查是否需要压缩
-        if self.ctx.should_compress(self.messages):
-            self.messages = self.ctx.compress(self.messages)
-
-        # 4. 工具调用循环（第2章 Agent Loop）
-        for _ in range(MAX_TOOL_ROUNDS):
-            resp = self.llm.chat(self.messages, tools=self.tools.to_schemas())
-            if not resp.tool_calls:
-                self.messages.append({"role": "assistant",
-                                      "content": resp.content})
-                return resp.content
-
-            self.messages.append(_assistant_with_tool_calls(resp))
-            for tc in resp.tool_calls:
-                result = self.tools.invoke(tc.function.name,
-                                           json.loads(tc.function.arguments))
-                self.messages.append({"role": "tool",
-                                      "tool_call_id": tc.id,
-                                      "content": result})
-
-        return "⚠️ 达到最大工具调用轮次"
+print(agent.run("把 utils.py 里的 add 改成支持任意个参数"))
 ```
 
-## 整合 ≠ 复制粘贴
+跑通这一步，你就有了一个最小可用的 Coding Agent。
 
-新手最常见的错觉是"整合 = 把代码全搬过来"。真正的整合做了 4 件事：
+### 第二步：接上第4章的记忆与上下文压缩
 
-1. **统一入口**：所有零件从 `Agent` 类里访问，不再各自 import
-2. **拉直数据流**：用户输入 → Memory → Context → LLM → Tools → 回灌 → 输出，**单向**
-3. **修接口对齐问题**：5 个零件的方法签名要互相能对上
-4. **加错误兜底**：每个零件失败时返回字符串而不是 raise
+对话变长、需要跨会话记住事实时，再把第4章的两个类融进来——它们是 Agent 的**外挂增强**，不改 Agent 内部：
 
-**本章 lab 的核心练习就是这 4 件事——尤其第 3 件，你会在调试里花一半时间。**
+```python
+memory = Memory()          # 第4章
+ctx = ContextManager()     # 第4章
+
+def smart_run(user_input: str) -> str:
+    # 召回相关长期事实，拼进这一轮的 system prompt
+    facts = memory.search(user_input, k=3)
+    prompt = SYSTEM_PROMPT
+    if facts:
+        joined = "\n".join(f"- {text}" for _, text in facts)
+        prompt += f"\n\n已知用户事实：\n{joined}"
+
+    agent = Agent(llm, tools, system_prompt=prompt)
+    answer = agent.run(user_input)
+
+    memory.add(user_input)     # 把这轮值得记的写回记忆
+    return answer
+```
+
+> `ContextManager.should_compress / compress` 用在多轮、超长对话里压缩历史 messages，避免撑爆上下文窗口；具体接入点取决于你第3章 `Agent.run` 的实现方式。
+
+## 整合时最容易翻的车
+
+新手第一次整合，绝大多数 bug 都是**接口对不齐**：
+
+| 现象 | 根因 | 修法 |
+|---|---|---|
+| `NoneType is not iterable` | `Memory.search()` 空库时返回 `None` 而不是 `[]` | 在源头返回空列表 |
+| LLM 一直循环不停 | 工具失败时 `raise` 了，没转成字符串 | 工具内部 `try/except` 返回错误字符串 |
+| messages 越来越长直到超限 | 忘了调 `should_compress` | 在 loop 里加一次检查 |
+
+**调试技巧**：打印每一步的 `messages`，99% 的整合 bug 看一眼就能定位。
 
 ## 小结
 
 | 概念 | 一句话理解 |
 |------|-----------|
-| 主线数据流 | input → Memory → Context → LLM → Tools → 回灌 → output（单向）|
-| 模块边界 | 每个零件只懂自己的事，不越界 |
-| 接口契约 | 零件之间只通过方法签名说话 |
-| Agent 类 | 编排者，不是干活者 |
-| 整合 4 件事 | 统一入口 / 拉直数据流 / 对齐接口 / 错误兜底 |
+| 回顾的几个类 | LLMClient / ToolRegistry / Agent / ContextManager / Memory + 5 个工具 |
+| Agent.run | 第3章已封好 agent loop，本章直接用 |
+| 组装第一步 | LLM + Tools + Agent 三件套即可跑 |
+| 组装第二步 | Memory / ContextManager 作为外挂增强 |
+| 整合的核心 | 把类按单向数据流串起来，对齐接口 |
 
 ---
 
-下一节：Agent 整合好了，**怎么让人用**？REPL / Solo / 流式输出三种交互模式。
+下一节：Agent 组装好了，**怎么让人用**？REPL / Solo / 流式输出三种交互模式。
