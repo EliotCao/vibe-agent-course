@@ -16,12 +16,6 @@
 | 28 | 整合架构 | [28-integration-architecture.md](./lecture/28-integration-architecture.md) | `demo_30_integration_walkthrough.py` |
 | 29 | UI 与交互 | [29-ui-and-modes.md](./lecture/29-ui-and-modes.md) | `demo_31_three_tasks.py` |
 
-## 运行 Demo
-
-```bash
-cd 07-coding-agent-integration/lab
-python demo_30_integration_walkthrough.py
-python demo_31_three_tasks.py
 ```
 
 ## 作业指引
