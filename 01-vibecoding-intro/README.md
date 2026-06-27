@@ -4,6 +4,8 @@
 > 然后把代码推到 CNB，用云原生开发环境一键跑起来——让你的成果立刻能在浏览器里被别人玩到。
 > 产出：一个你自己 vibe 出来的小游戏 + 跑在 CNB 云原生环境里的在线 Demo。
 
+> 🎯 **先看两个成品找感觉**：[百岁修仙录 xiuxian](https://cnb.cool/Hackathon/xiuxian)（AI 文字修仙游戏）、[AI 对话 ai-chat](https://cnb.cool/Hackathon/ai-chat)（网页 AI 聊天应用）。它们都做到了**一个开源仓库 = 可读的源码 + 点一下就能玩的作品**——这就是你这一章要产出的东西。
+
 ## 你将学到
 
 - VibeCoding 是什么：用自然语言驱动 AI 写代码的新姿势
@@ -11,28 +13,15 @@
 - 如何把本地 vibe 出来的代码推送到 CNB 仓库
 - 如何用 CNB 云原生开发环境把项目跑起来 / 在线预览
 
-## 内容结构
+## 参考文档
 
-| 节 | 内容 | 讲义 | Demo |
-|----|------|------|------|
-| 01 | 什么是 VibeCoding | [01-what-is-vibecoding.md](./lecture/01-what-is-vibecoding.md) | — |
-| 02 | 动手：vibe 一个小游戏 | [02-vibe-a-game.md](./lecture/02-vibe-a-game.md) | `demo_01_guess_game.py` |
-| 03 | 推到 CNB + 云原生跑起来 | [03-push-to-cnb-and-run.md](./lecture/03-push-to-cnb-and-run.md) | — |
+本章配套参考文档放在 [`docs/`](./docs/) 目录，按需查阅：
 
-## 运行 Demo
-
-```bash
-cd 01-vibecoding-intro/lab
-python demo_01_guess_game.py
-```
-
-## 作业指引
-
-本章为动手 Lab，配套作业仓库中**无填空练习**（标注为「无填空题」）。
-
-> 📦 **作业仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
-
-本章产出（你 vibe 出的小游戏）推送到**你个人的 CNB 仓库**并跑起来，不进入作业仓库的 CI 测评。
+| 文档 | 内容 |
+|------|------|
+| [开发环境准备](./docs/开发环境准备.md) | CodeBuddy + CNB 实战入门：Fork 模板、云原生开发环境写代码、提交回 CNB |
+| [CNB LLM 接口](./docs/CNB-LLM接口.md) | 在 CNB 云原生环境里零密钥调用 OpenAI 兼容的大模型接口。如果你想在自己的应用中调用 AI 接口，关注这篇文档 |
+| [CNB 仅预览模式配置](./docs/CNB仅预览模式配置.md) | 用仅预览模式 + 自定义启动按钮，让别人「Fork 即玩」你的成果 |
 
 ## 本章产出
 
