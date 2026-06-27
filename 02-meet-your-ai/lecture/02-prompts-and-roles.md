@@ -39,7 +39,7 @@ messages = [
 
 ## 三种角色
 
-![三种角色：System 是身份说明书 / User 提问 / Assistant 回答](./images/02-prompts-and-roles.png)
+<img src="./images/02-prompts-and-roles.png" alt="三种角色：System 是身份说明书 / User 提问 / Assistant 回答" width="480">
 
 | 角色 | 作用 | 由谁写 | 类比 |
 |------|------|--------|------|
@@ -55,7 +55,7 @@ messages = [
 
 ## 关键认知 1：模型没有记忆
 
-![模型无状态：每一轮都要把整段历史重新喂回去](./images/02-stateless-conversation.png)
+<img src="./images/02-stateless-conversation.png" alt="模型无状态：每一轮都要把整段历史重新喂回去" width="480">
 
 这是一个朴素但重要的事实：**LLM 是无状态的，每次调用都是从零开始**。
 
@@ -137,12 +137,6 @@ system_prompt = """
 | user | 用户的输入 |
 | assistant | AI 的历史回复 |
 | 模型无状态 | 每次调用必须全量传入历史 |
-
-## 随堂练习
-
-> 一行 system prompt = 一个不同的"人格"，亲手切一下就知道 messages 协议到底怎么工作：
->
-> 🧪 [练习 1.2 · System Prompt 切换器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-meet-your-ai/ex_1_2.py)
 
 ---
 

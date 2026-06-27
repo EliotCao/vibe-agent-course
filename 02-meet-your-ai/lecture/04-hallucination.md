@@ -13,7 +13,7 @@
 
 ## 为什么会幻觉
 
-![模型按统计最像往下接，从来不会停下来核对真假](./images/04-hallucination-mechanism.png)
+<img src="./images/04-hallucination-mechanism.png" alt="模型按统计最像往下接，从来不会停下来核对真假" width="480">
 
 回到第 1 节的核心：模型在做 **next-token prediction**。
 
@@ -36,7 +36,7 @@
 
 ## 4 种典型幻觉触发场景
 
-![四种最容易触发幻觉的场景：训练外/时效/具体细节/模糊指令](./images/04-hallucination-triggers.png)
+<img src="./images/04-hallucination-triggers.png" alt="四种最容易触发幻觉的场景：训练外/时效/具体细节/模糊指令" width="480">
 
 ### 1. 训练数据里没有的事实
 
@@ -157,12 +157,6 @@ prompt = f"""
 | 识别 | 交叉验证 / 要求引用 / LLM 自查 |
 | 缓解 | RAG / 工具调用 / Prompt 约束 |
 | 现状 | 被对齐训练压制，但不当 prompt 可能让它复发 |
-
-## 随堂练习
-
-> 缓解幻觉的第一步是**能检测**。让 LLM 当"裁判"，判断另一段回答里有没有编造的内容——这就是工业上"LLM 自查"的最朴素版本：
->
-> 🧪 [练习 1.3 · 幻觉检测器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-meet-your-ai/ex_1_3.py)
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## LLM 的"天生不知道"
 
-![LLM 被关在玻璃罩里，四类信息它够不到](./images/05-llm-glass-dome.png)
+<img src="./images/05-llm-glass-dome.png" alt="LLM 被关在玻璃罩里，四类信息它够不到" width="480">
 
 回忆第 1 节的类比：LLM 就像一个住在图书馆里、读过所有书但从未出门的人。以下四类信息，它**永远无法从自身获取**：
 
@@ -80,7 +80,7 @@ LLM 组织自然语言回复: "现在是北京时间 15:20。"
 
 ## 两种方式的对比
 
-![朴素 RAG vs 工具调用：人喂资料 vs AI 自己伸手](./images/05-rag-vs-tool.png)
+<img src="./images/05-rag-vs-tool.png" alt="朴素 RAG vs 工具调用：人喂资料 vs AI 自己伸手" width="480">
 
 | | 朴素 RAG（塞进 prompt） | Tool Use（模型自己调） |
 |---|---|---|
@@ -142,16 +142,6 @@ LLM 组织自然语言回复: "现在是北京时间 15:20。"
 | 朴素 RAG | 手动把信息塞进 prompt |
 | Tool Use | 让 LLM 自己决定调什么工具 |
 | Agent | LLM + 工具 + 自主决策能力 |
-
-## 随堂练习
-
-> 第 1 章理论结束，回头把 4 道练习一次串完，**你就完整握住了"和 LLM 打交道"的最小工具箱**：Token 计数 → System Prompt → 幻觉检测 → 流式输出。
->
-> 🧪 [第 1 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/02-meet-your-ai)
-> - 练习 1.1 · Token 计数器
-> - 练习 1.2 · System Prompt 切换器
-> - 练习 1.3 · 幻觉检测器
-> - 练习 1.4 · 流式输出收集器
 
 ---
 

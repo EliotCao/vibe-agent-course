@@ -8,7 +8,7 @@
 
 ## Next-Token Prediction
 
-![每个位置都有候选词的概率分布，按权重随机抽一个](./images/01-probability.png)
+<img src="./images/01-probability.png" alt="每个位置都有候选词的概率分布，按权重随机抽一个" width="480">
 
 先看一个直觉例子。假如输入是 `"今天天气真"`，模型内部会算出一张"下一个 token 的概率分布"：
 
@@ -49,7 +49,7 @@
 
 ## 模型怎么学会"预测得准"
 
-![Transformer 架构 → 预训练（万亿 token 接龙）→ SFT + RLHF 对齐 → 你现在用的 LLM](./images/01-training-loop.png)
+<img src="./images/01-training-loop.png" alt="Transformer 架构 → 预训练（万亿 token 接龙）→ SFT + RLHF 对齐 → 你现在用的 LLM" width="480">
 
 ### 1. 架构：Transformer
 
@@ -128,7 +128,7 @@ SFT + RLHF（学会当助手）
 
 ## 涌现：规模够大时，智能"长出来"
 
-![参数规模够大时，能力像爬阶梯一样跃迁](./images/01-emergence-stairs.png)
+<img src="./images/01-emergence-stairs.png" alt="参数规模够大时，能力像爬阶梯一样跃迁" width="480">
 
 一个令人惊讶的事实：小模型做不到的事，大模型突然能做了。
 
@@ -189,16 +189,6 @@ LLM 也是一样：
 | 训练 | 在万亿 token 上反复"纠正概率分布" |
 | 涌现 | 规模够大时，能力突然出现 |
 | Temperature | 控制采样随机性：0=确定，高=随机 |
-
-## 随堂练习
-
-> 第 1 章一共 4 道练习，建议跟着每节往下做。看完本节先去摸一下整个练习清单：
->
-> 🧪 [第 1 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/02-meet-your-ai)
->
-> 与"逐 token 生成"最贴近的练习，是把流式输出 chunk 一片片接住——做完你就明白模型为什么"打字机般"吐字：
->
-> 🧪 [练习 1.4 · 流式输出收集器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-meet-your-ai/ex_1_4.py)
 
 ---
 

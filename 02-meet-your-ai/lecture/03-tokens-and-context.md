@@ -79,7 +79,7 @@ flowchart LR
 
 ## 什么是 Token
 
-![Token 不是字也不是词，而是介于两者之间的子词单位](./images/03-tokenization.png)
+<img src="./images/03-tokenization.png" alt="Token 不是字也不是词，而是介于两者之间的子词单位" width="480">
 
 **Token 不是字、不是词，是介于两者之间的"子词单位"（subword）。**
 
@@ -152,7 +152,7 @@ LLM 是逐个 token 生成的，每输出一个 token 就要做一次前向传�
 
 ## 上下文窗口：LLM 的"工作内存"
 
-![输入和输出共享同一个上下文窗口，加起来不能超出容量](./images/03-context-window.png)
+<img src="./images/03-context-window.png" alt="输入和输出共享同一个上下文窗口，加起来不能超出容量" width="480">
 
 模型一次推理能"看"到的最大 token 数，叫**上下文窗口（context window）**。
 
@@ -185,7 +185,7 @@ ChatGPT 之所以聊久了会"忘事"，是因为前端**主动裁掉了早期�
 
 #### 3. 越长越笨（Lost in the Middle）
 
-![长上下文里中间最容易被忽略，注意力呈 U 形曲线](./images/03-lost-in-middle.png)
+<img src="./images/03-lost-in-middle.png" alt="长上下文里中间最容易被忽略，注意力呈 U 形曲线" width="480">
 
 研究表明，大部分模型在上下文超过 50% 容量后，对**中间位置**的内容关注度显著下降。
 
@@ -229,12 +229,6 @@ print(f"每天审查 50 个文件: ¥{cost_per_call * 50:.2f}")
 | Lost in the Middle | 长上下文的中间位置容易被忽略 |
 | 计费单位 | 按 token 计费，不是按字符 |
 | 经验法则 | 中文 1 字 ≈ 1-1.5 token，英文 1 词 ≈ 1 token |
-
-## 随堂练习
-
-> 拿 `tiktoken` 实测一段文本到底多少 token——以后估成本、估窗口都靠它。**估算 Coding Agent 一天烧多少钱前，先把这个工具拧到手里**：
->
-> 🧪 [练习 1.1 · Token 计数器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-meet-your-ai/ex_1_1.py)
 
 ---
 
