@@ -3,6 +3,21 @@ description: 上下文爆炸实验
 labels:
 - "context: explosion"
 body:
+- type: input
+  attributes:
+    label: 姓名
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: 实验参数变更说明（改动了哪几个参数，怎么改的）
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: 合并请求（Pull Request）
+  validations:
+    required: true
 - type: markdown
   attributes:
     value: |
@@ -17,13 +32,13 @@ body:
       ~~~
 
       即，需要一对 ``` （三个反引号 + text）
-- type: input
-  attributes:
-    label: 姓名
-  validations:
-    required: true
 - type: textarea
   attributes:
     label: 实验结果
   validations:
     required: true
+- type: textarea
+  attributes:
+    label: 实验总结
+  validations:
+    required: false
