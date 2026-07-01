@@ -1,0 +1,25 @@
+name: Context Explosion
+description: 上下文爆炸实验
+body:
+- type: markdown
+  attributes:
+    value: |
+      这里记录上下文爆炸的实验结果。
+      
+      在“实验结果”这一栏中，你需要手写 Markdown 代码块，语法格式如下：
+      
+      ```text
+      实验内容文本复制在这里
+      ```
+      
+      即，需要一对 ``` （三个反引号 + text）
+- type: input
+  attributes:
+    label: 姓名
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: 实验结果
+  validations:
+    required: true
