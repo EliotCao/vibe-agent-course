@@ -14,6 +14,7 @@ Demo 18 · 上下文爆炸：跑一个 30 轮的任务，亲眼看着它失控
 连跑 30 轮，最后画一张 token 增长曲线。
 
 运行方式：
+    cd /workspace/05-context-and-memory/lab/
     source /workspace/.venv/bin/activate
     python demo_18_context_explosion.py
 """

@@ -15,6 +15,7 @@ Memory 与 ContextManager 的分工：
 核心只用 numpy 计算余弦相似度，暂不引入向量数据库（先用最简方式把流程跑通，后续章节再换专业库）。
 
 运行方式：
+    cd /workspace/05-context-and-memory/lab/
     source /workspace/.venv/bin/activate
     python demo_20_memory.py
 """

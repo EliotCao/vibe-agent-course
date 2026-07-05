@@ -14,6 +14,8 @@ Demo 24 · 五阶段工作流：手动走一遍 Coding Agent 的"思考路径"
   - 为第 25 节讲解工具背后的设计哲学打下直观基础
 
 运行方式：
+    cd /workspace/06-coding-agent-tools/lab/
+    source /workspace/.venv/bin/activate
     python demo_24_five_stages.py
 """
 

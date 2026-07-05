@@ -24,6 +24,7 @@ Demo 19 · 四种上下文管理策略对比
     这里的"④ 分层"对应讲稿中的"③ 分层"。
 
 运行方式：
+    cd /workspace/05-context-and-memory/lab/
     source /workspace/.venv/bin/activate
     python demo_19_context_strategies.py
 """

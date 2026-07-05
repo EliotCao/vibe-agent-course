@@ -16,6 +16,7 @@ Demo 21 · Agent v2：将最小 Agent Loop 接入 ContextManager + Memory
   - 关键事实（早期透露的过敏 / 预算）在 Memory 加持下是否被保住
 
 运行方式：
+    cd /workspace/05-context-and-memory/lab/
     source /workspace/.venv/bin/activate
     python demo_21_agent_v2.py
 """
