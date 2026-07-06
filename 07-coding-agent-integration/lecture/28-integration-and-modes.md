@@ -23,6 +23,90 @@
 | 第4章 | `Memory` | `add(text)` / `search(query, k=3) -> list[tuple[float, str]]` | 存长期事实、按语义召回 |
 | 第5章 | 编程工具 | `read_file` / `list_dir` / `write_file` / `edit_file` / `run_bash` | 真正读写文件、跑命令 |
 
+### 整体架构图
+
+组件之间有两种关系，分开看才清楚：**① 结构上谁持有谁**，**② 运行时谁先谁后配合**。
+
+**① 组合关系（谁持有谁）** —— `Agent` 是编排中心，构造时注入其余组件；`tools` 挂在 `ToolRegistry` 名下：
+
+```mermaid
+classDiagram
+    class Agent {
+        +run(user_message) str
+        -agent loop：想→做→回灌
+    }
+    class LLMClient {
+        +complete(messages, tools) Message
+        +count_tokens(text) int
+    }
+    class ToolRegistry {
+        +register(func)
+        +to_schemas() list
+        +invoke(name, args) str
+    }
+    class ContextManager {
+        +should_compress(messages) bool
+        +compress(messages) list
+    }
+    class Memory {
+        +add(text)
+        +search(query, k) list
+    }
+    class tools {
+        read_file / list_dir
+        write_file / edit_file / run_bash
+    }
+
+    Agent *-- LLMClient : 必需·想
+    Agent *-- ToolRegistry : 必需·做
+    Agent o-- ContextManager : 选装·压缩
+    Agent o-- Memory : 选装·记忆
+    ToolRegistry *-- tools : 注册/持有
+
+    note for Agent "实心菱形 = 强持有(必需)\n空心菱形 = 可选注入(选装)"
+```
+
+**② 协作时序（一次 loop 里各组件怎么配合）** —— 谁在什么时机被调用、数据怎么流转，一眼看清：
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as 用户
+    participant A as Agent
+    participant M as Memory（选装）
+    participant C as ContextManager（选装）
+    participant L as LLMClient
+    participant R as ToolRegistry
+    participant T as tools
+
+    U->>A: run(user_message)
+    A->>M: search(query) 召回事实
+    M-->>A: 相关记忆 → 拼进 system prompt
+    A->>R: to_schemas() 取工具清单
+    R-->>A: tool schemas
+
+    loop 每轮循环，直到没有 tool_calls
+        A->>C: should_compress(messages)?
+        C-->>A: 超长则 compress() 返回更短 messages
+        A->>L: complete(messages, tools=schemas)
+        L-->>A: Message（content 或 tool_calls）
+        alt 有 tool_calls
+            A->>R: invoke(name, args)
+            R->>T: 分发执行对应工具
+            T-->>R: 结果字符串
+            R-->>A: 结果 → 作为 tool 消息回灌 messages
+        else 没有 tool_calls
+            A-->>U: 返回最终回答
+        end
+    end
+```
+
+读图要点：
+
+- **持有关系**：`Agent` 强持有 `LLMClient`（想）和 `ToolRegistry`（做）——缺一不可；`ContextManager`、`Memory` 是空心菱形，**可选注入、不改内核**。`tools` 不直接跟 `Agent` 打交道，而是注册在 `ToolRegistry` 名下，由它统一分发。
+- **配合次序**：一次 `run` 先（选装）召回记忆、取工具清单，然后进 loop——每轮**先压缩、再想（LLM）、按需做（工具）、回灌**，直到 LLM 不再要求调用工具才收尾。
+- **数据主线**：一切围绕 `messages` 流转——记忆拼进它、压缩裁剪它、LLM 读它产出、工具结果又回灌它。
+
 **关键认知**：`Agent.run()` 内部就是第3、4章那套 agent loop——「调 LLM → 看工具调用 → 执行 → 回灌」这件事**第3章已经替你封好了**，本章不用再手写。它的对外契约很简单：**传进一句话，返回最终回答的字符串**。
 
 组装的目标，就是把这些零件按下面这条单向数据流串起来：
