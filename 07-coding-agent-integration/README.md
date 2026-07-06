@@ -5,18 +5,15 @@
 
 ## 你将学到
 
-- 整合架构：各模块怎么协作
-- REPL 交互界面
+- 整体串联流程：各模块按单向数据流怎么协作组装
+- Coding Agent 的几个形态：REPL / Solo / WebUI，一个内核多种壳
 - 端到端调试技巧
 
 ## 内容结构
 
 | 节 | 内容 | 讲义 | Demo |
 |----|------|------|------|
-| 28 | 整合架构 | [28-integration-architecture.md](./lecture/28-integration-architecture.md) | `demo_30_integration_walkthrough.py` |
-| 29 | UI 与交互 | [29-ui-and-modes.md](./lecture/29-ui-and-modes.md) | `demo_31_three_tasks.py` |
-
-```
+| 28 | 整合与形态 | [28-integration-and-modes.md](./lecture/28-integration-and-modes.md) | `demo_30_integration_walkthrough.py` |
 
 ## 作业指引
 

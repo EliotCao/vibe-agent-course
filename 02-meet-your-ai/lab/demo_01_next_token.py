@@ -54,6 +54,12 @@ if not BASE_URL or not API_KEY:
 
 client = OpenAI(base_url=BASE_URL, api_key=API_KEY)
 
+# Chat 模式的 system prompt：让模型以对话助手的身份回应
+CHAT_SYSTEM_PROMPT = (
+    "你是一个友好的 AI 聊天助手。用户会跟你聊天或提问，"
+    "你需要自然地回应，像一个真人在对话一样。"
+)
+
 # 把模型伪装成"续写引擎"用的 system prompt
 COMPLETE_SYSTEM_PROMPT = (
     "你是一个文本续写引擎。用户给你一段话，你直接把这段话接着往下写，"
@@ -70,29 +76,29 @@ def _build_messages(prefix: str, mode: Literal["chat", "complete"]) -> list:
             {"role": "system", "content": COMPLETE_SYSTEM_PROMPT},
             {"role": "user", "content": prefix},
         ]
-    # chat 模式：直接把 prefix 当成用户消息
-    return [{"role": "user", "content": prefix}]
+    # chat 模式：用对话助手的 system prompt
+    return [
+        {"role": "system", "content": CHAT_SYSTEM_PROMPT},
+        {"role": "user", "content": prefix},
+    ]
 
 
 def show_top_candidates(
     prefix: str,
     mode: Literal["chat", "complete"] = "chat",
 ) -> None:
-    """让模型只生成 1 个 token，展示模型选择的结果。"""
+    """让模型根据输入做补全，展示完整返回内容。"""
     mode_label = "续写模式（complete）" if mode == "complete" else "对话模式（chat）"
     print("=" * 60)
     print(f"输入: {prefix!r}   [{mode_label}]")
-    print(f"问题: 请预测下一个 token 是什么？")
     print("-" * 60)
 
     messages = _build_messages(prefix, mode)
 
-    # 直接调用 OpenAI API，设置 max_tokens=1 只拿一个 token
     stream = client.chat.completions.create(
         model=MODEL,
         messages=messages,
         temperature=0,
-        max_tokens=1,
         stream=True,
     )
 
@@ -101,8 +107,8 @@ def show_top_candidates(
         if chunk.choices and chunk.choices[0].delta.content:
             parts.append(chunk.choices[0].delta.content)
 
-    chosen = "".join(parts)
-    print(f"模型选择: {chosen!r}")
+    result = "".join(parts)
+    print(f"模型输出: {result!r}")
     print()
 
 
@@ -118,5 +124,5 @@ if __name__ == "__main__":
     for title, prefix in PREFIXES:
         print(f"\n{title}")
         # 同一个输入跑两种模式，对比下一个 token 分布
-        # show_top_candidates(prefix, mode="chat")
+        show_top_candidates(prefix, mode="chat")
         show_top_candidates(prefix, mode="complete")
