@@ -2,7 +2,7 @@
 
 ## 一句话回答
 
-> **第1章-第5章你已经把每个零件都写好了。本章不写新功能，只做两件事：先把这些类一点点拼成一个能干活的 Coding Agent，再聊聊它能长成哪几种形态。**
+> **第2章-第6章你已经把每个零件都写好了。本章不写新功能，只做两件事：先把这些类一点点拼成一个能干活的 Coding Agent，再聊聊它能长成哪几种形态。**
 
 你手上的零件全部定义在 [`my-agent/interfaces.py`](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise/-/blob/main/my-agent/interfaces.py) 里——这个文件不用改，只是接口参考。本章就基于这些接口，循序渐进地组装。
 
@@ -23,7 +23,7 @@
 | 第4章 | `Memory` | `add(text)` / `search(query, k=3) -> list[tuple[float, str]]` | 存长期事实、按语义召回 |
 | 第5章 | 编程工具 | `read_file` / `list_dir` / `write_file` / `edit_file` / `run_bash` | 真正读写文件、跑命令 |
 
-**关键认知**：`Agent.run()` 内部就是第2、3章那套 agent loop——「调 LLM → 看工具调用 → 执行 → 回灌」这件事**第3章已经替你封好了**，本章不用再手写。它的对外契约很简单：**传进一句话，返回最终回答的字符串**。
+**关键认知**：`Agent.run()` 内部就是第3、4章那套 agent loop——「调 LLM → 看工具调用 → 执行 → 回灌」这件事**第3章已经替你封好了**，本章不用再手写。它的对外契约很简单：**传进一句话，返回最终回答的字符串**。
 
 组装的目标，就是把这些零件按下面这条单向数据流串起来：
 
