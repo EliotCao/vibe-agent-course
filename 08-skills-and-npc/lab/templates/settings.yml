@@ -1,7 +1,0 @@
-# .cnb/settings.yml 模板（学生用）
-# 把这个文件放到你的仓库 .cnb/ 目录下
-
-settings:
-  npc:
-    - name: my-agent          # ← 改成你想要的 NPC 名字
-      description: "仓库 Coding Agent，帮你看代码、修 bug、跑测试"

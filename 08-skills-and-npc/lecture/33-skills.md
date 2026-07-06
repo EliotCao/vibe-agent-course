@@ -1,31 +1,50 @@
-# 第 33 节 · Skills 系统：为什么需要、SKILL.md 标准、加载机制
+# 第 33 节 · Skills：为什么需要、与 Tool Call 的区别、实现原理
 
 ## 一句话回答
 
-> **Skills = 可热插拔的领域知识包。** 让同一个 Agent 面对不同团队/项目时，自动切换到正确的规范——不用改代码。
+> **Skill = 可热插拔的领域知识包（一份 `SKILL.md`）。** 让同一个 Agent 面对不同团队/项目时，自动切换到正确的规范——不改一行代码。
 
-## 为什么 system prompt 不够
+## 一、为什么需要 Skills
 
 ![为什么需要 Skills](./images/33-why-skills.png)
 
-想象你在同一家公司接了 3 个项目：
+同一个人接了 3 个项目，规范完全不同：
 
 | 项目 | 代码规范 | 测试要求 | 提交格式 |
 |---|---|---|---|
-| 前端 React | 函数组件 + hooks + 禁止 class | vitest | `feat(ui): xxx` |
-| 后端 Go | 错误必须用 sentinel + wrap | go test -race | `fix(api): xxx` |
-| 数据流水线 | PEP8 + type hint 100% | pytest --cov ≥80% | `chore(etl): xxx` |
+| 前端 React | 函数组件 + hooks，禁止 class | vitest | `feat(ui): xxx` |
+| 后端 Go | 错误必须 sentinel + wrap | `go test -race` | `fix(api): xxx` |
+| 数据流水线 | PEP8 + type hint 100% | `pytest --cov ≥80%` | `chore(etl): xxx` |
 
 如果把 3 套规范全塞进 system prompt：
-- token 炸裂（每次都付 3 倍钱）
-- LLM 容易"串台"
 
-**Skills 的解法：**
-- 每套规范 = 一个 `SKILL.md` 文件
-- 启动时只加载**索引**（name + description，极小）
-- 用户问题匹配到哪个 skill，才加载对应的**完整指令**
+- **token 炸裂**：每次对话都为 3 倍规范付费
+- **容易串台**：写前端时把 Go 的错误规范也带上了
 
-## SKILL.md 格式标准
+**Skills 的解法**：每套规范 = 一个 `SKILL.md`；启动时只装**索引**（name + 一句话描述），真正命中某个 skill 时才加载它的**完整正文**。
+
+## 二、Skills vs Tool Call
+
+这是本节最关键的一组对比。两者常被混淆，但定位完全不同：
+
+| 维度 | Tool Call | Skill |
+|---|---|---|
+| 本质 | 一个**能执行的动作**（函数） | 一段**领域知识 / 工作规范**（文本） |
+| 回答的问题 | Agent **能做什么**（read/write/bash…） | Agent 该**怎么做、按什么标准做** |
+| 注入方式 | 函数签名 → JSON Schema，进 `tools` 参数 | Markdown 正文 → 拼进 prompt |
+| 模型如何用 | 生成一次 `tool_call`，运行时执行并回填结果 | 当作"上文规范"阅读，指导后续所有输出 |
+| 有无副作用 | 通常有（改文件、跑命令） | 没有，纯知识 |
+| 扩展成本 | 写代码 + 注册 | 丢一个 `.md` 文件进目录 |
+
+一句话概括：
+
+> **Tool 是"手"，Skill 是"脑子里的规矩"。** 光有手不知道规矩会乱做；Skill 告诉手该按什么标准做。
+
+有意思的是：**Skills 机制本身正是用两个 Tool 实现的**——`list_skills` / `load_skill`。也就是"用工具去加载知识"。下面就是原理。
+
+## 三、SKILL.md 标准
+
+每个 skill 是一个目录，目录里放一份 `SKILL.md`：**YAML frontmatter（元数据）+ Markdown 正文（完整规范）**。
 
 ```markdown
 ---
@@ -35,97 +54,128 @@ description: 给 Python 函数添加 Google 风格 docstring
 
 # 使用规则
 
-当用户要求"加注释""加文档""补 docstring"时，遵循以下规范：
-
-## 格式
-- Google 风格 docstring
-- 第一行是简短描述（不超 72 字符）
+当用户要求"加注释/加文档/补 docstring"时，遵循以下规范：
+- Google 风格，第一行简短描述（≤72 字符）
 - Args / Returns / Raises 三段
-
-## 示例
-
-```python
-def fetch_user(user_id: int, timeout: float = 5.0) -> dict:
-    """根据 ID 获取用户信息。
-
-    Args:
-        user_id: 用户唯一标识符。
-        timeout: HTTP 超时（秒），默认 5.0。
-
-    Returns:
-        用户信息字典，包含 name / email / role。
-
-    Raises:
-        NotFoundError: user_id 不存在时。
-    """
 ```
-```
-
-### frontmatter 字段
 
 | 字段 | 必填 | 作用 |
 |------|------|------|
-| `name` | ✅ | Skill 唯一标识（用于匹配 + 加载） |
-| `description` | ✅ | 一句话描述（注入到 system prompt 索引里） |
+| `name` | ✅ | 唯一标识（= 目录名） |
+| `description` | ✅ | 一句话摘要，注入到 system prompt 索引 |
 
-## 渐进式加载机制
+> 更宽松的实现：没有 frontmatter 时，自动取正文第一个非标题非空行当作 brief。
+
+## 四、Agent 实现 Skills 的原理（伪代码）
+
+核心是**两级渐进式加载**：
 
 ```
-Level 1（启动时）：
-  扫描 skills/ → 解析 frontmatter → 生成索引
-  注入到 system prompt：
-    "可用 Skills: add-docstring(给函数加 docstring) / go-sentinel(Go 错误规范) / ..."
-
-Level 2（运行时）：
-  用户问 "帮我给这个函数加文档"
-  → 匹配到 add-docstring
-  → 加载完整 body 注入到 system prompt
-  → LLM 按照 body 里的格式规范生成 docstring
+Level 1（启动时，极省 token）：扫描目录 → 只拿 name + 一句话 brief → 注入 system prompt
+Level 2（运行时，命中才付费）：加载某个 skill 的 SKILL.md 全文 → 注入上下文
 ```
 
-**好处**：
-1. 启动 token 极小（索引只有几十个 token）
-2. 只付当次真正需要的 skill 的 token 成本
-3. 新增 skill 不用改代码——放一个 .md 文件进去就行
+### 4.1 SkillLoader —— 扫描 + 索引 + 按需读全文
 
-## 给 Agent 加 `list_skills` 和 `load_skill` 工具
+关键点：**惰性扫描**（首次用到才做 IO）、**索引缓存**、**防目录穿越**。
 
-最小实现只要 2 个新工具：
+```
+类 SkillLoader:
+    初始化(skills_dir):
+        本.根目录  = 规范化绝对路径(skills_dir)
+        本.索引    = 空            # 缓存，首次访问才填充
+        本.名字表  = 空字典        # name → 实际目录
 
-```python
-@registry.tool("列出所有可用的 Skills 名称和描述")
-def list_skills() -> str:
-    return skills.to_index_prompt()
+    # ---- Level 1：只读元数据，生成一句话索引 ----
+    方法 列出索引():
+        若 本.索引 为空:
+            本.索引 = 扫描()       # 首次调用才真正扫盘
+        返回 本.索引               # [(name, brief), ...]
 
-@registry.tool("加载指定 skill 的完整规范到上下文中")
-def load_skill(name: str) -> str:
-    return skills.load(name)
+    方法 扫描():
+        结果 = 空
+        对 根目录下每个子目录 child:
+            若 child 内存在 SKILL.md:
+                头部  = 只读前若干KB(child/SKILL.md)
+                brief = 提取摘要(头部)          # frontmatter.description 或正文首行
+                结果[child.name] = (child.name, brief)
+                本.名字表[child.name] = child
+            否则若 child 内存在 skills/ 子目录:   # 兼容嵌套 skill 包
+                对 skills/ 下每个内层目录: 同上收录
+        返回 按 name 排序(结果)
+
+    # ---- Level 2：命中某个 skill 才读全文 ----
+    方法 加载(name):
+        校验名字合法(name)                        # 白名单，挡非法字符
+        skill_dir = 本.名字表[name]
+        断言 skill_dir 仍在 本.根目录 之内         # 防目录穿越
+        全文 = 读文件(skill_dir/SKILL.md)
+        返回 Skill(name, brief=提取摘要(全文), 全文)
 ```
 
-这样 LLM 就可以**自己决定什么时候该加载哪个 skill**——不需要人手动指定。
+### 4.2 把 Loader 暴露成两个 Tool
 
-## 动手试试
+这样 **LLM 能自己决定何时加载哪个 skill**：
 
-1. 在 `my_coding_agent/skills/` 下建一个 `add-docstring/SKILL.md`
-2. 给 ToolRegistry 添加 `list_skills` + `load_skill` 两个工具
-3. 用 Agent 问"帮我给 bash.py 里的函数加 docstring"
-4. 观察 Agent 是否自动 `load_skill("add-docstring")` → 按规范生成
+```
+函数 注册skill工具(工具表, loader):
+
+    工具 list_skills():
+        「列出所有可用 skill（name + 一句话）。不确定有哪些能力时调用。」
+        返回 逐行拼接("- {name}: {brief}"  取自  loader.列出索引())
+
+    工具 load_skill(name):
+        「按名字加载某个 skill 的完整规范（SKILL.md 全文）。」
+        skill = loader.加载(name)
+        返回 "# Skill: {skill.name}\n---\n{skill.全文}"
+
+    工具表.注册(list_skills)
+    工具表.注册(load_skill)
+```
+
+### 4.3 启动时把 Level 1 索引拼进 system prompt
+
+```
+函数 组装系统提示词(loader):
+    索引 = loader.列出索引()
+    若 索引为空:
+        返回 基础系统提示词
+    索引文本 = 逐行拼接("- **{name}**: {brief}"  取自 索引)
+    # 模型开局就"知道有哪些 skill 可用"，但只花几十 token
+    返回 基础系统提示词 + Skills索引模板(索引文本)
+```
+
+### 4.4 两条运行路径
+
+**路径 A：LLM 自主加载（自动）**
+
+```
+system prompt 里已列出 skill 索引
+用户："帮这个函数加 docstring"
+  → LLM 判断命中 add-docstring
+  → 主动调用工具: load_skill("add-docstring")
+  → 拿到全文规范 → 按规范生成 docstring
+```
+
+**路径 B：用户显式指定（快捷指令）** —— 在调用 LLM **之前**本地拦截：
+
+```
+函数 预处理(用户输入, loader):
+    若 用户输入 以 "/skills" 开头:          # 本地直接列出，不走 LLM
+        返回 直接回复(格式化skill列表(loader))
+    若 用户输入 以 "@" 开头:                # 语法：@name <任务>
+        name, 任务 = 解析(用户输入)
+        skill = loader.加载(name)
+        # 把 skill 全文当作"前置规范"拼到任务前面，再送 Agent
+        返回 改写("[按以下规范完成]\n{skill.全文}\n\n[任务]\n{任务}")
+    返回 原样透传                            # 交给 Agent 正常处理
+```
+
+> 两条路径的取舍：**A 省心（LLM 自己判断）**，但多一次工具调用往返；**B 精准（用户点名）**，省往返但要用户知道 skill 名。二者可同时保留。
 
 ## 小结
 
-- Skills = 热插拔的领域规范包，解决"多项目多规范"问题
-- SKILL.md = YAML frontmatter（元数据）+ Markdown body（完整指令）
-- 渐进式加载：启动只加索引，运行时按需加 body
-- 给 Agent 加 2 个工具（list_skills / load_skill）就能让 LLM 自主管理 Skills
-
----
-
-## 随堂练习
-
-> 看懂 SKILL.md 标准不算数，**自己写一个能跑通的 Skill** 才算。下面这道必做题就是让你为真实项目场景产出一份 SKILL.md，并让 Agent 自动加载它：
->
-> 🧪 [作业 7.1 · 写一个自定义 Skill](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/08-skills-and-npc/README.md)（README 中的 §7.1）
->
-> 进阶选做：把"`list_skills` + `load_skill` 由 LLM 调"改成"chat 入口自动 `skills.match()`"，体会 token 节省 vs LLM 自主决策的权衡：
->
-> 🧪 [作业 7.4 ★ Skills 自动匹配](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/08-skills-and-npc/README.md)（README 中的 §7.4）
+- **Skill = 热插拔的领域规范包**，解决"多项目多规范"下 system prompt 膨胀 + 串台
+- **Tool 是能力（动作），Skill 是知识（规范）**；而 Skills 机制本身用两个 Tool（`list_skills`/`load_skill`）实现
+- 原理 = **两级加载**：启动只装索引（Level 1，省 token），命中才加载全文（Level 2，按需付费）
+- 落地只需三块：`SkillLoader`（扫描/索引/读全文）+ 两个工具 + system prompt 注入索引
