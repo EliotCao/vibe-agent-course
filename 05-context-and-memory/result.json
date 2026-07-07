@@ -1,0 +1,334 @@
+{
+    "① RAW (not process)": [
+        {
+            "role": "system",
+            "content": "你是个旅行助手。"
+        },
+        {
+            "role": "user",
+            "content": "我准备 6 月去北京玩 7 天。"
+        },
+        {
+            "role": "assistant",
+            "content": "好的，6 月北京天气合适。先问您几个问题..."
+        },
+        {
+            "role": "user",
+            "content": "重要：我对花粉过敏，户外活动要避开花期。"
+        },
+        {
+            "role": "assistant",
+            "content": "明白，会注意避开花季景点。"
+        },
+        {
+            "role": "user",
+            "content": "故宫门票需要提前预约吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "建议提前在官网预约，现场票经常售罄，尤其旺季。"
+        },
+        {
+            "role": "user",
+            "content": "从故宫到颐和园怎么走方便？"
+        },
+        {
+            "role": "assistant",
+            "content": "地铁 4 号线直达北宫门站，大约 40 分钟。"
+        },
+        {
+            "role": "user",
+            "content": "北京 6 月天气怎么样？"
+        },
+        {
+            "role": "assistant",
+            "content": "6 月已经偏热，白天 30°C 左右，注意防晒补水。"
+        },
+        {
+            "role": "user",
+            "content": "有没有适合拍照的胡同？"
+        },
+        {
+            "role": "assistant",
+            "content": "南锣鼓巷、杨梅竹斜街都不错，建议早上去人少。"
+        },
+        {
+            "role": "user",
+            "content": "长城哪个段落人少一点？"
+        },
+        {
+            "role": "assistant",
+            "content": "慕田峪比八达岭人少很多，景色也更好。"
+        },
+        {
+            "role": "user",
+            "content": "天坛几点开门？"
+        },
+        {
+            "role": "assistant",
+            "content": "公园 6:00 开门，祈年殿等核心景点 8:00 开放。"
+        },
+        {
+            "role": "user",
+            "content": "北京烤鸭哪家好？"
+        },
+        {
+            "role": "assistant",
+            "content": "全聚德、便宜坊是老字号，四季民福性价比也不错。"
+        },
+        {
+            "role": "user",
+            "content": "需要带现金吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "基本不用，手机支付覆盖几乎所有场景。"
+        },
+        {
+            "role": "user",
+            "content": "798 艺术区值得去吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "喜欢当代艺术的话很推荐，周末还有各种展览和集市。"
+        },
+        {
+            "role": "user",
+            "content": "早晚高峰地铁挤吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "8-9 点和 17-19 点非常拥挤，建议错峰出行。"
+        },
+        {
+            "role": "user",
+            "content": "什刹海晚上有什么玩的？"
+        },
+        {
+            "role": "assistant",
+            "content": "可以坐游船、逛酒吧街，夏天夜晚很热闹。"
+        },
+        {
+            "role": "user",
+            "content": "国家博物馆需要身份证吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "是的，需要身份证或护照，提前预约可以走快速通道。"
+        },
+        {
+            "role": "user",
+            "content": "簋街有什么推荐菜？"
+        },
+        {
+            "role": "assistant",
+            "content": "麻辣小龙虾是招牌，很多店营业到凌晨。"
+        },
+        {
+            "role": "user",
+            "content": "从大兴机场到市区怎么走？"
+        },
+        {
+            "role": "assistant",
+            "content": "乘坐地铁最实惠，非高峰期最快；打车约 100-400 元，看路况和车型。"
+        },
+        {
+            "role": "user",
+            "content": "圆明园和颐和园选一个？"
+        },
+        {
+            "role": "assistant",
+            "content": "颐和园更完整更好逛，圆明园偏历史遗迹感。"
+        },
+        {
+            "role": "user",
+            "content": "有没有免费的景点？"
+        },
+        {
+            "role": "assistant",
+            "content": "奥林匹克公园、前门大街、琉璃厂都免费，值得逛。"
+        },
+        {
+            "role": "user",
+            "content": "北京的出租车好打吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "路边招手不容易，建议用打车软件。"
+        },
+        {
+            "role": "user",
+            "content": "王府井小吃街还值得去吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "本地人很少去，更推荐牛街或护国寺小吃。"
+        },
+        {
+            "role": "user",
+            "content": "后海白天好看还是晚上好看？"
+        },
+        {
+            "role": "assistant",
+            "content": "各有味道，白天安静看景，晚上热闹泡吧。"
+        },
+        {
+            "role": "user",
+            "content": "香山现在有红叶吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "6 月没有红叶，夏天爬山看绿野也不错。"
+        },
+        {
+            "role": "user",
+            "content": "鸟巢可以进去参观吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "可以的，买票进内部参观，水立方也挨在一起。"
+        },
+        {
+            "role": "user",
+            "content": "北京的公共交通用什么卡？"
+        },
+        {
+            "role": "assistant",
+            "content": "亿通行 App 扫码就行，地铁公交都能用。"
+        },
+        {
+            "role": "user",
+            "content": "景山公园值得爬吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "很值得！山顶俯瞰故宫全景是经典机位。"
+        },
+        {
+            "role": "user",
+            "content": "北大清华能进去逛吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "需要预约，一般提前在公众号上申请参观名额。"
+        },
+        {
+            "role": "user",
+            "content": "回程想带点特产，推荐什么？"
+        },
+        {
+            "role": "assistant",
+            "content": "稻香村糕点、张一元茶叶、内联升布鞋都挺有特色。"
+        },
+        {
+            "role": "user",
+            "content": "对了，我的预算是每天 500 元。"
+        },
+        {
+            "role": "assistant",
+            "content": "我会把每天行程控制在预算内。"
+        }
+    ],
+    "② TRUNCATE (Last 6 rounds)": [
+        {
+            "role": "system",
+            "content": "你是个旅行助手。"
+        },
+        {
+            "role": "user",
+            "content": "北大清华能进去逛吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "需要预约，一般提前在公众号上申请参观名额。"
+        },
+        {
+            "role": "user",
+            "content": "回程想带点特产，推荐什么？"
+        },
+        {
+            "role": "assistant",
+            "content": "稻香村糕点、张一元茶叶、内联升布鞋都挺有特色。"
+        },
+        {
+            "role": "user",
+            "content": "对了，我的预算是每天 500 元。"
+        },
+        {
+            "role": "assistant",
+            "content": "我会把每天行程控制在预算内。"
+        }
+    ],
+    "③ SUMMARY (summary + Last 6 rounds)": [
+        {
+            "role": "system",
+            "content": "你是个旅行助手。"
+        },
+        {
+            "role": "system",
+            "content": "[早期对话摘要]\n用户计划6月赴京旅游7天，**对花粉过敏**，需避开户外花期。行程关注景点预约、交通及美食。得知故宫需预约，慕田峪人少，6月无红叶，手机支付普及，地铁高峰拥挤，推荐颐和园、牛街等，需携带身份证参观国博。"
+        },
+        {
+            "role": "user",
+            "content": "北大清华能进去逛吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "需要预约，一般提前在公众号上申请参观名额。"
+        },
+        {
+            "role": "user",
+            "content": "回程想带点特产，推荐什么？"
+        },
+        {
+            "role": "assistant",
+            "content": "稻香村糕点、张一元茶叶、内联升布鞋都挺有特色。"
+        },
+        {
+            "role": "user",
+            "content": "对了，我的预算是每天 500 元。"
+        },
+        {
+            "role": "assistant",
+            "content": "我会把每天行程控制在预算内。"
+        }
+    ],
+    "④ HIERARCHICAL (Key Facts + summary + Last 6 rounds)": [
+        {
+            "role": "system",
+            "content": "你是个旅行助手。"
+        },
+        {
+            "role": "system",
+            "content": "[关键事实，永远记住]\n- 重要：我对花粉过敏，户外活动要避开花期。\n- 对了，我的预算是每天 500 元。"
+        },
+        {
+            "role": "system",
+            "content": "[早期对话摘要]\n用户计划6月赴京旅游7天，对花粉过敏，需避开花期。行程要点：故宫、国博需预约带证件，长城推荐慕田峪，交通建议地铁或打车软件避高峰。天气炎热需防晒，支付靠手机。推荐颐和园、胡同、牛街及景山公园俯瞰故宫。"
+        },
+        {
+            "role": "user",
+            "content": "北大清华能进去逛吗？"
+        },
+        {
+            "role": "assistant",
+            "content": "需要预约，一般提前在公众号上申请参观名额。"
+        },
+        {
+            "role": "user",
+            "content": "回程想带点特产，推荐什么？"
+        },
+        {
+            "role": "assistant",
+            "content": "稻香村糕点、张一元茶叶、内联升布鞋都挺有特色。"
+        },
+        {
+            "role": "user",
+            "content": "对了，我的预算是每天 500 元。"
+        },
+        {
+            "role": "assistant",
+            "content": "我会把每天行程控制在预算内。"
+        }
+    ]
+}

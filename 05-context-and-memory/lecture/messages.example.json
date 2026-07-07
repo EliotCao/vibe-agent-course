@@ -1,0 +1,73 @@
+[
+  {
+    "role": "system",
+    "content": "你是天气助手。需要查实时数据时调用工具，回答用简体中文。"
+  },
+  {
+    "role": "user",
+    "content": "我想去户外跑步，北京和上海哪个更合适？"
+  },
+  {
+    "role": "assistant",
+    "content": null,
+    "tool_calls": [
+      {
+        "id": "call_001",
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "arguments": "{\"city\": \"北京\"}"
+        }
+      },
+      {
+        "id": "call_002",
+        "type": "function",
+        "function": {
+          "name": "get_weather",
+          "arguments": "{\"city\": \"上海\"}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_001",
+    "content": "北京 晴 18°C 空气优 PM2.5=35 风力 2级"
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_002",
+    "content": "上海 多云 22°C 空气良 PM2.5=58 风力 3级"
+  },
+  {
+    "role": "assistant",
+    "content": "两地对比：北京 18°C 晴空优，上海 22°C 多云良。跑步推荐北京——温度略凉但空气更干净，体感更舒适；如果你怕冷偏好暖和，上海也可以。需要我查一下未来 3 小时的降雨概率吗？"
+  },
+  {
+    "role": "user",
+    "content": "不用了，就北京吧。顺便提醒我 19:00 出门。"
+  },
+  {
+    "role": "assistant",
+    "content": null,
+    "tool_calls": [
+      {
+        "id": "call_003",
+        "type": "function",
+        "function": {
+          "name": "set_reminder",
+          "arguments": "{\"time\": \"19:00\", \"text\": \"出门跑步\"}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call_003",
+    "content": "已创建提醒：19:00 出门跑步"
+  },
+  {
+    "role": "assistant",
+    "content": "已设好，19:00 会提醒你出门跑步。祝跑得愉快！"
+  }
+]

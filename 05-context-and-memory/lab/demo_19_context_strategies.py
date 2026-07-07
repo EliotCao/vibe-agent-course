@@ -405,6 +405,9 @@ def main() -> None:
         f"④ HIERARCHICAL (Key Facts + summary + Last {keep_last} rounds)": strategy_hierarchical(history, keep_last=keep_last),
     }
 
+    import json
+    open("result.json", "w").write(json.dumps(strategies, indent=4, ensure_ascii=False))
+
     # 用 prettytable 打印对比表（无边框）
     table = PrettyTable()
     table.field_names = ["Strategy", "Item", "Character", "Allergy", "Budget"]

@@ -60,4 +60,4 @@ def list_dir(path: str = ".", show_hidden: bool = False, max_items: int = 200) -
 if __name__ == "__main__":
     print(list_dir("."))
     print()
-    print(list_dir("/nonexistent"))
+    # print(list_dir("/nonexistent"))

@@ -136,9 +136,11 @@ if __name__ == "__main__":
     ]
 
     print_file_content(filepath)
-    for index, replace_params in replace_list:
+    index = 1
+    for replace_params in replace_list:
         print(f"编辑实验 {index}: {replace_params.get('description', '')}")
         edit(filepath, replace_params.get("old_content"), replace_params.get("new_content"))
         print("查看调用编辑功能后的文件内容：\n")
         print_file_content(filepath)
+        index += 1
         print()
