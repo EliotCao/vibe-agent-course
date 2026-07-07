@@ -119,7 +119,23 @@ sequenceDiagram
                                             内部 loop：LLM ⇄ 工具
 ```
 
-下面一步一步来。
+下面一步一步来。组装不是一口气堆到位，而是沿着一条工程惯用的节奏推进：
+
+> **Make it run → Make it fast → Make it beautiful**
+> 先让它**能跑**，再让它**扛得住、更省**，最后让它**好看好用**。
+
+```mermaid
+flowchart LR
+    A["<b>Make it run</b><br/>能跑"]
+    B["<b>Make it fast</b><br/>扛得住、更省"]
+    C["<b>Make it beautiful</b><br/>好看好用"]
+    A --> B --> C
+    style A fill:#e3f2fd,stroke:#1976d2
+    style B fill:#fff3e0,stroke:#f57c00
+    style C fill:#f3e5f5,stroke:#7b1fa2
+```
+
+这是软件工程里一条很朴素的推进理念：**先解决"有没有"，再解决"稳不稳"，最后才追"好不好用"**。三个阶段层层叠加、互不推翻，我们组装 Agent 也按这个节奏来。下面从 Make it run 开始。
 
 ## 第 1 步：三件套，先跑通一次任务
 
@@ -241,7 +257,7 @@ def run_with_memory(agent, user_input: str) -> str:
 
 至此，一个「有记忆、不爆上下文、过程可见」的 Coding Agent 就组装完了。
 
-## 第 5 步（选做）：用 `rich` 让界面好看起来
+## 第 5 步：用 `rich` 让界面好看起来
 
 前面的 `print` 已经能用，但想让 REPL 观感接近 Cursor / Claude Code，可以用 [`rich`](https://github.com/Textualize/rich) 这个包——它能在终端渲染彩色文本、面板、表格、Markdown、语法高亮：
 
