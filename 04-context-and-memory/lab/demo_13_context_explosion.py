@@ -2,7 +2,7 @@
 Demo 18 · 上下文爆炸：跑一个 30 轮的任务，亲眼看着它失控
 ====================================================
 
-配套：第 18 节《上下文工程：为什么必须管，不管会怎样》
+配套：第 13 节《上下文工程：为什么必须管，不管会怎样》
 
 不做任何上下文管理，让你直观看到三件事同时发生：
   - messages 列表如何随轮次不断膨胀
@@ -14,9 +14,9 @@ Demo 18 · 上下文爆炸：跑一个 30 轮的任务，亲眼看着它失控
 连跑 30 轮，最后画一张 token 增长曲线。
 
 运行方式：
-    cd /workspace/05-context-and-memory/lab/
+    cd /workspace/04-context-and-memory/lab/
     source /workspace/.venv/bin/activate
-    python demo_18_context_explosion.py
+    python demo_13_context_explosion.py
 """
 
 from _env import get_model_id, make_client

@@ -1,10 +1,10 @@
-# demo_18_context_explosion.py 代码导读
+# demo_13_context_explosion.py 代码导读
 
-这份文档帮你**从零看懂这段[代码](../demo_18_context_explosion.py)**：先讲它要干什么，再梳理整体结构，配一张流程图，最后结合真实运行结果解读现象。
+这份文档帮你**从零看懂这段[代码](../demo_13_context_explosion.py)**：先讲它要干什么，再梳理整体结构，配一张流程图，最后结合真实运行结果解读现象。
 
 > [!NOTE]
 >
-> 配套讲稿：[第 18 节《上下文工程：为什么必须管，不管会怎样》](../../lecture/18-why-context-matters.md)
+> 配套讲稿：[第 13 节《上下文工程：为什么必须管，不管会怎样》](../../lecture/13-why-context-matters.md)
 
 ---
 
@@ -137,7 +137,7 @@ messages.append({"role": "user", "content": FOLLOW_UP})     # 下一轮的追问
 
 ## 六、真实运行结果解读
 
-截取 [输出](../output/demo_18_context_explosion.txt) 数据：
+截取 [输出](../output/demo_13_context_explosion.txt) 数据：
 
 | 轮次 | prompt_tokens | messages 字符数 |
 |---|---|---|
@@ -174,4 +174,4 @@ messages.append({"role": "user", "content": FOLLOW_UP})     # 下一轮的追问
 
 > [!TIP]
 >
-> 下一个 demo（`demo_19_context_strategies.py`）就会给出**截断 / 摘要 / 分层 / GSSC** 四种解法，把这条飙升曲线压下去。
+> 下一个 demo（`demo_14_context_strategies.py`）就会给出**截断 / 摘要 / 分层 / GSSC** 四种解法，把这条飙升曲线压下去。

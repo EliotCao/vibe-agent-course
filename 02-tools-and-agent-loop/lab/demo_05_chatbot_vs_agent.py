@@ -2,7 +2,7 @@
 Demo 06 · Chatbot vs Agent：同一道题，循环不循环差别有多大
 ========================================================
 
-配套：第 6 节《Agent vs Chatbot：为什么需要循环》
+配套：第 5 节《Agent vs Chatbot：为什么需要循环》
 
 效果：直观对比——
   ① 朴素 Chatbot：单轮回答一个"需要外部信息 + 计算"的题，必然翻车
@@ -12,7 +12,7 @@ Demo 06 · Chatbot vs Agent：同一道题，循环不循环差别有多大
 看清"Agent = LLM + Tools + Loop"这个等式具体是什么样子。
 
 跑法：
-    python demo_06_chatbot_vs_agent.py
+    python demo_05_chatbot_vs_agent.py
 """
 
 from __future__ import annotations

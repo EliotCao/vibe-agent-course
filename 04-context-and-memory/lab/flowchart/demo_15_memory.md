@@ -1,12 +1,12 @@
-# demo_20_memory.py 代码导读
+# demo_15_memory.py 代码导读
 
-这份文档帮你**从零看懂这段[代码](../demo_20_memory.py)**：什么是 Memory 系统、为什么它和 ContextManager 不是一回事、embedding 怎么把文本变成向量、余弦相似度怎么算，最后用两个真实演示告诉你——"给模型植入记忆"到底是怎么做到的。
+这份文档帮你**从零看懂这段[代码](../demo_15_memory.py)**：什么是 Memory 系统、为什么它和 ContextManager 不是一回事、embedding 怎么把文本变成向量、余弦相似度怎么算，最后用两个真实演示告诉你——"给模型植入记忆"到底是怎么做到的。
 
 > [!NOTE]
 >
-> 配套讲稿：[第 20 节《记忆系统：短期 / 长期 / 工作记忆》](../../lecture/20-memory-types.md)
+> 配套讲稿：[第 15 节《记忆系统：短期 / 长期 / 工作记忆》](../../lecture/15-memory-types.md)
 >
-> 前置 demo：[demo_19_context_strategies.py](../demo_19_context_strategies.py) — ContextManager 管的是"本次对话的 messages 列表"，Memory 管的是"跨会话的长期事实"，看完前一个再来看这个，分工立刻清晰。
+> 前置 demo：[demo_14_context_strategies.py](../demo_14_context_strategies.py) — ContextManager 管的是"本次对话的 messages 列表"，Memory 管的是"跨会话的长期事实"，看完前一个再来看这个，分工立刻清晰。
 
 
 
@@ -25,7 +25,7 @@
 | **embedding（嵌入）** | 把一段文本变成一个固定长度的 float 向量，语义相近的文本向量也相近 | `embed("我喜欢喝拿铁")` → 一个 768 维向量 |
 | **余弦相似度** | 衡量两个向量"指向多一致"，忽略长度差异，值 0~1 越大越相似 | `cosine(vec_a, vec_b)` → 0.305 表示不太像，0.900 表示很像 |
 | **Memory（长期记忆）** | 跨会话持久化的用户事实库，按语义可搜索 | `Memory` 类：`add` 写入、`search` 查询、`save/load` 持久化 |
-| **ContextManager（上下文管理）** | 管理"本次对话"的 messages 列表，demo_19 讲的截断/摘要/分层都属于这一层 | demo_19 的 `strategy_truncate` / `strategy_summary` |
+| **ContextManager（上下文管理）** | 管理"本次对话"的 messages 列表，demo_14 讲的截断/摘要/分层都属于这一层 | demo_14 的 `strategy_truncate` / `strategy_summary` |
 | **注入（injection）** | 把 Memory 召回的事实塞进 system prompt，让模型在生成时遵守这些约束 | demo_2：`system_prompt = "用户偏好：" + facts` |
 
 > [!NOTE]
@@ -305,7 +305,7 @@ def demo_basic_search():
 
 **验证的核心问题**：查询和记忆的**措辞完全不同**（如"饮食喜好" vs "喜欢喝拿铁"），但 embedding 能捕捉到语义关联，从而正确召回。
 
-运行结果（截取自[输出](../output/demo_20_memory.txt)）：
+运行结果（截取自[输出](../output/demo_15_memory.txt)）：
 
 ```
 查询: 用户的饮食喜好是什么
@@ -424,7 +424,7 @@ def demo_with_context_injection():
 
 ## Memory 与 ContextManager 的分工
 
-| | ContextManager（demo_19） | Memory（demo_20） |
+| | ContextManager（demo_14） | Memory（demo_15） |
 |---|---|---|
 | **管什么** | 本次对话的 messages 列表 | 跨会话的用户事实库 |
 | **生命周期** | 单次会话 | 跨会话持久化 |
@@ -440,7 +440,7 @@ def demo_with_context_injection():
 
 ## 这段代码体现出什么
 
-正是第 20 节要教你的三件事：
+正是第 15 节要教你的三件事：
 
 1. **embedding 让"语义搜索"成为可能** —— 不需要精确匹配关键词，"饮食喜好"能命中"喜欢喝拿铁"，"金钱约束"能命中"预算 500"
 2. **Memory 和 ContextManager 不是一回事** —— 前者管跨会话的事实库，后者管当前会话的 messages 列表
@@ -448,7 +448,7 @@ def demo_with_context_injection():
 
 > [!TIP]
 >
-> 跑完 demo_19（四种上下文管理策略）再跑 demo_20（Memory 系统），你会直观感受到整个架构是怎么搭起来的：
+> 跑完 demo_14（四种上下文管理策略）再跑 demo_15（Memory 系统），你会直观感受到整个架构是怎么搭起来的：
 >
 > ```mermaid
 > flowchart TD

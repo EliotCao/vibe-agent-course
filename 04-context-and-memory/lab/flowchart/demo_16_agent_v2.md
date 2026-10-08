@@ -1,12 +1,12 @@
-# demo_21_agent_v2.py 代码导读
+# demo_16_agent_v2.py 代码导读
 
-这份文档帮你**从零看懂这段[代码](../demo_21_agent_v2.py)**：它是如何把第 5 章前面学到的 ContextManager、Memory 两大组件，**组合进一个完整的 Agent Loop**，让它第一次拥有"跨会话记忆"能力。
+这份文档帮你**从零看懂这段[代码](../demo_16_agent_v2.py)**：它是如何把第 5 章前面学到的 ContextManager、Memory 两大组件，**组合进一个完整的 Agent Loop**，让它第一次拥有"跨会话记忆"能力。
 
 > [!NOTE]
 >
 > 前置 demo：
-> - [demo_19_context_strategies.py](../demo_19_context_strategies.py) — ContextManager 的来源，四种压缩策略
-> - [demo_20_memory.py](../demo_20_memory.py) — Memory 系统的来源，embedding + 余弦相似度检索
+> - [demo_14_context_strategies.py](../demo_14_context_strategies.py) — ContextManager 的来源，四种压缩策略
+> - [demo_15_memory.py](../demo_15_memory.py) — Memory 系统的来源，embedding + 余弦相似度检索
 
 
 
@@ -42,7 +42,7 @@
 整个文件分四块：
 
 ```text
-① ContextManager       把 demo_19 的分层压缩策略包成类，提供 should_compress / compress 方法
+① ContextManager       把 demo_14 的分层压缩策略包成类，提供 should_compress / compress 方法
 ② MemoryV2             增强版 Memory，在父类基础上增加精确匹配 + 语义相似度双重去重
 ③ distill_to_memory    用 LLM 从完整对话中提炼长期事实，写入 Memory（纯函数）
 ④ AgentV2              组合 ContextManager + MemoryV2 的增强 Agent，核心是 chat 方法
@@ -51,7 +51,7 @@
 
 > [!TIP]
 >
-> 前两块都是从 demo_19 / demo_20 **导入复用**，本文件只做了薄封装。AgentV2 才是"粘合层"——把前两章的成果接进 Agent Loop。
+> 前两块都是从 demo_14 / demo_15 **导入复用**，本文件只做了薄封装。AgentV2 才是"粘合层"——把前两章的成果接进 Agent Loop。
 
 
 
@@ -133,7 +133,7 @@ class ContextManager:
         self._max_messages = max_messages if max_messages > 0 else 20
 ```
 
-**这是 demo_19 的 `strategy_hierarchical` 的薄封装**。设计思路：
+**这是 demo_14 的 `strategy_hierarchical` 的薄封装**。设计思路：
 
 - `keep_last` 和 `max_messages` 都是**只读属性**（`@property`），防止外部随意篡改导致行为不一致
 - `should_compress(messages)` 只做一件事：比较 `len(messages) > self.max_messages`
@@ -479,7 +479,7 @@ def run_comparison() -> None:
 
 ## 真实运行结果解读
 
-截取自[输出](../output/demo_21_agent_v2.txt)：
+截取自[输出](../output/demo_16_agent_v2.txt)：
 
 ### Token 消耗一览
 
@@ -587,19 +587,19 @@ flowchart LR
 
 
 
-## 和 demo_18 / demo_19 / demo_20 的关系
+## 和 demo_13 / demo_14 / demo_15 的关系
 
 ```
-demo_18（不做管理）
+demo_13（不做管理）
   │ 暴露问题：context 爆炸
   ▼
-demo_19（四种策略）
+demo_14（四种策略）
   │ 给出方案：截断 / 摘要 / 分层
   ▼
-demo_20（Memory）
+demo_15（Memory）
   │ 新增能力：长期记忆 + 语义检索
   ▼
-demo_21（Agent v2） ← 你在这里
+demo_16（Agent v2） ← 你在这里
   │ 把前两个组件接入 Agent Loop，形成完整的"智能体记忆架构"
   │ 新增：MemoryV2 → 在 Memory 基础上增加双重去重能力（精确 + 语义）
   ▼
@@ -609,7 +609,7 @@ demo_21（Agent v2） ← 你在这里
 
 > [!NOTE]
 >
-> 💡 如果你刚学完前三节，建议按顺序跑一遍：demo_18（看爆炸）→ demo_19（学策略）→ demo_20（学记忆）→ demo_21（看它们如何组合成一个完整的 Agent）。每个 demo 单跑不到 2 分钟，串下来就能建立起"上下文工程"的完整认知。
+> 💡 如果你刚学完前三节，建议按顺序跑一遍：demo_13（看爆炸）→ demo_14（学策略）→ demo_15（学记忆）→ demo_16（看它们如何组合成一个完整的 Agent）。每个 demo 单跑不到 2 分钟，串下来就能建立起"上下文工程"的完整认知。
 
 
 

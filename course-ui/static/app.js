@@ -454,7 +454,7 @@ function rewriteExerciseLinks(scope) {
     const href = a.getAttribute('href') || '';
     const m = href.match(RE);
     if (!m) return;
-    const rest = m[1]; // 形如 "03-tools-and-agent-loop" 或 "03-tools-and-agent-loop/ex_2_1.py"
+    const rest = m[1]; // 形如 "02-tools-and-agent-loop" 或 "02-tools-and-agent-loop/ex_2_1.py"
     const parts = rest.split('/');
     const last = parts[parts.length - 1];
     const isFile = /\.[a-z0-9]+$/i.test(last);
@@ -1238,7 +1238,7 @@ function openInVscode() {
  *      "<root>//?folder=" 这种导致 code-server 404 或忽略参数的形态
  *   ③ window.open 用 noopener，避免新窗口拿到 opener 引用
  *
- * @param {string} relPath   仓库相对目录，如 "exercises/03-tools-and-agent-loop"
+ * @param {string} relPath   仓库相对目录，如 "exercises/02-tools-and-agent-loop"
  * @param {string=} hintFile 仅用于 toast 提示「在左侧文件树点 xxx 打开」，不进 URL
  */
 function openFolderInIDE(relPath, hintFile) {

@@ -45,27 +45,24 @@ bash course-ui/run.sh
 
 完成后你能做到：
 
-1. 用 VibeCoding 快速做出一个能跑的小项目，并推到 CNB 云原生环境运行
-2. 理解 LLM 的工作原理（next-token prediction、token、向量、幻觉）
-3. 用 Python 流式调用 LLM、设计 prompt、估算 token
-4. 实现工具注册系统 + Agent 主循环（Function Calling）
-5. 区分并实现 ReAct、Plan-and-Solve、Reflection 三种 Agent 范式
-6. 从零实现上下文管理与向量记忆系统
-7. 搭建完整的 Coding Agent（5 个核心工具）
-8. 整合所有模块，部署为 CNB 仓库 NPC
+1. 理解 LLM 的工作原理（next-token prediction、token、向量、幻觉）
+2. 用 Python 流式调用 LLM、设计 prompt、估算 token
+3. 实现工具注册系统 + Agent 主循环（Function Calling）
+4. 区分并实现 ReAct、Plan-and-Solve、Reflection 三种 Agent 范式
+5. 从零实现上下文管理与向量记忆系统
+6. 搭建完整的 Coding Agent（5 个核心工具）
+7. 整合所有模块，扩展 Skills，部署为 CNB 仓库 NPC
 
 ## 内容总览
 
 | 模块 | 主题 | 知识点 | 你的产出 |
 |------|------|--------|---------|
-| 01 | [VibeCoding 入门](./01-vibecoding-intro/) | VibeCoding 是什么 · 跟 AI 协作的节奏 · vibe 一个小游戏 · 推到 CNB · 云原生开发环境运行 | 一个你 vibe 出来、跑在 CNB 上的小游戏 |
-| 02 | [认识你的 AI](./02-meet-your-ai/) | Next-token prediction · Token 与向量 · Messages 协议（system/user/assistant） · 上下文窗口与成本 · 幻觉 | `my-agent/llm.py` — LLMClient 类 |
-| 03 | [Function Calling 与最小 Agent](./03-tools-and-agent-loop/) | Chatbot vs Agent · Function Calling 协议 · ToolRegistry（自动生成 JSON schema） · 最小 Agent Loop | `my-agent/tools.py` — ToolRegistry 类 |
-| 04 | [Agent 范式](./04-agent-patterns/) | ReAct（边想边做） · Plan-and-Solve（先规划再执行） · Reflection（起草→评审→修订） · 范式选型 | `my-agent/agent.py` — Agent 主循环 |
-| 05 | [上下文与记忆](./05-context-and-memory/) | 上下文爆炸问题 · 管理策略（keep_last + 摘要压缩） · 向量记忆（Embedding + 余弦相似度） · Agent v2 整合 | `my-agent/context.py` + `memory.py` |
-| 06 | [Coding Agent 工具集](./06-coding-agent-tools/) | 5 阶段工作流（理解→定位→修改→验证→汇报） · 工具设计哲学 · 5 个核心工具（read/write/edit/list_dir/bash） | `my-agent/coding_tools/` — 5 个工具 |
-| 07 | [整合：完整 Coding Agent](./07-coding-agent-integration/) | 模块协作架构 · REPL 交互界面 · 端到端调试 · 真实任务闭环 | `my-agent/main.py` — 零件拼装 |
-| 08 | [Skills 扩展 + NPC 上线 + 大作业](./08-skills-and-npc/) | Skills 系统（SKILL.md） · NPC 概念 · Docker 打包 · CNB Pipeline + NPC 部署 · 结课大作业 | 自定义 Skills + 仓库 NPC + 大作业 |
+| 01 | [认识你的 AI](./01-meet-your-ai/) | Next-token prediction · Token 与向量 · Messages 协议（system/user/assistant） · 上下文窗口与成本 · 幻觉 | `my-agent/llm.py` — LLMClient 类 |
+| 02 | [Function Calling 与最小 Agent](./02-tools-and-agent-loop/) | Chatbot vs Agent · Function Calling 协议 · ToolRegistry（自动生成 JSON schema） · 最小 Agent Loop | `my-agent/tools.py` — ToolRegistry 类 |
+| 03 | [Agent 范式](./03-agent-patterns/) | ReAct（边想边做） · Plan-and-Solve（先规划再执行） · Reflection（起草→评审→修订） · 范式选型 | `my-agent/agent.py` — Agent 主循环 |
+| 04 | [上下文与记忆](./04-context-and-memory/) | 上下文爆炸问题 · 管理策略（keep_last + 摘要压缩） · 向量记忆（Embedding + 余弦相似度） · Agent v2 整合 | `my-agent/context.py` + `memory.py` |
+| 05 | [Coding Agent 工具集](./05-coding-agent-tools/) | 5 阶段工作流（理解→定位→修改→验证→汇报） · 工具设计哲学 · 5 个核心工具（read/write/edit/list_dir/bash） | `my-agent/coding_tools/` — 5 个工具 |
+| 06 | [整合与部署：Coding Agent + Skills + NPC](./06-integration-and-deploy/) | 模块协作架构 · REPL 交互界面 · 端到端调试 · Skills 系统（SKILL.md） · NPC 概念 · Docker 打包 · CNB Pipeline + NPC 部署 · 结课大作业 | `my-agent/main.py` + 自定义 Skills + 仓库 NPC |
 
 ## 动手练习
 

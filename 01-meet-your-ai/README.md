@@ -23,7 +23,7 @@
 ## 运行 Demo
 
 ```bash
-cd 02-meet-your-ai/lab
+cd 01-meet-your-ai/lab
 python demo_00_chat.py           # 最简交互式对话
 python demo_01_next_token.py     # 看模型怎么"猜下一个词"
 python demo_02_roles.py          # system prompt 改变模型人格
@@ -50,4 +50,4 @@ python tests/test_llm.py
 
 ## 配套练习
 
-作业仓库的 `exercises/02-meet-your-ai/` — 4 道代码填空题（运行 `python exercises/02-meet-your-ai/ex_*.py` 看到 ✅ PASSED 即通过）。
+作业仓库的 `exercises/01-meet-your-ai/` — 4 道代码填空题（运行 `python exercises/01-meet-your-ai/ex_*.py` 看到 ✅ PASSED 即通过）。

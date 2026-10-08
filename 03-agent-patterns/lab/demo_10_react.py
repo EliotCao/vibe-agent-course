@@ -2,7 +2,7 @@
 Demo 12 · ReAct：Thought → Action → Observation
 ================================================
 
-配套：第 12 节《ReAct：Thought-Action-Observation 循环》
+配套：第 10 节《ReAct：Thought-Action-Observation 循环》
 
 ReAct 是 2022 年 Yao 等人提出的范式，**早于 OpenAI Function Calling**。
 它的核心：让模型在每一步**先输出一段思考（Thought），再输出一个行动（Action）**，
@@ -14,10 +14,10 @@ ReAct 是 2022 年 Yao 等人提出的范式，**早于 OpenAI Function Calling*
   - 用正则解析 Thought / Action
 
 跑完之后你会感觉到——为什么 2023 年 OpenAI Function Calling 出来后，
-所有人都迫不及待地切过去（demo_13 / demo_14 也都用 tool_calls 写）。
+所有人都迫不及待地切过去（demo_11 / demo_12 也都用 tool_calls 写）。
 
 跑法：
-    python demo_12_react.py
+    python demo_10_react.py
 """
 
 from __future__ import annotations

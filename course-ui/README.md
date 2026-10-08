@@ -1,6 +1,6 @@
 # Course UI · 课程学习中心
 
-把仓库中 `01 ~ 08` 节课的 Markdown 讲义渲染成更易读的网页，并支持
+把仓库中 `01 ~ 06` 节课的 Markdown 讲义渲染成更易读的网页，并支持
 **一键运行 Python Demo**、实时回流标准输出/标准错误，可在终端面板里
 向交互式 Demo 注入 stdin。
 
@@ -24,7 +24,7 @@ bash   course-ui/run.sh            # 启动脚本
 
 ## 功能
 
-- 📚 **讲义美化**：左侧自动列出 8 节课的所有 lecture markdown，使用
+- 📚 **讲义美化**：左侧自动列出 6 节课的所有 lecture markdown，使用
   marked + highlight.js 渲染，支持代码块高亮、表格、引用、相对图片。
 - 🐍 **Demo 一键运行**：每节课的 `lab/demo_*.py` 渲染为可运行卡片，
   ▶ 按钮通过 SSE 流式回传 stdout/stderr，按行实时显示。

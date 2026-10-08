@@ -2,7 +2,7 @@
 Demo 14 · Reflection：让 Agent 自己回头看一眼
 =============================================
 
-配套：第 14 节《Reflection：让 Agent 自我反思与修正》
+配套：第 12 节《Reflection：让 Agent 自我反思与修正》
 
 Reflection 是一个**包装层**：它不改变底层 Agent 怎么工作，
 只是在底层 Agent 给出答案后**多走一步**：
@@ -10,11 +10,11 @@ Reflection 是一个**包装层**：它不改变底层 Agent 怎么工作，
   ② 如果有问题 → 让原 Agent 拿着批注重新作答
   ③ 重复 N 次或直到评审员说"没问题"
 
-本 demo 把 Reflection 包在 demo_13 (Plan-and-Solve) 的外面。
-你可以替换成 demo_12 (ReAct) 或者 第2章 的最小 Agent，逻辑一样。
+本 demo 把 Reflection 包在 demo_11 (Plan-and-Solve) 的外面。
+你可以替换成 demo_10 (ReAct) 或者 第2章 的最小 Agent，逻辑一样。
 
 跑法：
-    python demo_14_reflection.py
+    python demo_12_reflection.py
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ import re
 
 from _env import chat as llm_chat
 from toy_agent_base import TASKS, make_llm
-from demo_13_plan_and_solve import run_plan_and_solve
+from demo_11_plan_and_solve import run_plan_and_solve
 
 client, MODEL = make_llm()
 
@@ -145,5 +145,5 @@ if __name__ == "__main__":
     print("  - 适用场景：质量优先 > 速度优先（写代码、写报告、做推理）")
     print()
     print("  注意：Reflection 是个'包装层'，可以套在任何 Agent 外面。")
-    print("        你也可以把它套在 demo_12 (ReAct) 上，或者 第2章 的最小 Agent 上。")
+    print("        你也可以把它套在 demo_10 (ReAct) 上，或者 第2章 的最小 Agent 上。")
     print("=" * 60)

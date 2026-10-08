@@ -2,17 +2,17 @@
 Demo 08 · ToolRegistry：从函数到 Schema 的自动化
 ================================================
 
-配套：第 8 节《ToolRegistry：让加工具像加函数一样简单》
+配套：第 7 节《ToolRegistry：让加工具像加函数一样简单》
 
 效果：直观展示——
   - 一个 80 行以内的 ToolRegistry，能做到：
     ① 装饰器注册：@registry.tool("xx") 一行搞定
     ② 自动从函数签名 + docstring 生成 OpenAI tool schema
     ③ 按工具名分发执行
-  - 与 demo_07 对比：手写 schema 那 30 行配置全部消失了
+  - 与 demo_06 对比：手写 schema 那 30 行配置全部消失了
 
 跑法：
-    python demo_08_tool_registry.py
+    python demo_07_tool_registry.py
 """
 
 from __future__ import annotations
@@ -218,10 +218,10 @@ if __name__ == "__main__":
     run_with_llm()
 
     print("\n\n" + "=" * 60)
-    print("🎯 跟 demo_07 对比一下")
+    print("🎯 跟 demo_06 对比一下")
     print("=" * 60)
-    print("  demo_07：每加一个工具都要手写 30 行 schema JSON")
-    print("  demo_08：写个普通函数 + 装饰器一行，schema 自己长出来")
+    print("  demo_06：每加一个工具都要手写 30 行 schema JSON")
+    print("  demo_07：写个普通函数 + 装饰器一行，schema 自己长出来")
     print()
     print("  这就是为什么需要 ToolRegistry —— 让加工具像加函数一样简单。")
     print("=" * 60)

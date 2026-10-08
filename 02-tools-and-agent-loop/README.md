@@ -14,20 +14,20 @@
 
 | 节 | 内容 | 讲义 | Demo |
 |----|------|------|------|
-| 6 | Agent vs Chatbot | [06-agent-vs-chatbot.md](./lecture/06-agent-vs-chatbot.md) | `demo_06_chatbot_vs_agent.py` |
-| 7 | Function Calling 协议 | [07-function-calling.md](./lecture/07-function-calling.md) | `demo_07_function_calling_protocol.py` |
-| 8 | ToolRegistry | [08-tool-registry.md](./lecture/08-tool-registry.md) | `demo_08_tool_registry.py` |
-| 9 | 最小 Agent Loop | [09-agent-loop.md](./lecture/09-agent-loop.md) | `demo_09_mini_agent.py` |
-| 10 | Tool Calling 扩展面（MCP / Skill / RAG 预告） | [10-tool-calling-extensions.md](./lecture/10-tool-calling-extensions.md) | — |
+| 5 | Agent vs Chatbot | [05-agent-vs-chatbot.md](./lecture/05-agent-vs-chatbot.md) | `demo_05_chatbot_vs_agent.py` |
+| 6 | Function Calling 协议 | [06-function-calling.md](./lecture/06-function-calling.md) | `demo_06_function_calling_protocol.py` |
+| 7 | ToolRegistry | [07-tool-registry.md](./lecture/07-tool-registry.md) | `demo_07_tool_registry.py` |
+| 8 | 最小 Agent Loop | [08-agent-loop.md](./lecture/08-agent-loop.md) | `demo_08_mini_agent.py` |
+| 9 | Tool Calling 扩展面（MCP / Skill / RAG 预告） | [09-tool-calling-extensions.md](./lecture/09-tool-calling-extensions.md) | — |
 
 ## 运行 Demo
 
 ```bash
-cd 03-tools-and-agent-loop/lab
-python demo_06_chatbot_vs_agent.py
-python demo_07_function_calling_protocol.py
-python demo_08_tool_registry.py
-python demo_09_mini_agent.py
+cd 02-tools-and-agent-loop/lab
+python demo_05_chatbot_vs_agent.py
+python demo_06_function_calling_protocol.py
+python demo_07_tool_registry.py
+python demo_08_mini_agent.py
 ```
 
 ## 作业指引
@@ -49,4 +49,4 @@ python tests/test_tools.py
 
 ## 配套练习
 
-作业仓库的 `exercises/03-tools-and-agent-loop/` — 3 道代码填空题（运行 `python exercises/03-tools-and-agent-loop/ex_*.py` 看到 ✅ PASSED 即通过）。
+作业仓库的 `exercises/02-tools-and-agent-loop/` — 3 道代码填空题（运行 `python exercises/02-tools-and-agent-loop/ex_*.py` 看到 ✅ PASSED 即通过）。

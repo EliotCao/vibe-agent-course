@@ -1,4 +1,4 @@
-# 第 18 节 · 上下文工程：为什么必须管，不管会怎样
+# 第 13 节 · 上下文工程：为什么必须管，不管会怎样
 
 **上下文管理是 Agent 工程的核心命题。** 第2章 demo 里"每轮全量传 messages"看似没什么问题，但在 30 轮以上的真实任务中**必然撞窗口 + 烧光预算**——本章就来解决这件事。
 
@@ -8,7 +8,7 @@
 
 ![上下文管道越拼越长 直到爆窗](./images/18-context-overflow.png)
 
-跑一下 [`demo_18_context_explosion.py`](../lab/demo_18_context_explosion.py)，让 Agent 反复执行"总结之前的讨论 + 再补充 3 条建议"。输出如下：
+跑一下 [`demo_13_context_explosion.py`](../lab/demo_13_context_explosion.py)，让 Agent 反复执行"总结之前的讨论 + 再补充 3 条建议"。输出如下：
 
 ```text
 [第  1 轮] prompt=  256 tokens · total=  680 tokens
@@ -92,8 +92,8 @@
 在云原生开发环境中执行：
 
 ```bash
-cd 05-context-and-memory/lab/demos
-python demo_18_context_explosion.py
+cd 04-context-and-memory/lab/demos
+python demo_13_context_explosion.py
 ```
 
 注意观察三件事：
@@ -132,7 +132,7 @@ python demo_18_context_explosion.py
 - 设定一个合理的 token 阈值（参考本节实验数据：20 轮 ≈ 23k token）
 - 阈值可以不是死的——考虑留出安全余量，别等窗口满了再反应
 
-🧪 [练习 4.3 · 上下文管理决策器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise/-/blob/main/exercises/05-context-and-memory/ex_4_3.py)
+🧪 [练习 4.3 · 上下文管理决策器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise/-/blob/main/exercises/04-context-and-memory/ex_4_3.py)
 
 
 

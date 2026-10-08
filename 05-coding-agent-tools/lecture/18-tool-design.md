@@ -1,4 +1,4 @@
-# 第 25 节 · 工具的设计哲学：4 个关键选择
+# 第 18 节 · 工具的设计哲学：4 个关键选择
 
 **工具设计不是"实现功能就完事了"，而是"帮 LLM 不犯错"。** 本节聚焦 4 个最关键的设计选择——每一个都来自真实开发中 LLM 反复翻车的场景。
 
@@ -170,7 +170,7 @@ sequenceDiagram
     Note over LLM: 看到错误 → 自己分析 → 修正重试
 ```
 
-**让模型自己看到错误，自己决定下一步。**这正是第 2 章第 8 节讲过的"工具异常兜底"原则——本课程所有工具一律遵守。
+**让模型自己看到错误，自己决定下一步。**这正是第 2 章第 7 节讲过的"工具异常兜底"原则——本课程所有工具一律遵守。
 
 
 
@@ -206,7 +206,7 @@ sequenceDiagram
 在云原生开发环境中，运行演示脚本：
 
 ```bash
-python demo_25_design_philosophy.py
+python demo_18_design_philosophy.py
 ```
 
 脚本包含 3 个对比演示：edit 唯一性约束、行号偏移问题、bash 危险命令拦截。
@@ -228,8 +228,8 @@ python demo_25_design_philosophy.py
 
 > 本节讲的"写类工具严防死守"和"bash 四道闸门"，正好对应下面两道——前者把 `write` 的"默认拒绝覆盖"落到代码上，后者把超时+黑名单的安全闸门亲手装一遍：
 >
-> 🧪 [练习 5.2 · write_file 工具](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/06-coding-agent-tools/ex_5_2.py)
-> 🧪 [练习 5.3 · bash 工具（带安全闸门）](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/06-coding-agent-tools/ex_5_3.py)
+> 🧪 [练习 5.2 · write_file 工具](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/05-coding-agent-tools/ex_5_2.py)
+> 🧪 [练习 5.3 · bash 工具（带安全闸门）](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/05-coding-agent-tools/ex_5_3.py)
 
 ---
 

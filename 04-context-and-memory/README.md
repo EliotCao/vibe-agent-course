@@ -1,8 +1,8 @@
 <p align="center">
-    <img src="../assets/banner-05-context-memory.svg" alt="Context & Memory">
+    <img src="../assets/banner-04-context-memory.svg" alt="Context & Memory">
 </p>
 
-# 第 5 章 · 上下文与记忆
+# 第 4 章 · 上下文与记忆
 
 本章目标：解决 Agent 的两个关键问题 —— 对话过长导致上下文爆炸（token 超限）、会话结束后遗忘用户偏好（无长期记忆）。
 产出：`my-agent/context.py`（上下文管理器）和 `my-agent/memory.py`（向量记忆系统）。
@@ -22,10 +22,10 @@
 
 | 节 | 内容 | 讲义 | Demo |
 |----|------|------|------|
-| 18 | 为什么要管上下文 | [18-why-context-matters.md](./lecture/18-why-context-matters.md) | `demo_18_context_explosion.py` |
-| 19 | 上下文管理策略 | [19-context-strategies.md](./lecture/19-context-strategies.md) | `demo_19_context_strategies.py` |
-| 20 | Memory 系统 | [20-memory-types.md](./lecture/20-memory-types.md) | `demo_20_memory.py` |
-| 21 | Agent v2（整合） | — | `demo_21_agent_v2.py` |
+| 13 | 为什么要管上下文 | [13-why-context-matters.md](./lecture/13-why-context-matters.md) | `demo_13_context_explosion.py` |
+| 14 | 上下文管理策略 | [14-context-strategies.md](./lecture/14-context-strategies.md) | `demo_14_context_strategies.py` |
+| 15 | Memory 系统 | [15-memory-types.md](./lecture/15-memory-types.md) | `demo_15_memory.py` |
+| 16 | Agent v2（整合） | — | `demo_16_agent_v2.py` |
 
 
 
@@ -34,11 +34,11 @@
 在云原生开发环境中执行：
 
 ```bash
-cd 05-context-and-memory/lab
-python demo_18_context_explosion.py
-python demo_19_context_strategies.py
-python demo_20_memory.py
-python demo_21_agent_v2.py
+cd 04-context-and-memory/lab
+python demo_13_context_explosion.py
+python demo_14_context_strategies.py
+python demo_15_memory.py
+python demo_16_agent_v2.py
 ```
 
 
@@ -74,4 +74,4 @@ python tests/test_memory.py
 
 ## 配套练习
 
-作业仓库的 `exercises/05-context-and-memory/` — 3 道代码填空题（运行 `python exercises/05-context-and-memory/ex_*.py` 看到 ✅ PASSED 即通过）。
+作业仓库的 `exercises/04-context-and-memory/` — 3 道代码填空题（运行 `python exercises/04-context-and-memory/ex_*.py` 看到 ✅ PASSED 即通过）。

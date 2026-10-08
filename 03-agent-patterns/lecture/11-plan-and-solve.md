@@ -1,4 +1,4 @@
-# 第 13 节 · Plan-and-Solve：先规划再执行
+# 第 11 节 · Plan-and-Solve：先规划再执行
 
 ## 一句话回答
 
@@ -124,7 +124,7 @@ Planner 拆任务
 ## 动手试试
 
 ```bash
-python demo_13_plan_and_solve.py
+python demo_11_plan_and_solve.py
 ```
 
 跑 5 个测试任务，观察：
@@ -147,7 +147,7 @@ python demo_13_plan_and_solve.py
 
 > Planner 写得好不好，看它能不能**稳定输出 JSON 数组**。这道题让你把"复杂问题 → 有序步骤列表"这一环节落到代码上：
 >
-> 🧪 [练习 3.2 · Plan-and-Solve 的 Planner](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/04-agent-patterns/ex_3_2.py)
+> 🧪 [练习 3.2 · Plan-and-Solve 的 Planner](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/03-agent-patterns/ex_3_2.py)
 
 ---
 

@@ -1,4 +1,4 @@
-# 第 14 节 · Reflection：让 Agent 自我反思与修正
+# 第 12 节 · Reflection：让 Agent 自我反思与修正
 
 ## 一句话回答
 
@@ -52,8 +52,8 @@ def run_with_reflection(question, max_rounds=2):
 
 **底层 Agent 可以是：**
 - 第2章的最小 Agent Loop
-- demo_12 的 ReAct
-- demo_13 的 Plan-and-Solve
+- demo_10 的 ReAct
+- demo_11 的 Plan-and-Solve
 - 甚至一个纯 chatbot（不调工具）
 
 > 这就是为什么把 Reflection 单独作为一节讲——它是**正交**于"怎么干活"的。
@@ -142,13 +142,13 @@ def solve(task):
 ## 动手试试
 
 ```bash
-python demo_14_reflection.py
+python demo_12_reflection.py
 ```
 
 注意几个观察点：
 1. 第一次 review 通常给 NEEDS_REVISION 还是 PASS？
 2. Refine 后的答案跟初稿比，主要改了什么？
-3. **token 消耗**：跟 demo_12 / demo_13 比，跑同一道题贵了多少？
+3. **token 消耗**：跟 demo_10 / demo_11 比，跑同一道题贵了多少？
 
 ## 小结
 
@@ -165,11 +165,11 @@ python demo_14_reflection.py
 
 > 把"起草 → 评审 → 修订"的闭环亲手敲一遍——尤其要踩一次"评审员对自己太宽容"的坑，再用"假装挑刺"的 trick 把它压回去：
 >
-> 🧪 [练习 3.3 · Reflection 评审循环](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/04-agent-patterns/ex_3_3.py)
+> 🧪 [练习 3.3 · Reflection 评审循环](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/03-agent-patterns/ex_3_3.py)
 
 ---
 
 理论部分到此结束。下面 lab：
-- Part 1（50min）：把 demo_12 的 ReAct 从参考实现填空补完
-- Part 2（50min）：把 demo_13 的 Plan-and-Solve 填空补完
+- Part 1（50min）：把 demo_10 的 ReAct 从参考实现填空补完
+- Part 2（50min）：把 demo_11 的 Plan-and-Solve 填空补完
 - Part 3（30min）：套上 Reflection 跑横向对比 + 写 comparison.md

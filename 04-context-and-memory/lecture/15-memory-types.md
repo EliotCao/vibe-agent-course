@@ -1,4 +1,4 @@
-# 第 20 节 · 记忆系统：短期 / 长期 / 工作记忆
+# 第 15 节 · 记忆系统：短期 / 长期 / 工作记忆
 
 **ContextManager 是"本次对话怎么压缩"，Memory 是"跨会话怎么记住事实并按需召回"。** 二者协作让 Agent 像人一样"既不爆窗也不忘事"。
 
@@ -288,7 +288,7 @@ class Memory:
 | `scored = [(cosine(q, v), t) for ...]` | 步骤 3：逐条算相似度 |
 | `scored.sort(reverse=True)` + `[:k]` | 步骤 3：排序 + 取 top-k |
 
-**就这么简单。** `demo_20_memory.py` 完整版在这基础上加了持久化、元数据和阈值过滤，核心还是这十行。
+**就这么简单。** `demo_15_memory.py` 完整版在这基础上加了持久化、元数据和阈值过滤，核心还是这十行。
 
 
 
@@ -427,7 +427,7 @@ flowchart TD
 在云原生开发环境中运行配套演示脚本，直观感受 Memory 的召回效果：
 
 ```bash
-python demo_20_memory.py
+python demo_15_memory.py
 ```
 
 脚本依次跑两个演示：
@@ -457,7 +457,7 @@ python demo_20_memory.py
 
 把"向量记忆"的最小实现亲手写一遍——补全 `add()`（编码文本→存入向量）和 `search()`（余弦相似度 → top-k 召回）。**第 5 章的核心代码就这十几行，值得亲手敲**：
 
-🧪 [练习 4.2 · 向量记忆存取](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/05-context-and-memory/ex_4_2.py)
+🧪 [练习 4.2 · 向量记忆存取](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/04-context-and-memory/ex_4_2.py)
 
 ---
 

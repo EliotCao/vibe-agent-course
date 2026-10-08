@@ -1,4 +1,4 @@
-# 第 9 节 · 最小 Agent Loop 的 5 个核心点
+# 第 8 节 · 最小 Agent Loop 的 5 个核心点
 
 ## 一句话回答
 
@@ -136,9 +136,9 @@ return "⚠️ 达到最大轮次"
 
 第 1 / 2 个本章必须有，第 3 个第3章 / 第6章再加。
 
-## 跟 demo_06 的"hand-rolled 版"对比
+## 跟 demo_05 的"hand-rolled 版"对比
 
-第1章末尾的那种"让模型输出 JSON 再 parse"的写法（demo_06 也演示了），跟本章的 `tool_calls` 写法对比：
+第1章末尾的那种"让模型输出 JSON 再 parse"的写法（demo_05 也演示了），跟本章的 `tool_calls` 写法对比：
 
 | 维度 | hand-rolled JSON | OpenAI tool_calls |
 |---|---|---|
@@ -168,10 +168,10 @@ return "⚠️ 达到最大轮次"
 
 ## 动手试试
 
-运行 `demo_09_mini_agent.py`：
+运行 `demo_08_mini_agent.py`：
 
 ```bash
-python demo_09_mini_agent.py
+python demo_08_mini_agent.py
 ```
 
 它会跑 4 个测试任务：
@@ -196,8 +196,8 @@ python demo_09_mini_agent.py
 
 > Agent Loop 的 5 步全靠一个 `while` 串起来。这道题让你把循环骨架敲出来：有 `tool_calls` 就跑工具、回传结果；没有就退出。**循环终止条件别写错**：
 >
-> 🧪 [练习 2.3 · 最小 Agent Loop](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/03-tools-and-agent-loop/ex_2_3.py)
+> 🧪 [练习 2.3 · 最小 Agent Loop](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-tools-and-agent-loop/ex_2_3.py)
 
 ---
 
-理论部分还差一节鸟瞰图：[第 10 节《Tool Calling 扩展面》](./10-tool-calling-extensions.md) 把 MCP / Skill / RAG 在循环里的位置交代清楚。看完之后再**进 lab**：part1 自己实现一个 ToolRegistry，part2 把循环搭起来 + 接 3 个工具。
+理论部分还差一节鸟瞰图：[第 9 节《Tool Calling 扩展面》](./09-tool-calling-extensions.md) 把 MCP / Skill / RAG 在循环里的位置交代清楚。看完之后再**进 lab**：part1 自己实现一个 ToolRegistry，part2 把循环搭起来 + 接 3 个工具。

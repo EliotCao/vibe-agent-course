@@ -1,4 +1,4 @@
-# 第 10 节 · Tool Calling 的三个扩展面：MCP / Skill / RAG
+# 第 9 节 · Tool Calling 的三个扩展面：MCP / Skill / RAG
 
 ## 一句话回答
 
@@ -25,7 +25,7 @@ MCP ：Agent 进程  ←→  MCP Server（独立进程/远程服务，暴露工�
                   ←→  MCP Server （另一个，暴露另一组工具）
 ```
 
-为什么这件事重要？回想第 8 节我们手写的 `ToolRegistry`——所有工具都得**写死**在你 Agent 仓库里。如果想接 GitHub、Slack、Notion 三个外部系统，你要：
+为什么这件事重要？回想第 7 节我们手写的 `ToolRegistry`——所有工具都得**写死**在你 Agent 仓库里。如果想接 GitHub、Slack、Notion 三个外部系统，你要：
 
 - 自己读三家 API 文档；
 - 自己写三套 schema；
@@ -79,7 +79,7 @@ def search_kb(query: str, top_k: int = 5) -> str:
 
 ## 工具的四种来源 · 协议一致
 
-回到第 9 节的最小循环，再把今天的三条延长线（再加上你已经学过的"本地 @tool"）贴上去——**LLM 视角里它们长得一模一样**：
+回到第 8 节的最小循环，再把今天的三条延长线（再加上你已经学过的"本地 @tool"）贴上去——**LLM 视角里它们长得一模一样**：
 
 ![工具的四种来源·协议一致：Local / Skill / MCP / RAG 都汇入同一个 messages.append(role=tool)](./images/10-tool-calling-extensions.png)
 
@@ -87,16 +87,16 @@ def search_kb(query: str, top_k: int = 5) -> str:
 
 - **四种来源、一份协议**——Local @tool / Skill / MCP / RAG，最终都变成 `messages` 里一条 `role=tool` 的记录回喂给 LLM。LLM 不知道、也不关心工具实际来自哪儿。
 - **Skill 站位略特殊**——它本身不是单个工具，而是"工具 + prompt + 资源"的打包容器：在 system prompt 阶段被注入说明，激活后内部的工具同样走标准 `tool_calls` 流程。所以图里把它和另外三种并排画，意思是"它也是工具的一种**来源**"，而不是"它本身就是一个工具"。
-- **核心循环 5 步没动一根毛**——第 9 节的 30 行循环骨架，足够托起 MCP / Skill / RAG 这三条延长线。这就是为什么"Tool Calling 协议是行业拐点"。
+- **核心循环 5 步没动一根毛**——第 8 节的 30 行循环骨架，足够托起 MCP / Skill / RAG 这三条延长线。这就是为什么"Tool Calling 协议是行业拐点"。
 
 ## 接下来去哪
 
 | 这条延长线 | 在哪一章亲手做 |
 |---|---|
-| Skill 打包与挂载 | 第 8 章《Skills 扩展 + NPC》33-skills.md |
-| RAG / 向量记忆 | 第 5 章《上下文与记忆》20-memory-types.md |
-| MCP（仅概念，不亲手实现 Server） | 第 8 章 NPC 部署时再提及 |
-| 真实 Coding Agent 的工具集 | 第 6 章《Coding Agent 工具集》—— 5 个核心工具 read/write/edit/list_dir/bash |
+| Skill 打包与挂载 | 第 6 章《整合与部署：Skills + NPC》21-skills.md |
+| RAG / 向量记忆 | 第 4 章《上下文与记忆》15-memory-types.md |
+| MCP（仅概念，不亲手实现 Server） | 第 6 章 NPC 部署时再提及 |
+| 真实 Coding Agent 的工具集 | 第 5 章《Coding Agent 工具集》—— 5 个核心工具 read/write/edit/list_dir/bash |
 
 ## 小结
 
@@ -113,7 +113,7 @@ def search_kb(query: str, top_k: int = 5) -> str:
 
 > 第 3 章理论到此结束。回头把三道练习从头串一遍——**协议 → 注册表 → 循环**——你就拥有一个能跑起来的最小 Agent：
 >
-> 🧪 [第 3 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/03-tools-and-agent-loop)
+> 🧪 [第 3 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/02-tools-and-agent-loop)
 > - 练习 2.1 · 手搓 Function Calling 消息流
 > - 练习 2.2 · ToolRegistry 注册与调用
 > - 练习 2.3 · 最小 Agent Loop

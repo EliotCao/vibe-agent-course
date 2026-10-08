@@ -8,7 +8,7 @@
 
 ## 1. `06-chatbot-vs-agent-swimlane.png`
 
-**用途**：第 6 节《Agent vs Chatbot》的时序泳道图，用画面表达 Chatbot（4 步直线）vs Agent（循环里反复调工具）的差异。
+**用途**：第 5 节《Agent vs Chatbot》的时序泳道图，用画面表达 Chatbot（4 步直线）vs Agent（循环里反复调工具）的差异。
 
 **画布建议**：横向 16:9，1920×1080 或更高。
 
@@ -74,7 +74,7 @@ Warm palette: kraft-paper beige background, orange-red lobster, mustard yellow s
 
 ## 2. `10-tool-calling-extensions.png`
 
-**用途**：第 10 节《Tool Calling 的三个扩展面》——把 MCP / Skill / RAG 三种工具来源贴到第 9 节的最小循环上。
+**用途**：第 9 节《Tool Calling 的三个扩展面》——把 MCP / Skill / RAG 三种工具来源贴到第 8 节的最小循环上。
 
 **画布建议**：横向 16:9，1920×1080。
 

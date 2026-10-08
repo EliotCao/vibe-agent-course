@@ -5,9 +5,9 @@
 ## 前提
 
 已经在前 3 节看过 3 个 demo：
-- `demo_12_react.py` —— ReAct（prompt + 正则）
-- `demo_13_plan_and_solve.py` —— Plan-and-Solve（Planner + Executor + Aggregator）
-- `demo_14_reflection.py` —— Reflection（包装在 Plan-and-Solve 外面）
+- `demo_10_react.py` —— ReAct（prompt + 正则）
+- `demo_11_plan_and_solve.py` —— Plan-and-Solve（Planner + Executor + Aggregator）
+- `demo_12_reflection.py` —— Reflection（包装在 Plan-and-Solve 外面）
 
 并且**复用第2章的 ToolRegistry**（已经在 `toy_agent_base.py` 内置了一份）。
 
@@ -36,11 +36,11 @@
 ## 阶段 A · 看骨架（5min）
 
 ```bash
-cd 04-agent-patterns/lab
+cd 03-agent-patterns/lab
 ls -la
 ```
 
-你会看到 3 个范式实现，在 `lab/` 里的 4 个完整版（demo_12/13/14 + toy_agent_base）。
+你会看到 3 个范式实现，在 `lab/` 里的 4 个完整版（demo_10/13/14 + toy_agent_base）。
 
 **核心约定**：所有范式都从 `toy_agent_base` 里 import 同一套工具集和同一组 5 个任务，让横向对比是 apple-to-apple。
 
@@ -58,7 +58,7 @@ ls -la
 
 ## 阶段 B · Part 1：ReAct 填空（50min）<a id="part1"></a>
 
-打开 `demo_12_react.py`，里面三个 TODO：
+打开 `demo_10_react.py`，里面三个 TODO：
 
 | TODO | 难度 | 提示 |
 |---|---|---|
@@ -68,7 +68,7 @@ ls -la
 
 ### 动手 vibe（30min）
 
-让你先**不要看 demo_12**，直接给 AI 这个 prompt：
+让你先**不要看 demo_10**，直接给 AI 这个 prompt：
 
 ```
 帮我写一个 ReAct 风格的 prompt 模板和解析函数：
@@ -90,7 +90,7 @@ ls -la
 
 ### 参考演示（10min）
 
-参考实现 [`demo_12_react.py`](./demo_12_react.py) 的 `parse_react_output` 和 `parse_action`，重点对比：
+参考实现 [`demo_10_react.py`](./demo_10_react.py) 的 `parse_react_output` 和 `parse_action`，重点对比：
 - 你的 Thought 正则有没有处理 `Action:` 之后还有内容的情况
 - 你的 Action 有没有截断（用 `(?=...)` 前瞻）
 - `Finish[...]` 里的 `]` 转义了吗？
@@ -106,7 +106,7 @@ ls -la
 
 ## 阶段 C · Part 2：Plan-and-Solve 填空（50min）<a id="part2"></a>
 
-打开 `demo_13_plan_and_solve.py`，4 个 TODO：
+打开 `demo_11_plan_and_solve.py`，4 个 TODO：
 
 | TODO | 难度 | 提示 |
 |---|---|---|
@@ -121,7 +121,7 @@ ls -la
 
 `execute_step()` 内部就是第2章你写的 `mini_agent.py` 的核心循环。把第2章那部分代码**搬过来**，加一个 system prompt 说"你正在执行子任务"，user prompt 把"前序结果 + 本步任务"拼上即可。
 
-如果第2章的代码丢了，参考 [`demo_13_plan_and_solve.py`](./demo_13_plan_and_solve.py) 的 `execute_step` 函数（30 行内）。
+如果第2章的代码丢了，参考 [`demo_11_plan_and_solve.py`](./demo_11_plan_and_solve.py) 的 `execute_step` 函数（30 行内）。
 
 ### 跑通 5 个任务后观察
 
@@ -151,7 +151,7 @@ ls -la
 
 ### Reflection 填空
 
-打开 `demo_14_reflection.py`：
+打开 `demo_12_reflection.py`：
 | TODO | 提示 |
 |---|---|
 | ① `REVIEW_PROMPT` | 检查清单 + VERDICT/ISSUES 结构化输出 |
@@ -225,9 +225,9 @@ ls -la
 
 | 情况 | 投屏什么 |
 |---|---|
-| ReAct 解析卡住 | `demo_12_react.py` 的 `parse_react_output` |
-| Plan 输出 JSON 失败 | `demo_13_plan_and_solve.py` 的 `make_plan` 容错 |
-| Reflection 评审员从不挑刺 | `demo_14_reflection.py` 的 `REVIEW_PROMPT` 检查清单 |
+| ReAct 解析卡住 | `demo_10_react.py` 的 `parse_react_output` |
+| Plan 输出 JSON 失败 | `demo_11_plan_and_solve.py` 的 `make_plan` 容错 |
+| Reflection 评审员从不挑刺 | `demo_12_reflection.py` 的 `REVIEW_PROMPT` 检查清单 |
 | 想看工程级 ReAct | [`examples/01-hello-react/agent.py`](../../examples/01-hello-react/agent.py) 的 truncate 逻辑 |
 | 想看 hello-agents 框架对照 | [`examples/03-hello-agents/main.py`](../../examples/03-hello-agents/main.py) |
 

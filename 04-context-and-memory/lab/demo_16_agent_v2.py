@@ -16,14 +16,14 @@ Demo 21 · Agent v2：将最小 Agent Loop 接入 ContextManager + Memory
   - 关键事实（早期透露的过敏 / 预算）在 Memory 加持下是否被保住
 
 运行方式：
-    cd /workspace/05-context-and-memory/lab/
+    cd /workspace/04-context-and-memory/lab/
     source /workspace/.venv/bin/activate
-    python demo_21_agent_v2.py
+    python demo_16_agent_v2.py
 """
 
 from _env import get_model_id, chat
-from demo_19_context_strategies import strategy_hierarchical
-from demo_20_memory import (
+from demo_14_context_strategies import strategy_hierarchical
+from demo_15_memory import (
     Memory,
     MemoryEntry,
     embed,
@@ -32,7 +32,7 @@ from demo_20_memory import (
 
 
 # ============================================================
-# ContextManager：把 demo_19 的策略包成一个类
+# ContextManager：把 demo_14 的策略包成一个类
 # ============================================================
 class ContextManager:
     """对话上下文管理器，负责控制上下文窗口大小并执行分层压缩策略。

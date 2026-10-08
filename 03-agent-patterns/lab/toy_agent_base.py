@@ -15,7 +15,7 @@ from _env import get_model_id, make_client
 
 
 # ============================================================
-# 极简 ToolRegistry（来自 第2章 demo_08）
+# 极简 ToolRegistry（来自 第2章 demo_07）
 # ============================================================
 _TYPE_MAP = {str: "string", int: "integer", float: "number", bool: "boolean"}
 

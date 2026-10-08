@@ -2,7 +2,7 @@
 Demo 07 · Function Calling 协议：手工拼出完整消息流
 ==================================================
 
-配套：第 7 节《Function Calling 协议：Tool Schema 与消息流》
+配套：第 6 节《Function Calling 协议：Tool Schema 与消息流》
 
 效果：直观展示——
   - 一个完整的 function calling 调用，到底有几条消息
@@ -11,12 +11,12 @@ Demo 07 · Function Calling 协议：手工拼出完整消息流
   - tool 消息凭什么对应到上一条 tool_call（靠 tool_call_id）
 
 我们故意**不调用任何 Agent 封装**，全部手写 messages 列表，
-但循环骨架已经按 demo_09《最小 Agent Loop》的标准模板来写
+但循环骨架已经按 demo_08《最小 Agent Loop》的标准模板来写
 （`for turn in range(max_iters)`、消息回填字段顺序完全一致），
-方便你之后切到第 9 节时一眼就能看出"啊，那个 loop 我已经见过了"。
+方便你之后切到第 8 节时一眼就能看出"啊，那个 loop 我已经见过了"。
 
 跑法：
-    python demo_07_function_calling_protocol.py
+    python demo_06_function_calling_protocol.py
 """
 
 from __future__ import annotations
@@ -65,15 +65,15 @@ def get_weather(city: str) -> str:
 # ============================================================
 # Step 3：一次完整调用，把每条消息打印出来看全貌
 #
-# 循环结构与 demo_09 的 run_agent 严格对齐：
+# 循环结构与 demo_08 的 run_agent 严格对齐：
 #   ① 调 LLM（带 tools 参数）
 #   ② 看返回里有没有 tool_calls
 #   ③ 没有 → 把最终 assistant 消息回填后 break（结束）
 #   ④ 有   → 把 assistant 消息（含 tool_calls）和 tool 结果都回填到 messages
 #   ⑤ 回到 ①，直到不再要工具 / 达到 max_iters
 #
-# 与 demo_09 唯一的差异：本 demo 在每一步都把 messages 详细打印出来，
-# 让你看到协议本身长什么样；demo_09 只打印必要进度。
+# 与 demo_08 唯一的差异：本 demo 在每一步都把 messages 详细打印出来，
+# 让你看到协议本身长什么样；demo_08 只打印必要进度。
 # ============================================================
 def main(
     question: str = "北京今天天气怎么样？穿什么衣服合适？",

@@ -1,10 +1,10 @@
-# demo_24_five_stages.py 代码导读
+# demo_17_five_stages.py 代码导读
 
-这份文档帮你**从零看懂这段[代码](../demo_24_five_stages.py)**：Coding Agent 写代码的"五阶段工作流"到底长什么样、5 个核心工具分别对应哪个阶段、上一步的输出如何变成下一步的输入，最后结合真实运行结果讲清楚每一步发生了什么。
+这份文档帮你**从零看懂这段[代码](../demo_17_five_stages.py)**：Coding Agent 写代码的"五阶段工作流"到底长什么样、5 个核心工具分别对应哪个阶段、上一步的输出如何变成下一步的输入，最后结合真实运行结果讲清楚每一步发生了什么。
 
 > [!NOTE]
 >
-> 配套讲稿：[第 24 节《Coding Agent 的工作模式》](../../lecture/24-coding-agent-workflow.md)
+> 配套讲稿：[第 17 节《Coding Agent 的工作模式》](../../lecture/17-coding-agent-workflow.md)
 >
 > 这是第 6 章的第一个 demo，也是整章的"骨架演示"——不引入 LLM，纯手动调用工具，把 Agent 内部本该自动完成的决策过程，一步步摆在你眼前。
 
@@ -49,7 +49,7 @@
 
 > [!TIP]
 >
-> 五个阶段用到的工具全部从 `coding_tools` 包导入：`from coding_tools import bash, edit, list_dir, read, write`。`write` 只在"准备工作"里用来**创建**两个示例文件——这也印证了第 24 节的一个核心原则：**write 用于新建文件，edit 用于修改已有文件**，两者不能互换。
+> 五个阶段用到的工具全部从 `coding_tools` 包导入：`from coding_tools import bash, edit, list_dir, read, write`。`write` 只在"准备工作"里用来**创建**两个示例文件——这也印证了第 17 节的一个核心原则：**write 用于新建文件，edit 用于修改已有文件**，两者不能互换。
 
 
 
@@ -112,7 +112,7 @@ print(list_dir(workspace))
 
 **对应人类动作**：在 IDE 里展开项目目录树，第一眼看看有哪些文件。
 
-**输出（截取自[运行结果](../output/demo_24_five_stages.txt)）：**
+**输出（截取自[运行结果](../output/demo_17_five_stages.txt)）：**
 
 ```
 # /var/folders/.../05_demo_lpj47o27
@@ -168,7 +168,7 @@ if count > 1:    # old_content 匹配了多处 → 报错，提示加更多上�
 new_full = content.replace(old_content, new_content, 1)
 ```
 
-`old_content` 必须在文件中**逐字符**唯一匹配（含空格、缩进、换行），这是"按内容定位"而非"按行号定位"——第 24 节讲稿解释过原因：任何一次修改都会导致后续行号整体偏移，行号定位在多步编辑时极易出错，而内容定位永远精确。
+`old_content` 必须在文件中**逐字符**唯一匹配（含空格、缩进、换行），这是"按内容定位"而非"按行号定位"——第 17 节讲稿解释过原因：任何一次修改都会导致后续行号整体偏移，行号定位在多步编辑时极易出错，而内容定位永远精确。
 
 **输出：**
 
@@ -187,7 +187,7 @@ new_full = content.replace(old_content, new_content, 1)
 
 > [!IMPORTANT]
 >
-> ⚠️ 对比第 24 节讲稿里的反模式：如果这里用 `write` 重写整个 `main.py`，哪怕只改一行 `print`，也要把 `greet()` 的调用那一行原样重新输出一遍——这就是"灯泡坏了却把整栋楼电路全拆了重装"。`edit` 只动目标那一小段，其余代码原封不动。
+> ⚠️ 对比第 17 节讲稿里的反模式：如果这里用 `write` 重写整个 `main.py`，哪怕只改一行 `print`，也要把 `greet()` 的调用那一行原样重新输出一遍——这就是"灯泡坏了却把整栋楼电路全拆了重装"。`edit` 只动目标那一小段，其余代码原封不动。
 
 
 
@@ -234,7 +234,7 @@ shutil.rmtree(workspace)
 
 ## 真实运行结果解读
 
-完整运行日志见 [output/demo_24_five_stages.txt](../output/demo_24_five_stages.txt)：
+完整运行日志见 [output/demo_17_five_stages.txt](../output/demo_17_five_stages.txt)：
 
 | 阶段 | 工具调用 | 输出关键信息 | 决定了什么 |
 |---|---|---|---|
@@ -256,7 +256,7 @@ bash 的 exit code    → 决定任务是否完成，还是要回到 edit 再修
 
 ## 这段代码体现出什么
 
-正是第 24 节要教你的核心认识：
+正是第 17 节要教你的核心认识：
 
 1. **五阶段工作流是一切 Coding Agent 的公共骨架**——无论 Cursor、Claude Code 还是 Devin，核心循环都是浏览 → 定位 → 理解 → 修改 → 验证，产品之间的差异只在工具实现得更精致，而不是流程本身不同。
 2. **工具是按"工作流阶段"设计的，不是按"文件操作动词"设计的**——这也是为什么本章只做 5 个工具（`list_dir`/`read`/`write`/`edit`/`bash`），而不是一堆看似全面的 `open_file`/`close_file`/`delete_file`。
@@ -264,4 +264,4 @@ bash 的 exit code    → 决定任务是否完成，还是要回到 edit 再修
 
 > [!TIP]
 >
-> 跑完这个 demo 再往下看第 25 节（[demo_25_design_philosophy.py](../demo_25_design_philosophy.py)），你会看到这 5 个工具背后那些"防 LLM 翻车"的设计细节——比如 `edit` 为什么要求 `old_content` 必须唯一匹配、`bash` 为什么要拦截危险命令模式。这些细节正是让"手动走一遍"的流程，能安全地交给 LLM 自主执行的关键。
+> 跑完这个 demo 再往下看第 18 节（[demo_18_design_philosophy.py](../demo_18_design_philosophy.py)），你会看到这 5 个工具背后那些"防 LLM 翻车"的设计细节——比如 `edit` 为什么要求 `old_content` 必须唯一匹配、`bash` 为什么要拦截危险命令模式。这些细节正是让"手动走一遍"的流程，能安全地交给 LLM 自主执行的关键。

@@ -1,4 +1,4 @@
-# 第 7 节 · Function Calling 协议：Tool Schema 与消息流
+# 第 6 节 · Function Calling 协议：Tool Schema 与消息流
 
 ## 一句话回答
 
@@ -197,10 +197,10 @@ for tc in resp.choices[0].message.tool_calls:    # ← 结构化字段，没正�
 
 ## 动手试试
 
-运行 `demo_07_function_calling_protocol.py`，它会**手工拼出**一次完整的 4 角色消息流，把每条消息打印出来给你看：
+运行 `demo_06_function_calling_protocol.py`，它会**手工拼出**一次完整的 4 角色消息流，把每条消息打印出来给你看：
 
 ```bash
-python demo_07_function_calling_protocol.py
+python demo_06_function_calling_protocol.py
 ```
 
 观察重点：
@@ -223,7 +223,7 @@ python demo_07_function_calling_protocol.py
 
 > 协议看懂了，**只有自己拼一遍 messages 才算真懂**。这道题让你手搓一次 user → assistant(tool_calls) → tool(result) → assistant(final) 的完整 4 步消息流：
 >
-> 🧪 [练习 2.1 · 手搓 Function Calling 消息流](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/03-tools-and-agent-loop/ex_2_1.py)
+> 🧪 [练习 2.1 · 手搓 Function Calling 消息流](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-tools-and-agent-loop/ex_2_1.py)
 
 ---
 

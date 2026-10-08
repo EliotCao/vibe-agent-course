@@ -2,7 +2,7 @@
 Demo 24 · 五阶段工作流：手动走一遍 Coding Agent 的"思考路径"
 ============================================================
 
-配套：第 24 节《Coding Agent 的工作模式》
+配套：第 17 节《Coding Agent 的工作模式》
 
 无需 LLM，也能亲身体验 Agent 写代码的完整步骤。
 我们手动按"浏览 → 定位 → 理解 → 修改 → 验证"五个阶段，依次调用 5 个工具，
@@ -11,12 +11,12 @@ Demo 24 · 五阶段工作流：手动走一遍 Coding Agent 的"思考路径"
 这个 demo 的目的：
   - 看清每一步分别对应哪个工具
   - 看清工具的输出长什么样，以及模型如何基于它决定下一步
-  - 为第 25 节讲解工具背后的设计哲学打下直观基础
+  - 为第 18 节讲解工具背后的设计哲学打下直观基础
 
 运行方式：
-    cd /workspace/06-coding-agent-tools/lab/
+    cd /workspace/05-coding-agent-tools/lab/
     source /workspace/.venv/bin/activate
-    python demo_24_five_stages.py
+    python demo_17_five_stages.py
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-# 第 12 节 · ReAct：Thought-Action-Observation 循环
+# 第 10 节 · ReAct：Thought-Action-Observation 循环
 
 ## 一句话回答
 
@@ -107,8 +107,8 @@ ReAct 的精髓不是"多了个 Action 字段"，是 **每一步把 Thought 也�
 ## 动手试试
 
 ```bash
-cd 04-agent-patterns/lab/demos
-python demo_12_react.py
+cd 03-agent-patterns/lab/demos
+python demo_10_react.py
 ```
 
 会跑 5 个测试任务（详见 [`toy_agent_base.py`](./toy_agent_base.py) 里 `TASKS`），观察：
@@ -116,7 +116,7 @@ python demo_12_react.py
 1. 模型的 Thought 是否合理？
 2. 哪个任务它能正确 Finish？
 3. 哪个任务正则解析翻车了？
-4. 跟第2章 demo_09 的最小 Agent（用 tool_calls）相比，每步输出的 token 量怎么变化？
+4. 跟第2章 demo_08 的最小 Agent（用 tool_calls）相比，每步输出的 token 量怎么变化？
 
 ## 小结
 
@@ -132,7 +132,7 @@ python demo_12_react.py
 
 > ReAct 最脆弱的就是**正则解析**——这道题让你亲手写一遍 Thought / Action / Action Input 抠取器，体验"模型多说一句就崩"的真实痛感：
 >
-> 🧪 [练习 3.1 · ReAct 输出解析器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/04-agent-patterns/ex_3_1.py)
+> 🧪 [练习 3.1 · ReAct 输出解析器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/03-agent-patterns/ex_3_1.py)
 
 ---
 

@@ -1,14 +1,14 @@
-# 第 8 节 · ToolRegistry：让加工具像加函数一样简单
+# 第 7 节 · ToolRegistry：让加工具像加函数一样简单
 
 ## 一句话回答
 
 > **`ToolRegistry` 是一个"装饰器 + 反射"的小工具，让你写一个普通 Python 函数 → 自动成为 LLM 能调用的工具。**
 
-它不是魔法，是把第 7 节那 30 行 schema JSON **从手写挪到了自动生成**。
+它不是魔法，是把第 6 节那 30 行 schema JSON **从手写挪到了自动生成**。
 
 ## 没有 ToolRegistry 时的痛
 
-回到第 7 节：每加一个工具，你都要写两份东西。
+回到第 6 节：每加一个工具，你都要写两份东西。
 
 ```python
 # 1. 函数本体
@@ -188,10 +188,10 @@ def invoke(self, name, args):
 
 ## 动手试试
 
-运行 `demo_08_tool_registry.py`：
+运行 `demo_07_tool_registry.py`：
 
 ```bash
-python demo_08_tool_registry.py
+python demo_07_tool_registry.py
 ```
 
 它会：
@@ -337,7 +337,7 @@ python demo_08_tool_registry.py
 
 > 看 demo 不等于会写。亲手实现一个最小 `ToolRegistry`：装饰器注册 + 自动生成 schema + 按名字分发执行。三件事缺一不可：
 >
-> 🧪 [练习 2.2 · ToolRegistry 注册与调用](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/03-tools-and-agent-loop/ex_2_2.py)
+> 🧪 [练习 2.2 · ToolRegistry 注册与调用](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-tools-and-agent-loop/ex_2_2.py)
 
 ---
 

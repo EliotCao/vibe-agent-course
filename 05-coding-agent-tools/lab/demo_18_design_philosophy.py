@@ -2,7 +2,7 @@
 Demo 25 · 工具设计哲学：3 个对比演示
 =====================================
 
-配套第 25 节《9 个工具的设计哲学》，通过三个"翻车案例"
+配套第 18 节《9 个工具的设计哲学》，通过三个"翻车案例"
 直观展示工具设计背后的权衡与取舍：
 
   ① edit 要求 old_content 唯一匹配
@@ -17,9 +17,9 @@ Demo 25 · 工具设计哲学：3 个对比演示
 核心思想：工具不仅要"能干活"，更要主动帮 LLM 避开常见陷阱。
 
 运行方式：
-    cd /workspace/06-coding-agent-tools/lab/
+    cd /workspace/05-coding-agent-tools/lab/
     source /workspace/.venv/bin/activate
-    python demo_25_design_philosophy.py
+    python demo_18_design_philosophy.py
 """
 
 import os

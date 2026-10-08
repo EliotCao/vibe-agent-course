@@ -14,17 +14,17 @@
 
 | 节 | 内容 | 讲义 | Demo |
 |----|------|------|------|
-| 12 | ReAct 范式 | [12-react.md](./lecture/12-react.md) | `demo_12_react.py` |
-| 13 | Plan-and-Solve | [13-plan-and-solve.md](./lecture/13-plan-and-solve.md) | `demo_13_plan_and_solve.py` |
-| 14 | Reflection | [14-reflection.md](./lecture/14-reflection.md) | `demo_14_reflection.py` |
+| 10 | ReAct 范式 | [10-react.md](./lecture/10-react.md) | `demo_10_react.py` |
+| 11 | Plan-and-Solve | [11-plan-and-solve.md](./lecture/11-plan-and-solve.md) | `demo_11_plan_and_solve.py` |
+| 12 | Reflection | [12-reflection.md](./lecture/12-reflection.md) | `demo_12_reflection.py` |
 
 ## 运行 Demo
 
 ```bash
-cd 04-agent-patterns/lab
-python demo_12_react.py
-python demo_13_plan_and_solve.py
-python demo_14_reflection.py
+cd 03-agent-patterns/lab
+python demo_10_react.py
+python demo_11_plan_and_solve.py
+python demo_12_reflection.py
 ```
 
 ## 作业指引
@@ -46,4 +46,4 @@ python tests/test_agent.py
 
 ## 配套练习
 
-作业仓库的 `exercises/04-agent-patterns/` — 3 道代码填空题（运行 `python exercises/04-agent-patterns/ex_*.py` 看到 ✅ PASSED 即通过）。
+作业仓库的 `exercises/03-agent-patterns/` — 3 道代码填空题（运行 `python exercises/03-agent-patterns/ex_*.py` 看到 ✅ PASSED 即通过）。

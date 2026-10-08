@@ -2,14 +2,14 @@
 Demo 09 · 最小 Agent Loop：50 行核心代码搞定
 =============================================
 
-配套：第 9 节《最小 Agent Loop 的 5 个核心点》
+配套：第 8 节《最小 Agent Loop 的 5 个核心点》
 
-效果：把 demo_06 / demo_07 / demo_08 的零件拼成一个真正的 Agent：
-  - 复用 demo_08 里写的 ToolRegistry
-  - 用 OpenAI 官方 tool_calls 协议（demo_07 学过）
+效果：把 demo_05 / demo_06 / demo_07 的零件拼成一个真正的 Agent：
+  - 复用 demo_07 里写的 ToolRegistry
+  - 用 OpenAI 官方 tool_calls 协议（demo_06 学过）
   - 主循环就 5 个核心点：调 LLM → 看 tool_calls → 跑工具 → 拼回 messages → 再来
 
-核心代码不到 50 行，对比 demo_06 那个 hand-rolled 版本，你会发现：
+核心代码不到 50 行，对比 demo_05 那个 hand-rolled 版本，你会发现：
   - 不再手写 prompt 让模型"输出 JSON"
   - 不再担心模型把 JSON 写歪了
   - 不再手工 parse 每一行模型输出
@@ -17,7 +17,7 @@ Demo 09 · 最小 Agent Loop：50 行核心代码搞定
 这是因为 OpenAI tool_calls 协议把"调用"这件事从 prompt 移到了结构化字段。
 
 跑法：
-    python demo_09_mini_agent.py
+    python demo_08_mini_agent.py
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ from _env import get_model_id, make_client
 
 
 # ============================================================
-# Step 1：复用 ToolRegistry（demo_08 的写法，这里直接精简内联）
+# Step 1：复用 ToolRegistry（demo_07 的写法，这里直接精简内联）
 # ============================================================
 import inspect
 from typing import Any, Callable

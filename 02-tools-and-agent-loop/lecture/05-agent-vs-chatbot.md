@@ -1,4 +1,4 @@
-# 第 6 节 · Agent vs Chatbot：为什么需要循环
+# 第 5 节 · Agent vs Chatbot：为什么需要循环
 
 ## 一句话回答
 
@@ -104,11 +104,11 @@ Agent:      用户 -> [程序{ LLM, 工具, 循环 }] -> 用户
 
 ## 动手试试
 
-运行 `demo_06_chatbot_vs_agent.py`，会看到同一道题的两种命运：
+运行 `demo_05_chatbot_vs_agent.py`，会看到同一道题的两种命运：
 
 ```bash
-cd 03-tools-and-agent-loop/lab/demos
-python demo_06_chatbot_vs_agent.py
+cd 02-tools-and-agent-loop/lab/demos
+python demo_05_chatbot_vs_agent.py
 ```
 
 注意观察"实验 ② Agent"输出里的轮次日志——这就是今天的核心：**循环**。
@@ -126,7 +126,7 @@ python demo_06_chatbot_vs_agent.py
 
 > 看完讲义和 demo，趁热把循环骨架自己敲一遍。本章三道练习连起来就是一个最小 Agent，本节先看入口：
 >
-> 🧪 [第 3 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/03-tools-and-agent-loop)
+> 🧪 [第 3 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/02-tools-and-agent-loop)
 
 ---
 

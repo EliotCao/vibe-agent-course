@@ -2,7 +2,7 @@
 Demo 19 · 四种上下文管理策略对比
 ================================
 
-配套：第 19 节《上下文管理策略：截断 / 摘要 / 分层 / GSSC》
+配套：第 14 节《上下文管理策略：截断 / 摘要 / 分层 / GSSC》
 
 承接 18 节示例暴露的"上下文爆炸"问题，这里给出解法并横向对比。
 
@@ -24,9 +24,9 @@ Demo 19 · 四种上下文管理策略对比
     这里的"④ 分层"对应讲稿中的"③ 分层"。
 
 运行方式：
-    cd /workspace/05-context-and-memory/lab/
+    cd /workspace/04-context-and-memory/lab/
     source /workspace/.venv/bin/activate
-    python demo_19_context_strategies.py
+    python demo_14_context_strategies.py
 """
 
 from prettytable import PrettyTable

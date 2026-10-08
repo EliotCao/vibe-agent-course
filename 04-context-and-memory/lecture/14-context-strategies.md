@@ -1,4 +1,4 @@
-# 第 19 节 · 上下文管理策略：截断 / 摘要 / 分层 / GSSC
+# 第 14 节 · 上下文管理策略：截断 / 摘要 / 分层 / GSSC
 
 **四种策略，复杂度从低到高，token 节省效果越来越强，但丢失关键信息的风险也随之上升。** 没有万能方案，你需要根据任务类型灵活组合。
 
@@ -156,7 +156,7 @@ def extract_key_facts(messages):
 
 ## 实验对比：四种策略实测
 
-在 [`demo_19_context_strategies.py`](../lab/demo_19_context_strategies.py) 中跑了一段 30 轮对话，故意在第 2 轮埋了"过敏"事实、第 28 轮埋了"预算"事实，看各策略能不能保住：
+在 [`demo_14_context_strategies.py`](../lab/demo_14_context_strategies.py) 中跑了一段 30 轮对话，故意在第 2 轮埋了"过敏"事实、第 28 轮埋了"预算"事实，看各策略能不能保住：
 
 | 策略 | messages 条数 | 字符数 | "过敏"（早期） | "预算"（近期） |
 |---|---|---|---|---|
@@ -174,7 +174,7 @@ def extract_key_facts(messages):
 在云原生开发环境中执行：
 
 ```bash
-python demo_19_context_strategies.py
+python demo_14_context_strategies.py
 ```
 
 运行后重点关注三件事：
@@ -204,7 +204,7 @@ python demo_19_context_strategies.py
 
 > 把"摘要策略"亲手实现一遍——`compress_messages` 接收一段长 messages，用 LLM 把早期对话压缩成一段话再拼回去。**关键事实别丢、客套话别留**：
 >
-> 🧪 [练习 4.1 · 上下文压缩器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/05-context-and-memory/ex_4_1.py)
+> 🧪 [练习 4.1 · 上下文压缩器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/04-context-and-memory/ex_4_1.py)
 
 ---
 

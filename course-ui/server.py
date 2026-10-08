@@ -1,7 +1,7 @@
 """Vibe Agent Course UI 后端服务（纯 stdlib，无外部依赖）
 
 特性：
-- 扫描 01-08 课程目录，提供课程结构索引
+- 扫描 01-06 课程目录，提供课程结构索引
 - 读取 markdown 讲义、Python 示例源码，渲染图片资源
 - 一键运行 lab/demo_*.py，并通过 SSE 流式回传 stdout/stderr
 - 支持向运行中进程注入 stdin（演示交互式 demo）
@@ -32,27 +32,23 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent  # 仓库根目录
 STATIC_DIR = HERE / "static"
 
-COURSE_DIRS = sorted([p for p in ROOT.iterdir() if re.match(r"^0[1-8]-", p.name)])
+COURSE_DIRS = sorted([p for p in ROOT.iterdir() if re.match(r"^0[1-6]-", p.name)])
 
 COURSE_TITLES: dict[str, str] = {
-    "01-vibecoding-intro": "VibeCoding 入门：先玩起来",
-    "02-meet-your-ai": "认识你的 AI",
-    "03-tools-and-agent-loop": "Function Calling 与最小 Agent",
-    "04-agent-patterns": "Agent 范式（ReAct / Plan / Reflection）",
-    "05-context-and-memory": "上下文与记忆",
-    "06-coding-agent-tools": "Coding Agent 工具集",
-    "07-coding-agent-integration": "整合：完整 Coding Agent",
-    "08-skills-and-npc": "Skills 扩展 + NPC 上线 + 大作业",
+    "01-meet-your-ai": "认识你的 AI",
+    "02-tools-and-agent-loop": "Function Calling 与最小 Agent",
+    "03-agent-patterns": "Agent 范式（ReAct / Plan / Reflection）",
+    "04-context-and-memory": "上下文与记忆",
+    "05-coding-agent-tools": "Coding Agent 工具集",
+    "06-integration-and-deploy": "整合与部署：Coding Agent + Skills + NPC",
 }
 COURSE_SUBTITLES: dict[str, str] = {
-    "01-vibecoding-intro": "vibe 一个游戏 · 推到 CNB · 云原生运行",
-    "02-meet-your-ai": "Next-token · Tokens · Roles · 工具与上下文",
-    "03-tools-and-agent-loop": "Function Calling · ToolRegistry · Agent Loop",
-    "04-agent-patterns": "ReAct · Plan-and-Solve · Reflection",
-    "05-context-and-memory": "上下文管理 · 向量记忆 · Agent v2",
-    "06-coding-agent-tools": "5 阶段工作流 · 5 个核心工具",
-    "07-coding-agent-integration": "REPL · 端到端调试 · 真实任务闭环",
-    "08-skills-and-npc": "SKILL.md · NPC · Docker · CNB · 大作业",
+    "01-meet-your-ai": "Next-token · Tokens · Roles · 工具与上下文",
+    "02-tools-and-agent-loop": "Function Calling · ToolRegistry · Agent Loop",
+    "03-agent-patterns": "ReAct · Plan-and-Solve · Reflection",
+    "04-context-and-memory": "上下文管理 · 向量记忆 · Agent v2",
+    "05-coding-agent-tools": "5 阶段工作流 · 5 个核心工具",
+    "06-integration-and-deploy": "REPL · 端到端 · SKILL.md · NPC · Docker · 大作业",
 }
 
 # ------------------------------------------------------------------
@@ -150,12 +146,12 @@ def scan_course(course_dir: Path) -> dict[str, Any]:
             )
 
     # 练习题：约定章节目录名 ↔ exercises/<同名子目录> 一一对应
-    # （例如 04-agent-patterns 课对应 exercises/04-agent-patterns/）。
+    # （例如 03-agent-patterns 课对应 exercises/03-agent-patterns/）。
     # 现在前端有独立「📝 随堂练习」tab，所以这里要返回完整结构：
     #   - dir：练习目录的仓库相对路径，前端拼 CNB 云端 IDE 跳转 URL
     #   - readme：本章练习总览（题目说明），渲染在 tab 顶部
     #   - items：每题一项（filename + 从 docstring 抽出来的标题）
-    # 没有对应练习目录（如 01-vibecoding-intro）则为 None，前端隐藏 tab。
+    # 某章没有对应练习目录则为 None，前端隐藏 tab。
     ex_dir = ROOT / "exercises" / name
     if ex_dir.is_dir():
         ex_readme = ex_dir / "README.md"
@@ -254,7 +250,7 @@ def start_demo(rel_path: str) -> tuple[str, RunningProc, str]:
     if target.suffix != ".py" or not target.is_file():
         raise ValueError("目标必须是 .py 文件")
     rel = target.relative_to(ROOT).as_posix()
-    if not re.match(r"^0[1-8]-.+/lab/demo_.+\.py$", rel):
+    if not re.match(r"^0[1-6]-.+/lab/demo_.+\.py$", rel):
         raise ValueError("只允许执行各课 lab 下的 demo_*.py")
 
     env = os.environ.copy()
@@ -423,7 +419,7 @@ class Handler(BaseHTTPRequestHandler):
                     return self._send_error_json(400, str(e))
                 # 只允许保存各课 lab 下的 demo_*.py
                 rel_norm = target.relative_to(ROOT).as_posix()
-                if not re.match(r"^0[1-8]-.+/lab/demo_.+\.py$", rel_norm):
+                if not re.match(r"^0[1-6]-.+/lab/demo_.+\.py$", rel_norm):
                     return self._send_error_json(400, "只允许编辑各课 lab 下的 demo_*.py")
                 if len(content.encode("utf-8")) > 512 * 1024:
                     return self._send_error_json(413, "文件过大（>512KB）")

@@ -1,14 +1,14 @@
 # 第 2 章 · 实操：从零搭出最小 Agent Loop
 
-> 130 分钟 · 实操（第 10 节 + 第 11 节）
+> 130 分钟 · 实操（第 9 节 + 第 11 节）
 
 ## 前提
 
 已经跑过 4 个 demo**，分别看到：
-- demo_06：Chatbot vs Agent 同一道题的差别
-- demo_07：手写一次完整的 4 角色 function calling 消息流
-- demo_08：ToolRegistry 自动从函数签名生成 schema
-- demo_09：把上面两件事拼成 ~50 行的最小 Agent Loop
+- demo_05：Chatbot vs Agent 同一道题的差别
+- demo_06：手写一次完整的 4 角色 function calling 消息流
+- demo_07：ToolRegistry 自动从函数签名生成 schema
+- demo_08：把上面两件事拼成 ~50 行的最小 Agent Loop
 
 本节把这些能力**整合成自己的小工具**：
 
@@ -59,11 +59,11 @@ MODEL_ID=<使用的模型 ID>
 
 ### A.4 验证 function calling 能跑
 
-直接跑 demo_07 看完整消息流是否打印出来：
+直接跑 demo_06 看完整消息流是否打印出来：
 
 ```bash
-cd ../03-tools-and-agent-loop/lab/demos
-python demo_07_function_calling_protocol.py
+cd ../02-tools-and-agent-loop/lab/demos
+python demo_06_function_calling_protocol.py
 ```
 
 看到 `[1] system / [2] user / [3] assistant / [4] tool / [5] assistant` 5 条消息就算通了。
@@ -83,7 +83,7 @@ python demo_07_function_calling_protocol.py
 
 ### 让你先 vibe（25min）
 
-让他们打开 IDE，先**不要看 demo_08**，直接给 AI 这个 prompt：
+让他们打开 IDE，先**不要看 demo_07**，直接给 AI 这个 prompt：
 
 ```
 帮我写一个 Python 类 ToolRegistry，要求：
@@ -104,7 +104,7 @@ python demo_07_function_calling_protocol.py
 
 ### 参考实现参考（10min）
 
-给一份"参考代码"对照（**不要在课前发**）：详见 [`demo_08_tool_registry.py`](./demo_08_tool_registry.py)。
+给一份"参考代码"对照（**不要在课前发**）：详见 [`demo_07_tool_registry.py`](./demo_07_tool_registry.py)。
 
 投屏时重点对比：
 - 你写的 description 是从哪里读的？（docstring vs 装饰器参数）
@@ -147,7 +147,7 @@ print(reg.invoke("nope", {}))                    # '未知工具: nope'
 
 ### 目标
 
-打开 `demo_09_mini_agent.py`（已经准备好的填空骨架），把里面 4 个 `TODO` 填上，让 4 个测试任务都能跑通。
+打开 `demo_08_mini_agent.py`（已经准备好的填空骨架），把里面 4 个 `TODO` 填上，让 4 个测试任务都能跑通。
 
 ### Step 1：填空骨架（30min）
 
@@ -162,7 +162,7 @@ print(reg.invoke("nope", {}))                    # '未知工具: nope'
 - TODO ③ 追加 assistant 消息
 - TODO ④ 执行工具 + 追加 tool 消息
 
-每个 TODO 旁边都标了"对应第 9 节哪个核心点"。**对照讲义填，不要直接抄 demo_09**——抄了你不会真懂。
+每个 TODO 旁边都标了"对应第 8 节哪个核心点"。**对照讲义填，不要直接抄 demo_08**——抄了你不会真懂。
 
 ### Step 2：跑 4 个任务，记录日志（20min）
 
@@ -214,7 +214,7 @@ python mini_agent.py > run_log.txt 2>&1
 
 ## 助教检查重点
 
-- [ ] tool_registry.py 是自己写的，不是 demo_08 直接拷贝（看变量命名 / 注释）
+- [ ] tool_registry.py 是自己写的，不是 demo_07 直接拷贝（看变量命名 / 注释）
 - [ ] tool_registry 里 invoke 有异常兜底
 - [ ] mini_agent.py 真的在 messages 里追加了 assistant 消息（带 tool_calls 字段）
 - [ ] 跑 4 个任务，前 3 个都能跑通；第 4 个能看到"承认不知道 / 硬调失败"两种反应之一
@@ -222,8 +222,8 @@ python mini_agent.py > run_log.txt 2>&1
 
 ## 参考资产（仅卡住时参考）
 
-- [`demo_08_tool_registry.py`](./demo_08_tool_registry.py) —— ToolRegistry 参考实现
-- [`demo_09_mini_agent.py`](./demo_09_mini_agent.py) —— 完整 Agent Loop
+- [`demo_07_tool_registry.py`](./demo_07_tool_registry.py) —— ToolRegistry 参考实现
+- [`demo_08_mini_agent.py`](./demo_08_mini_agent.py) —— 完整 Agent Loop
 - [`examples/04-my-agent/tools/tools.py`](../../examples/04-my-agent/tools/tools.py) —— 工程级 ToolRegistry（含 Tool 基类、装饰器/类双注册）
 - [`examples/04-my-agent/agent/agent.py`](../../examples/04-my-agent/agent/agent.py) —— SimpleAgent / ReActAgent 主循环
 

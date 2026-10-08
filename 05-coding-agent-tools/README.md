@@ -1,9 +1,9 @@
 <p align="center">
-    <img src="../assets/banner-06.svg" alt="Coding Agent Toolset">
+    <img src="../assets/banner-05.svg" alt="Coding Agent Toolset">
 </p>
 
 
-# 第 6 章 · Coding Agent 工具集
+# 第 5 章 · Coding Agent 工具集
 
 本章目标：为 Coding Agent 实现 5 个核心工具，让 Agent 具备读写文件、搜索代码、执行命令的能力。
 产出：`my-agent/coding_tools/` 目录，包含 `read`、`write`、`edit`、`list_dir`、`bash` 五个工具模块。
@@ -22,9 +22,9 @@
 
 | 节 | 内容 | 讲义 | Demo |
 |----|------|------|------|
-| 24 | Coding Agent 工作流 | [24-coding-agent-workflow.md](./lecture/24-coding-agent-workflow.md) | `demo_24_five_stages.py` |
-| 25 | 工具设计哲学 | [25-tool-design.md](./lecture/25-tool-design.md) | `demo_25_design_philosophy.py` |
-| — | 端到端演示 | — | `demo_26_end_to_end.py` |
+| 17 | Coding Agent 工作流 | [17-coding-agent-workflow.md](./lecture/17-coding-agent-workflow.md) | `demo_17_five_stages.py` |
+| 18 | 工具设计哲学 | [18-tool-design.md](./lecture/18-tool-design.md) | `demo_18_design_philosophy.py` |
+| — | 端到端演示 | — | `demo_19_end_to_end.py` |
 
 
 
@@ -33,10 +33,10 @@
 在云原生开发环境中执行：
 
 ```bash
-cd 06-coding-agent-tools/lab
-python demo_24_five_stages.py
-python demo_25_design_philosophy.py
-python demo_26_end_to_end.py
+cd 05-coding-agent-tools/lab
+python demo_17_five_stages.py
+python demo_18_design_philosophy.py
+python demo_19_end_to_end.py
 ```
 
 
@@ -71,4 +71,4 @@ python tests/test_coding_tools.py
 
 ## 配套练习
 
-作业仓库的 `exercises/06-coding-agent-tools/` — 3 道代码填空题（运行 `python exercises/06-coding-agent-tools/ex_*.py` 看到 ✅ PASSED 即通过）。
+作业仓库的 `exercises/05-coding-agent-tools/` — 3 道代码填空题（运行 `python exercises/05-coding-agent-tools/ex_*.py` 看到 ✅ PASSED 即通过）。

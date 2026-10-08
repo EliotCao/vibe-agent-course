@@ -2,7 +2,7 @@
 Demo 13 · Plan-and-Solve：先规划再执行
 ======================================
 
-配套：第 13 节《Plan-and-Solve：先规划再执行》
+配套：第 11 节《Plan-and-Solve：先规划再执行》
 
 跟 ReAct 反过来：
   - ReAct：走一步看一步（信息收集型）
@@ -14,10 +14,10 @@ Demo 13 · Plan-and-Solve：先规划再执行
   ③ Aggregator：拿到所有步骤的结果，由 LLM 汇总成最终答案
 
 跟 第2章 的最小 Agent Loop 比，多了一个"规划阶段"。
-跟 demo_12 的 ReAct 比，少了"边走边看"的自由度。
+跟 demo_10 的 ReAct 比，少了"边走边看"的自由度。
 
 跑法：
-    python demo_13_plan_and_solve.py
+    python demo_11_plan_and_solve.py
 """
 
 from __future__ import annotations
