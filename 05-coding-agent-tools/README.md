@@ -24,7 +24,6 @@
 |----|------|------|------|
 | 17 | Coding Agent 工作流 | [17-coding-agent-workflow.md](./lecture/17-coding-agent-workflow.md) | `demo_17_five_stages.py` |
 | 18 | 工具设计哲学 | [18-tool-design.md](./lecture/18-tool-design.md) | `demo_18_design_philosophy.py` |
-| — | 端到端演示 | — | `demo_19_end_to_end.py` |
 
 
 
@@ -36,7 +35,6 @@
 cd 05-coding-agent-tools/lab
 python demo_17_five_stages.py
 python demo_18_design_philosophy.py
-python demo_19_end_to_end.py
 ```
 
 
@@ -47,7 +45,7 @@ python demo_19_end_to_end.py
 
 > [!TIP]
 >
-> 📦 **作业仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
+> 📦 **作业仓库**：<https://cnb.cool/opencamp/learning-agent/vibe-agent-exercise>
 
 **操作流程**：
 

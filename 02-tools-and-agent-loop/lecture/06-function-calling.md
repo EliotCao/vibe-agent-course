@@ -219,12 +219,6 @@ python demo_06_function_calling_protocol.py
 | `tool_calls` 字段 | 模型决定调工具时藏在 assistant 里的结构化字段 |
 | `tool_call_id` | tool 消息怎么对应到上一条 assistant 的某个调用 |
 
-## 随堂练习
-
-> 协议看懂了，**只有自己拼一遍 messages 才算真懂**。这道题让你手搓一次 user → assistant(tool_calls) → tool(result) → assistant(final) 的完整 4 步消息流：
->
-> 🧪 [练习 2.1 · 手搓 Function Calling 消息流](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-tools-and-agent-loop/ex_2_1.py)
-
 ---
 
 下一节：协议看懂了，但每加一个工具都要写 30 行 schema JSON 太烦——**`ToolRegistry`** 一行装饰器搞定。

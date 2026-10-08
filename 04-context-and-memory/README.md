@@ -49,7 +49,7 @@ python demo_16_agent_v2.py
 
 > [!TIP]
 >
-> 📦 **作业仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
+> 📦 **作业仓库**：<https://cnb.cool/opencamp/learning-agent/vibe-agent-exercise>
 
 **操作流程**：
 

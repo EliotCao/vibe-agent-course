@@ -333,12 +333,6 @@ python demo_07_tool_registry.py
 >
 > 第 5 章我们做 Coding Agent 工具集时工具会变多，但本课程**仍坚持运行时方案**——把工程化优化的边界留给你的真实项目。
 
-## 随堂练习
-
-> 看 demo 不等于会写。亲手实现一个最小 `ToolRegistry`：装饰器注册 + 自动生成 schema + 按名字分发执行。三件事缺一不可：
->
-> 🧪 [练习 2.2 · ToolRegistry 注册与调用](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/02-tools-and-agent-loop/ex_2_2.py)
-
 ---
 
 下一节：注册表有了，怎么把它放进**循环**里跑起来——**最小 Agent Loop 的 5 个核心点**。

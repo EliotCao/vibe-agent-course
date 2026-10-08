@@ -109,15 +109,6 @@ def search_kb(query: str, top_k: int = 5) -> str:
 
 **Tool Calling 是地基；MCP / Skill / RAG 是地基上盖的三栋楼。**地基稳了，盖楼就是工程问题。
 
-## 随堂练习
-
-> 第 3 章理论到此结束。回头把三道练习从头串一遍——**协议 → 注册表 → 循环**——你就拥有一个能跑起来的最小 Agent：
->
-> 🧪 [第 3 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/02-tools-and-agent-loop)
-> - 练习 2.1 · 手搓 Function Calling 消息流
-> - 练习 2.2 · ToolRegistry 注册与调用
-> - 练习 2.3 · 最小 Agent Loop
-
 ---
 
 第 3 章理论部分到此真正结束。下一章我们换个视角：模型决定调工具时**怎么"想"**——ReAct、Plan-and-Solve、Reflection 三种 Agent 范式。

@@ -62,13 +62,13 @@ bash course-ui/run.sh
 | 03 | [Agent 范式](./03-agent-patterns/) | ReAct（边想边做） · Plan-and-Solve（先规划再执行） · Reflection（起草→评审→修订） · 范式选型 | `my-agent/agent.py` — Agent 主循环 |
 | 04 | [上下文与记忆](./04-context-and-memory/) | 上下文爆炸问题 · 管理策略（keep_last + 摘要压缩） · 向量记忆（Embedding + 余弦相似度） · Agent v2 整合 | `my-agent/context.py` + `memory.py` |
 | 05 | [Coding Agent 工具集](./05-coding-agent-tools/) | 5 阶段工作流（理解→定位→修改→验证→汇报） · 工具设计哲学 · 5 个核心工具（read/write/edit/list_dir/bash） | `my-agent/coding_tools/` — 5 个工具 |
-| 06 | [整合与部署：Coding Agent + Skills + NPC](./06-integration-and-deploy/) | 模块协作架构 · REPL 交互界面 · 端到端调试 · Skills 系统（SKILL.md） · NPC 概念 · Docker 打包 · CNB Pipeline + NPC 部署 · 结课大作业 | `my-agent/main.py` + 自定义 Skills + 仓库 NPC |
+| 06 | [整合与部署：Coding Agent + Skills + NPC](./06-integration-and-deploy/) | 模块协作架构 · REPL 交互界面 · 端到端调试 · Skills 系统（SKILL.md） · NPC 概念 · Docker 打包 · CNB Pipeline + NPC 部署 | `my-agent/main.py` + 自定义 Skills + 仓库 NPC |
 
 ## 动手练习
 
 各模块的代码填空（`my-agent/` 各文件 + 自动化测试）与配套练习已迁移到独立的**练习仓库**，按章节完成实践：
 
-> 📦 **练习仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
+> 📦 **练习仓库**：<https://cnb.cool/opencamp/learning-agent/vibe-agent-exercise>
 
 ## 先修要求
 

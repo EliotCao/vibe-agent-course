@@ -453,12 +453,6 @@ python demo_15_memory.py
 
 
 
-## 本节练习
-
-把"向量记忆"的最小实现亲手写一遍——补全 `add()`（编码文本→存入向量）和 `search()`（余弦相似度 → top-k 召回）。**第 5 章的核心代码就这十几行，值得亲手敲**：
-
-🧪 [练习 4.2 · 向量记忆存取](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/04-context-and-memory/ex_4_2.py)
-
 ---
 
 理论部分到此结束。下面 lab：

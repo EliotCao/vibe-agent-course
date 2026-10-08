@@ -119,23 +119,6 @@ python demo_13_context_explosion.py
 
 
 
-## 随堂练习：写一个上下文压缩决策器
-
-"撞窗口"是三大痛点之首，但 Agent 不能等到爆窗才动手——它需要在合适的时机**主动判断**是否该压缩历史消息。
-
-### 题目
-
-实现一个最小化的决策器：输入当前 messages 的 token 数，输出"继续"还是"该压了"。
-
-### 提示
-
-- 设定一个合理的 token 阈值（参考本节实验数据：20 轮 ≈ 23k token）
-- 阈值可以不是死的——考虑留出安全余量，别等窗口满了再反应
-
-🧪 [练习 4.3 · 上下文管理决策器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise/-/blob/main/exercises/04-context-and-memory/ex_4_3.py)
-
-
-
 ---
 
 下一节：四种典型上下文管理策略——**截断 / 摘要 / 分层 / GSSC** —— 各自适合什么场景。

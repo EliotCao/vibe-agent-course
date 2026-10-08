@@ -4,7 +4,7 @@
 
 > **第2章-第6章你已经把每个零件都写好了。本章不写新功能，只做两件事：先把这些类一点点拼成一个能干活的 Coding Agent，再聊聊它能长成哪几种形态。**
 
-你手上的零件全部定义在 [`my-agent/interfaces.py`](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise/-/blob/main/my-agent/interfaces.py) 里——这个文件不用改，只是接口参考。本章就基于这些接口，循序渐进地组装。
+你手上的零件全部定义在 [`my-agent/interfaces.py`](https://cnb.cool/opencamp/learning-agent/vibe-agent-exercise/-/blob/main/my-agent/interfaces.py) 里——这个文件不用改，只是接口参考。本章就基于这些接口，循序渐进地组装。
 
 ---
 
@@ -278,7 +278,7 @@ console.print(f"[dim]→ {str(result)[:200]}[/dim]")
 
 # Part 2 · Coding Agent 的几个形态
 
-Agent 内核组装好了，**同一个内核可以套上不同的「壳」给不同场景用**。参考项目 [`niuma-coder`](https://cnb.cool/xidian/vibe-coding-learning/niuma-coder) 的设计原则就是：**WebUI 与 CLI 共用同一个 Agent 内核，切换零成本、功能对等**。
+Agent 内核组装好了，**同一个内核可以套上不同的「壳」给不同场景用**。参考项目 [`niuma-coder`](https://cnb.cool/opencamp/learning-agent/niuma-coder) 的设计原则就是：**WebUI 与 CLI 共用同一个 Agent 内核，切换零成本、功能对等**。
 
 | 形态 | 一句话 | 典型代表 |
 |---|---|---|

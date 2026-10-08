@@ -9,7 +9,6 @@
 - Coding Agent 的几个形态：REPL / Solo / WebUI，一个内核多种壳
 - **Skills**：为什么需要 Skills、Skills 与 Tool Call 的区别，以及 Agent 实现 Skills 机制的原理（伪代码）
 - **NPC**：把 Agent 挂到仓库里，@ 它就自动干活的完整流程（伪代码）
-- 结课大作业：综合运用前面所有模块
 
 ## 内容结构
 
@@ -18,13 +17,12 @@
 | 20 | 整合与形态 | [20-integration-and-modes.md](./lecture/20-integration-and-modes.md) | - |
 | 21 | Skills 机制与原理 | [21-skills.md](./lecture/21-skills.md) | - |
 | 22 | NPC 上线流程 | [22-npc.md](./lecture/22-npc.md) | - |
-| 23 | 结课大作业 | [23-final-assignment.md](./lecture/23-final-assignment.md) | - |
 
 ## 作业指引
 
 本章作业在配套作业仓库中完成：
 
-> 📦 **作业仓库**：<https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-exercise>
+> 📦 **作业仓库**：<https://cnb.cool/opencamp/learning-agent/vibe-agent-exercise>
 
 **流程**：Fork 作业仓库 → 在 `my-agent/` 中完成本章整合任务 → 提交 PR，CI 流水线（`.cnb.yml`）自动测评，全绿即通过。
 

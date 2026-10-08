@@ -48,7 +48,7 @@ COURSE_SUBTITLES: dict[str, str] = {
     "03-agent-patterns": "ReAct · Plan-and-Solve · Reflection",
     "04-context-and-memory": "上下文管理 · 向量记忆 · Agent v2",
     "05-coding-agent-tools": "5 阶段工作流 · 5 个核心工具",
-    "06-integration-and-deploy": "REPL · 端到端 · SKILL.md · NPC · Docker · 大作业",
+    "06-integration-and-deploy": "REPL · 端到端 · SKILL.md · NPC · Docker",
 }
 
 # ------------------------------------------------------------------

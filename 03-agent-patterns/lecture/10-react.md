@@ -128,12 +128,6 @@ python demo_10_react.py
 | 老 paradigm 的痛 | 纯 prompt 约定 + 正则解析 = 脆弱 |
 | 今天为什么仍要学 | 直觉清晰 / 是后来很多范式的祖宗 / 真实工程仍混合用 |
 
-## 随堂练习
-
-> ReAct 最脆弱的就是**正则解析**——这道题让你亲手写一遍 Thought / Action / Action Input 抠取器，体验"模型多说一句就崩"的真实痛感：
->
-> 🧪 [练习 3.1 · ReAct 输出解析器](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/blob/main/exercises/03-agent-patterns/ex_3_1.py)
-
 ---
 
 下一节：ReAct 是"走一步看一步"。如果任务步骤多到一定程度，**先把整盘棋画出来再下** 是不是更稳？→ Plan-and-Solve。

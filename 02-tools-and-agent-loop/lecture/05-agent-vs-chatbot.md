@@ -122,12 +122,6 @@ python demo_05_chatbot_vs_agent.py
 | 关键拐点 | 2023 年 OpenAI Function Calling，把"调工具"做成协议 |
 | 升级路径 | Chatbot + 工具调用 + while 循环 = Agent |
 
-## 随堂练习
-
-> 看完讲义和 demo，趁热把循环骨架自己敲一遍。本章三道练习连起来就是一个最小 Agent，本节先看入口：
->
-> 🧪 [第 3 章练习题目录](https://cnb.cool/xidian/vibe-coding-learning/vibe-agent-course/-/tree/main/exercises/02-tools-and-agent-loop)
-
 ---
 
 下一节：**Function Calling 协议**到底是什么样？4 种角色 / Tool Schema / 完整消息流，每一处都拆开看。
