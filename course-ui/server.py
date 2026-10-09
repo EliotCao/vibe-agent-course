@@ -39,16 +39,16 @@ COURSE_TITLES: dict[str, str] = {
     "02-tools-and-agent-loop": "Function Calling 与最小 Agent",
     "03-agent-patterns": "Agent 范式（ReAct / Plan / Reflection）",
     "04-context-and-memory": "上下文与记忆",
-    "05-coding-agent-tools": "Coding Agent 工具集",
-    "06-integration-and-deploy": "整合与部署：Coding Agent + Skills + NPC",
+    "05-coding-agent-tools": "Coding Agent 工具集与整合",
+    "06-skills-and-npc": "Skills 扩展 + NPC 上线",
 }
 COURSE_SUBTITLES: dict[str, str] = {
     "01-meet-your-ai": "Next-token · Tokens · Roles · 工具与上下文",
     "02-tools-and-agent-loop": "Function Calling · ToolRegistry · Agent Loop",
     "03-agent-patterns": "ReAct · Plan-and-Solve · Reflection",
     "04-context-and-memory": "上下文管理 · 向量记忆 · Agent v2",
-    "05-coding-agent-tools": "5 阶段工作流 · 5 个核心工具",
-    "06-integration-and-deploy": "REPL · 端到端 · SKILL.md · NPC · Docker",
+    "05-coding-agent-tools": "5 阶段工作流 · 5 个核心工具 · REPL/Solo 整合",
+    "06-skills-and-npc": "SKILL.md · Skills vs Tool · NPC · CNB 用法",
 }
 
 # ------------------------------------------------------------------

@@ -3,10 +3,10 @@
 </p>
 
 
-# 第 5 章 · Coding Agent 工具集
+# 第 5 章 · Coding Agent 工具集与整合
 
-本章目标：为 Coding Agent 实现 5 个核心工具，让 Agent 具备读写文件、搜索代码、执行命令的能力。
-产出：`my-agent/coding_tools/` 目录，包含 `read`、`write`、`edit`、`list_dir`、`bash` 五个工具模块。
+本章目标：先为 Coding Agent 实现 5 个核心工具，再把前面各章的零件整合成一个能跑通真实任务的完整 Coding Agent。
+产出：`my-agent/coding_tools/`（read/write/edit/list_dir/bash 五个工具）+ `my-agent/main.py`（整合后的 Agent 入口）。
 
 
 
@@ -15,6 +15,8 @@
 - Coding Agent 的核心工作流：理解需求 → 定位代码 → 修改文件 → 验证结果 → 汇报变更，形成 5 阶段闭环
 - 工具设计的三条原则：唯一性约束（一个工具只做一件事）、安全闸门（高风险操作需确认）、友好报错（失败时给出可执行的提示）
 - `read` / `write` / `edit` / `list_dir` / `bash` 五个工具的实现思路与关键细节
+- 整体串联流程：把 LLMClient / ToolRegistry / Agent / ContextManager / Memory + 工具按单向数据流组装成完整 Agent
+- Coding Agent 的几个形态：REPL / Solo / WebUI，一个内核多种壳
 
 
 
@@ -24,6 +26,7 @@
 |----|------|------|------|
 | 17 | Coding Agent 工作流 | [17-coding-agent-workflow.md](./lecture/17-coding-agent-workflow.md) | `demo_17_five_stages.py` |
 | 18 | 工具设计哲学 | [18-tool-design.md](./lecture/18-tool-design.md) | `demo_18_design_philosophy.py` |
+| 19 | 整合与形态 | [19-integration-and-modes.md](./lecture/19-integration-and-modes.md) | - |
 
 
 
@@ -58,15 +61,17 @@ python demo_18_design_philosophy.py
 
 ## 本章产出
 
-在作业仓库中补全 `my-agent/coding_tools/` 下的 5 个工具文件，让测试通过：
+1. 在作业仓库中补全 `my-agent/coding_tools/` 下的 5 个工具文件，让测试通过：
 
 ```bash
 cd my-agent
 python tests/test_coding_tools.py
 ```
 
+2. 把所有模块接好，在 `my-agent/main.py` 里组装出完整 Agent 并跑通：
 
-
-## 配套练习
-
-作业仓库的 `exercises/05-coding-agent-tools/` — 3 道代码填空题（运行 `python exercises/05-coding-agent-tools/ex_*.py` 看到 ✅ PASSED 即通过）。
+```bash
+cd my-agent
+python main.py
+# 输入一个真实任务，如："在当前目录创建一个 hello.py，写一个 hello world，然后运行它"
+```

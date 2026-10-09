@@ -43,4 +43,4 @@ hello
      - list 输出 → 决定 read 哪个文件
      - read 输出 → 决定 edit 改哪一段
      - bash 输出 → 决定要不要再修一轮
-  ③ 把上面整段流程喂给 LLM + tool_calls 协议，就成了 第6章 的真 Agent
+  ③ 把上面整段流程喂给 LLM + tool_calls 协议，就成了 第5章 的真 Agent

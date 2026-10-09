@@ -1,8 +1,8 @@
-# 第 20 节 · 整合与形态：一步步组装一个 Coding Agent
+# 第 19 节 · 整合与形态：一步步组装一个 Coding Agent
 
 ## 一句话回答
 
-> **第2章-第6章你已经把每个零件都写好了。本章不写新功能，只做两件事：先把这些类一点点拼成一个能干活的 Coding Agent，再聊聊它能长成哪几种形态。**
+> **第1章-第5章你已经把每个零件都写好了。本节不写新功能，只做两件事：先把这些类一点点拼成一个能干活的 Coding Agent，再聊聊它能长成哪几种形态。**
 
 你手上的零件全部定义在 [`my-agent/interfaces.py`](https://cnb.cool/opencamp/learning-agent/vibe-agent-exercise/-/blob/main/my-agent/interfaces.py) 里——这个文件不用改，只是接口参考。本章就基于这些接口，循序渐进地组装。
 

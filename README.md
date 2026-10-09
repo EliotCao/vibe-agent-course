@@ -50,8 +50,8 @@ bash course-ui/run.sh
 3. 实现工具注册系统 + Agent 主循环（Function Calling）
 4. 区分并实现 ReAct、Plan-and-Solve、Reflection 三种 Agent 范式
 5. 从零实现上下文管理与向量记忆系统
-6. 搭建完整的 Coding Agent（5 个核心工具）
-7. 整合所有模块，扩展 Skills，部署为 CNB 仓库 NPC
+6. 搭建完整的 Coding Agent（5 个核心工具）并整合所有模块为可运行的 Agent
+7. 扩展 Skills，部署为 CNB 仓库 NPC
 
 ## 内容总览
 
@@ -61,8 +61,8 @@ bash course-ui/run.sh
 | 02 | [Function Calling 与最小 Agent](./02-tools-and-agent-loop/) | Chatbot vs Agent · Function Calling 协议 · ToolRegistry（自动生成 JSON schema） · 最小 Agent Loop | `my-agent/tools.py` — ToolRegistry 类 |
 | 03 | [Agent 范式](./03-agent-patterns/) | ReAct（边想边做） · Plan-and-Solve（先规划再执行） · Reflection（起草→评审→修订） · 范式选型 | `my-agent/agent.py` — Agent 主循环 |
 | 04 | [上下文与记忆](./04-context-and-memory/) | 上下文爆炸问题 · 管理策略（keep_last + 摘要压缩） · 向量记忆（Embedding + 余弦相似度） · Agent v2 整合 | `my-agent/context.py` + `memory.py` |
-| 05 | [Coding Agent 工具集](./05-coding-agent-tools/) | 5 阶段工作流（理解→定位→修改→验证→汇报） · 工具设计哲学 · 5 个核心工具（read/write/edit/list_dir/bash） | `my-agent/coding_tools/` — 5 个工具 |
-| 06 | [整合与部署：Coding Agent + Skills + NPC](./06-integration-and-deploy/) | 模块协作架构 · REPL 交互界面 · 端到端调试 · Skills 系统（SKILL.md） · NPC 概念 · Docker 打包 · CNB Pipeline + NPC 部署 | `my-agent/main.py` + 自定义 Skills + 仓库 NPC |
+| 05 | [Coding Agent 工具集与整合](./05-coding-agent-tools/) | 5 阶段工作流（理解→定位→修改→验证→汇报） · 工具设计哲学 · 5 个核心工具（read/write/edit/list_dir/bash） · 模块协作架构 · REPL/Solo/WebUI 形态 | `my-agent/coding_tools/` — 5 个工具 + `my-agent/main.py` 整合 |
+| 06 | [Skills 扩展 + NPC 上线](./06-skills-and-npc/) | Skills 系统（SKILL.md） · Skills vs Tool Call · NPC 概念 · CNB 上 NPC 用法 · 自定义 NPC（Docker 打包课后实验） | 自定义 Skills + 仓库 NPC |
 
 ## 动手练习
 

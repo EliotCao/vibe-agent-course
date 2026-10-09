@@ -93,7 +93,7 @@ def search_kb(query: str, top_k: int = 5) -> str:
 
 | 这条延长线 | 在哪一章亲手做 |
 |---|---|
-| Skill 打包与挂载 | 第 6 章《整合与部署：Skills + NPC》21-skills.md |
+| Skill 打包与挂载 | 第 6 章《Skills 扩展 + NPC 上线》20-skills.md |
 | RAG / 向量记忆 | 第 4 章《上下文与记忆》15-memory-types.md |
 | MCP（仅概念，不亲手实现 Server） | 第 6 章 NPC 部署时再提及 |
 | 真实 Coding Agent 的工具集 | 第 5 章《Coding Agent 工具集》—— 5 个核心工具 read/write/edit/list_dir/bash |

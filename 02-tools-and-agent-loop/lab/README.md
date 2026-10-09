@@ -227,4 +227,4 @@ python mini_agent.py > run_log.txt 2>&1
 - [`examples/04-my-agent/tools/tools.py`](../../examples/04-my-agent/tools/tools.py) —— 工程级 ToolRegistry（含 Tool 基类、装饰器/类双注册）
 - [`examples/04-my-agent/agent/agent.py`](../../examples/04-my-agent/agent/agent.py) —— SimpleAgent / ReActAgent 主循环
 
-> 注意：ch04 的 ToolRegistry 比本章教的复杂得多（Tool 基类 / 双注册路径 / 工具描述自动注入 prompt）。**本章先掌握极简版，第5章 / 第6章会逐步迭代到 ch04 的复杂度。**
+> 注意：ch04 的 ToolRegistry 比本章教的复杂得多（Tool 基类 / 双注册路径 / 工具描述自动注入 prompt）。**本章先掌握极简版，第5章会逐步迭代到 ch04 的复杂度。**

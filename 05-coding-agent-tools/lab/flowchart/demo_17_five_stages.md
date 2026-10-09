@@ -6,7 +6,7 @@
 >
 > 配套讲稿：[第 17 节《Coding Agent 的工作模式》](../../lecture/17-coding-agent-workflow.md)
 >
-> 这是第 6 章的第一个 demo，也是整章的"骨架演示"——不引入 LLM，纯手动调用工具，把 Agent 内部本该自动完成的决策过程，一步步摆在你眼前。
+> 这是第 5 章的第一个 demo，也是整章的"骨架演示"——不引入 LLM，纯手动调用工具，把 Agent 内部本该自动完成的决策过程，一步步摆在你眼前。
 
 
 
@@ -223,7 +223,7 @@ print("  ② 每个阶段的工具输出，**都是下一步决策的输入**")
 print("     - list 输出 → 决定 read 哪个文件")
 print("     - read 输出 → 决定 edit 改哪一段")
 print("     - bash 输出 → 决定要不要再修一轮")
-print("  ③ 把上面整段流程喂给 LLM + tool_calls 协议，就成了 第6章 的真 Agent")
+print("  ③ 把上面整段流程喂给 LLM + tool_calls 协议，就成了 第5章 的真 Agent")
 
 shutil.rmtree(workspace)
 ```
