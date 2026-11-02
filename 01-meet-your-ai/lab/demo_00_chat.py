@@ -44,7 +44,7 @@ else:
     BASE_URL = os.environ.get("BASE_URL", "")
 
 API_KEY = os.environ.get("API_KEY") or os.environ.get("CNB_TOKEN") or ""
-MODEL = os.environ.get("MODEL_ID", "glm-5.0")
+MODEL = os.environ.get("MODEL_ID", "deepseek-v4.1-flash")
 
 if not BASE_URL or not API_KEY:
     raise EnvironmentError(

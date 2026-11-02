@@ -3,7 +3,7 @@
 - 优先使用显式的 `BASE_URL` / `API_KEY`；
 - 若在 CNB 平台运行（未显式配置），则自动从 `CNB_API_ENDPOINT` + `CNB_REPO_SLUG`
   拼接 Base URL，并使用 `CNB_TOKEN` 作为 API Key。
-- `MODEL_ID` 未设置时默认 `glm-5.0`。
+- `MODEL_ID` 未设置时默认 `deepseek-v4.1-flash`。
 - 接口仅支持流式输出，chat() 内部强制 stream=True，
   拼接完整响应后返回 message 对象，模拟非流式行为。
 """
@@ -50,8 +50,8 @@ def get_api_key() -> str:
 
 
 def get_model_id() -> str:
-    """获取模型 ID，默认 `glm-5.0`。"""
-    return os.environ.get("MODEL_ID", "glm-5.0")
+    """获取模型 ID，默认 `deepseek-v4.1-flash`。"""
+    return os.environ.get("MODEL_ID", "deepseek-v4.1-flash")
 
 
 def make_client():
