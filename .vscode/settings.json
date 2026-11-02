@@ -36,11 +36,12 @@
   // （作为 cnb-welcome 插件 CNB_WELCOME_CMD 的兜底方案）
   "terminal.integrated.profiles.linux": {
     "bash-with-welcome": {
-      "path": "bash",
-      "args": ["-c", "bash /workspace/course-ui/welcome.sh; exec bash -l"],
+      "path": "/bin/zsh",
+      "args": ["-c", "bash /workspace/course-ui/welcome.sh; exec zsh -l"],
       "icon": "book",
       "color": "terminal.ansiYellow"
-    }
+    },
+    "zsh": { "path": "/bin/zsh", "icon": "terminal" }
   },
   "terminal.integrated.defaultProfile.linux": "bash-with-welcome"
 }
