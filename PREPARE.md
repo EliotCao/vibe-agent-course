@@ -9,3 +9,10 @@
    - c. 你也可以参加 CNB 的「天才程序员闯关」活动，通过后每月可获得 666 积分（永久有效）。申请地址：https://cnb.cool/profile/ext-identity
 
    > 注意：同一组织只能领取 b、c 两者中的一种特权，建议优先领取师生认证。
+
+## 前置条件
+
+- 您必须报名 [Agent 训练营](https://opencamp.cn/AI/camp/2026agent)
+  ![alt text](./assets/baoming.png)
+- 您必须在[opencamp.cn](https://opencamp.cn/my/edit)上完成 cnb 账号绑定
+  ![alt text](./assets/bangding.png)
