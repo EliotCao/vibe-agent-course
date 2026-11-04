@@ -129,16 +129,20 @@ print(f"切分结果: {pieces}")
 
 ### 1. 计费按 Token
 
-LLM API 的定价单位是 token，不是字符。典型价格（2025 年水平）：
+LLM API 的定价单位是 token，不是字符。典型价格（2026 年 11 月官方标准价；美元按 1 USD ≈ 6.72 CNY 折算）：
 
 | 模型 | 输入 ¥/1M token | 输出 ¥/1M token |
 |------|-----------------|-----------------|
-| GPT-4o | ¥18 | ¥72 |
-| Claude 3.5 Sonnet | ¥22 | ¥108 |
-| DeepSeek-V3 | ¥1 | ¥8 |
-| 混元 Turbo S | 免费/极低 | 免费/极低 |
+| GPT-5.6 Sol（旗舰） | ≈¥27 | ≈¥134 |
+| GPT-5.6 Terra（主力） | ≈¥13 | ≈¥81 |
+| Claude Sonnet 5.5 | ≈¥13 | ≈¥67 |
+| DeepSeek-V4.1-Flash（谷时） | ≈¥1 | ≈¥4 |
 
-**算一笔账**：一次典型的 Coding Agent 调用（输入 5K + 输出 1K token），用 GPT-4o 大约 ¥0.16。一天跑 100 次 = ¥16，一个月 = ¥480。
+> 以上均为不含缓存与批处理折扣的标准价。实际账单还能更低：prompt cache 命中通常省 50%-90%，Batch 批处理再省 50%；DeepSeek 用峰谷定价，高峰时段（北京时间工作日 9:00-12:00、14:00-18:00）按表中价格翻倍。
+
+**算一笔账**：一次典型的 Coding Agent 调用（输入 5K + 输出 1K token），用 GPT-5.6 Terra 大约 ¥0.15。一天跑 100 次 = ¥15，一个月 = ¥450。同样的调用换 GPT-5.6 Sol 约 ¥0.28，换 DeepSeek-V4.1-Flash（谷时）约 ¥0.007——差了 20 倍以上。
+
+注意输出单价普遍是输入的 4-6 倍：让模型少说废话，比压缩输入更能省钱。
 
 这就是为什么做 Agent 必须关注**上下文管理**——不是什么都往里塞。
 
@@ -209,7 +213,7 @@ with open("my_code.py") as f:
     code = f.read()
 
 n_tokens = len(enc.encode(code))
-cost_per_call = n_tokens / 1_000_000 * 18  # GPT-4o 输入价格
+cost_per_call = n_tokens / 1_000_000 * 13  # 输入单价（¥/1M token），以 GPT-5.6 Terra 为例
 
 print(f"文件: {len(code)} 字符 → {n_tokens} token")
 print(f"单次审查输入成本: ¥{cost_per_call:.4f}")
