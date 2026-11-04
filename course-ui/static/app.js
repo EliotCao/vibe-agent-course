@@ -44,6 +44,129 @@ function highlightAll(root) {
   });
 }
 
+// ---------------- Mermaid 图表 ----------------
+// 讲义里有 ```mermaid 代码块（流程图等），marked 只会渲染成普通 code。
+// mermaid 本体约 3.5MB（服务端已 gzip + vendor 长缓存），要尽量晚占用主线程：
+//   · 空闲时预热（warmupMermaid），首次打开讲义时脚本通常已在内存/缓存里
+//   · 渲染不阻塞正文：先把代码块换成骨架占位，再异步出图
+let mermaidLoadPromise = null;
+let mermaidInited = false;
+let mermaidSeq = 0;
+
+const hasMermaid = () => typeof window !== 'undefined' && typeof window.mermaid !== 'undefined';
+
+function loadMermaid() {
+  if (hasMermaid()) return Promise.resolve(window.mermaid);
+  if (mermaidLoadPromise) return mermaidLoadPromise;
+  mermaidLoadPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = '/static/vendor/mermaid.min.js';
+    s.async = true;
+    s.onload = () => {
+      if (hasMermaid()) resolve(window.mermaid);
+      else reject(new Error('mermaid 未挂载到 window'));
+    };
+    s.onerror = () => {
+      mermaidLoadPromise = null;   // 允许下次重试
+      reject(new Error('mermaid 脚本加载失败'));
+    };
+    document.head.appendChild(s);
+  });
+  return mermaidLoadPromise;
+}
+
+function initMermaid() {
+  if (mermaidInited || !hasMermaid()) return;
+  window.mermaid.initialize({
+    startOnLoad: false,
+    // loose：允许 label 里的 <b> / <br/> 等 HTML（讲义里的流程图用了这些）
+    securityLevel: 'loose',
+    theme: 'default',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif',
+    flowchart: { htmlLabels: true, curve: 'basis', useMaxWidth: true },
+    sequence: { useMaxWidth: true },
+  });
+  mermaidInited = true;
+}
+
+const MERMAID_LANG_RE = /(^|\s)(language-|lang-)?mermaid(\s|$)/i;
+
+/** 空闲时预热 mermaid：脚本 + initialize 都提前做完，首张图渲染更快。 */
+function warmupMermaid() {
+  loadMermaid().then(initMermaid).catch(() => {});
+}
+
+/**
+ * 把 root 内的 ```mermaid 代码块替换成渲染后的 SVG。
+ * 渲染失败时降级为「错误提示 + 原始代码块」，不吞掉内容。
+ *
+ * 调用方不需要 await：函数在第一个 await 之前就同步把代码块换成了占位骨架，
+ * 之后的下载/渲染在后台进行，正文、代码高亮、TOC、笔记都不必等图。
+ */
+async function renderMermaidBlocks(root) {
+  if (!root) return;
+  const codes = $$('pre > code', root).filter((c) => MERMAID_LANG_RE.test(c.className || ''));
+  if (!codes.length) return;
+
+  // ① 同步阶段：代码块 → loading 骨架（避免出图时正文二次跳动）
+  const jobs = [];
+  for (const code of codes) {
+    const pre = code.closest('pre');
+    const src = (code.textContent || '').trim();
+    if (!pre || !src) continue;
+    const box = document.createElement('div');
+    box.className = 'mermaid-box loading';
+    box.innerHTML = '<div class="mermaid-loading">图表渲染中…</div>';
+    pre.replaceWith(box);
+    jobs.push({ box, src, raw: code.innerHTML });
+  }
+  if (!jobs.length) return;
+
+  // ② 异步阶段：按需加载脚本；失败则把代码块原样还原
+  try {
+    await loadMermaid();
+  } catch (e) {
+    console.warn('[mermaid]', e);
+    jobs.forEach(({ box, raw }) => restoreMermaidBlock(box, raw));
+    return;
+  }
+  initMermaid();
+
+  // 多个块并行发起（mermaid 内部有渲染队列，但至少互不等待）
+  await Promise.all(jobs.map(({ box, src, raw }) => renderOneMermaid(box, src, raw)));
+}
+
+function restoreMermaidBlock(box, rawHtml) {
+  const pre = document.createElement('pre');
+  const code = document.createElement('code');
+  code.className = 'language-mermaid';
+  code.innerHTML = rawHtml || '';
+  pre.appendChild(code);
+  box.replaceWith(pre);
+}
+
+async function renderOneMermaid(box, src, rawHtml) {
+  const id = `mmd-${mermaidSeq++}`;
+  try {
+    const { svg } = await window.mermaid.render(id, src);
+    box.classList.remove('loading');
+    box.innerHTML = svg;
+  } catch (err) {
+    box.classList.remove('loading');
+    box.classList.add('mermaid-error');
+    box.innerHTML =
+      `<div class="mermaid-err-tip">Mermaid 渲染失败：${escapeHtml(
+        String((err && err.message) || err)
+      )}</div><pre><code class="language-mermaid">${
+        rawHtml || escapeHtml(src)
+      }</code></pre>`;
+  } finally {
+    // mermaid.render 出错时可能残留临时节点，清掉避免污染布局
+    const ghost = document.getElementById('d' + id);
+    if (ghost) ghost.remove();
+  }
+}
+
 function highlightOne(el) {
   if (!hasHljs() || !el) return;
   // hljs 在第一次高亮后会给元素打上 data-highlighted="yes" 并加 hljs/语言 class，
@@ -78,6 +201,14 @@ async function init() {
   }
 
   // 不再自动跳转，保留 hero 欢迎页
+
+  // 课程页几乎必然会打开讲义，趁浏览器空闲把 mermaid 预取 + 初始化好
+  // （配合 vendor 长缓存，只下载一次；不抢首屏带宽）
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(warmupMermaid, { timeout: 3000 });
+  } else {
+    setTimeout(warmupMermaid, 2000);
+  }
 }
 
 function enterFirstLesson() {
@@ -393,6 +524,8 @@ async function renderLecture(path) {
         img.src = '/api/asset?path=' + encodeURIComponent(`${baseDir}/${src}`);
       }
     });
+    // Mermaid 图表：同步换占位骨架，后台出图（不阻塞高亮 / TOC / 笔记）
+    renderMermaidBlocks($('.markdown', body));
     // 高亮代码块
     highlightAll($('.markdown', body));
 
@@ -803,6 +936,7 @@ async function renderExercises(course) {
         img.src = '/api/asset?path=' + encodeURIComponent(`${baseDir}/${src}`);
       }
     });
+    renderMermaidBlocks($('.ex-readme', body));
     highlightAll($('.ex-readme', body));
   }
 

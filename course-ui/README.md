@@ -26,6 +26,9 @@ bash   course-ui/run.sh            # 启动脚本
 
 - 📚 **讲义美化**：左侧自动列出 6 节课的所有 lecture markdown，使用
   marked + highlight.js 渲染，支持代码块高亮、表格、引用、相对图片。
+- 📊 **Mermaid 图表**：讲义里的 ```mermaid 代码块会渲染成 SVG 流程图
+  （本地 `vendor/mermaid.min.js`，离线可用，仅在页面含图表时按需加载；
+  渲染失败自动降级为原始代码块）。
 - 🐍 **Demo 一键运行**：每节课的 `lab/demo_*.py` 渲染为可运行卡片，
   ▶ 按钮通过 SSE 流式回传 stdout/stderr，按行实时显示。
 - ⌨️ **stdin 注入**：交互式 demo（如 `demo_00_chat.py`）可在终端面板

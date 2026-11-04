@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import gzip
 import json
 import mimetypes
 import os
@@ -187,6 +188,41 @@ def scan_course(course_dir: Path) -> dict[str, Any]:
 
 
 # ------------------------------------------------------------------
+# 静态资源压缩（纯 stdlib gzip + 内存缓存）
+# ------------------------------------------------------------------
+# 前端 vendor 里挂着 3.5MB 的 mermaid.min.js，不压缩的话首次打开讲义要等
+# 很久才能画出图。这里对文本类资源做 gzip：3.5MB → 约 660KB。
+_GZIP_CACHE: dict[str, tuple[float, int, bytes]] = {}
+_GZIP_LOCK = threading.Lock()
+
+
+def _is_compressible(ctype: str) -> bool:
+    ct = (ctype or "").split(";")[0].strip().lower()
+    if ct.startswith("text/"):
+        return True
+    return ct in {
+        "application/javascript",
+        "application/json",
+        "application/xml",
+        "image/svg+xml",
+    }
+
+
+def _gzip_file(path: Path) -> bytes:
+    """返回 path 的 gzip 字节；按 (mtime, size) 缓存，文件不变就不重复压缩。"""
+    st = path.stat()
+    key = str(path)
+    with _GZIP_LOCK:
+        hit = _GZIP_CACHE.get(key)
+        if hit and hit[0] == st.st_mtime and hit[1] == st.st_size:
+            return hit[2]
+    packed = gzip.compress(path.read_bytes(), compresslevel=6)
+    with _GZIP_LOCK:
+        _GZIP_CACHE[key] = (st.st_mtime, st.st_size, packed)
+    return packed
+
+
+# ------------------------------------------------------------------
 # 进程管理
 # ------------------------------------------------------------------
 class RunningProc:
@@ -317,17 +353,44 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _send_file(self, path: Path) -> None:
+    def _send_file(self, path: Path, immutable: bool = False) -> None:
+        """发送文件；文本类资源支持 gzip（结果按 mtime+size 缓存，避免重复压缩）。
+
+        immutable=True 用于 vendor/ 下版本固定的第三方库（比如 3.5MB 的
+        mermaid.min.js）：这类文件一旦发布就不会变，给长缓存可以让浏览器
+        只下载一次；其它资源仍然 no-cache，保证改前端代码后立即生效。
+        """
         ctype, _ = mimetypes.guess_type(str(path))
         ctype = ctype or "application/octet-stream"
+
+        body: bytes | None = None
+        encoding = None
+        wants_gzip = "gzip" in (self.headers.get("Accept-Encoding") or "").lower()
+        if wants_gzip and _is_compressible(ctype):
+            try:
+                body = _gzip_file(path)
+                encoding = "gzip"
+            except OSError:
+                body = None
+
+        size = len(body) if body is not None else path.stat().st_size
         self.send_response(200)
         self.send_header("Content-Type", ctype)
-        self.send_header("Content-Length", str(path.stat().st_size))
-        # 静态资源禁用缓存，避免改完前端旧代码还在生效
-        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
-        self.send_header("Pragma", "no-cache")
-        self.send_header("Expires", "0")
+        self.send_header("Content-Length", str(size))
+        if encoding:
+            self.send_header("Content-Encoding", encoding)
+            self.send_header("Vary", "Accept-Encoding")
+        if immutable:
+            self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+        else:
+            # 其余静态资源禁用缓存，避免改完前端旧代码还在生效
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
         self.end_headers()
+        if body is not None:
+            self.wfile.write(body)
+            return
         with path.open("rb") as fh:
             for chunk in iter(lambda: fh.read(64 * 1024), b""):
                 self.wfile.write(chunk)
@@ -515,7 +578,9 @@ class Handler(BaseHTTPRequestHandler):
             return self._send_error_json(400, "非法路径")
         if not target.is_file():
             return self._send_error_json(404, "not found")
-        self._send_file(target)
+        # vendor/ 下是版本固定的第三方库（mermaid 等），给长缓存 + immutable，
+        # 浏览器只需下载一次，之后打开讲义立刻就能画图。
+        self._send_file(target, immutable=rel.startswith("vendor/"))
 
     def _handle_file(self, rel: str) -> None:
         try:

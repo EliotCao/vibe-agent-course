@@ -105,7 +105,9 @@
     </main>
   </div>
 
-  <!-- markdown 渲染 + 代码高亮（本地 vendor，离线可用） -->
+  <!-- markdown 渲染 + 代码高亮（本地 vendor，离线可用）
+       mermaid 体积较大，由 app.js 在遇到 ```mermaid 代码块时按需加载
+       /static/vendor/mermaid.min.js -->
   <script src="/static/vendor/marked.min.js"></script>
   <script src="/static/vendor/highlight.min.js"></script>
   <script src="/static/vendor/highlight-python.min.js"></script>

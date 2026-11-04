@@ -512,6 +512,46 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
   background: transparent; padding: 0; border: 0;
   color: var(--c-text); font-size: 1em;
 }
+/* Mermaid 图表（讲义里的 ```mermaid 代码块渲染结果） */
+.markdown .mermaid-box {
+  background: var(--c-bg);
+  border: 1px solid var(--c-border-2);
+  border-radius: 12px;
+  padding: 18px 16px;
+  margin: 16px 0;
+  overflow-x: auto;
+  text-align: center;
+}
+.markdown .mermaid-box svg { max-width: 100%; height: auto; }
+
+/* 出图前的占位骨架：给个最小高度，避免图表插入时正文跳动 */
+.markdown .mermaid-box.loading {
+  min-height: 140px;
+  display: flex; align-items: center; justify-content: center;
+  border-style: dashed;
+  background: var(--c-bg-soft2);
+}
+.mermaid-loading {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--c-text-3);
+}
+.mermaid-loading::before {
+  content: '';
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid var(--c-border);
+  border-top-color: var(--c-primary);
+  animation: mermaidSpin .8s linear infinite;
+}
+@keyframes mermaidSpin { to { transform: rotate(360deg); } }
+.markdown .mermaid-box.mermaid-error {
+  background: #fff5f5;
+  border-color: var(--c-rose);
+  text-align: left;
+}
+.markdown .mermaid-err-tip {
+  font-size: 13px; color: var(--c-rose); margin-bottom: 10px;
+}
+
 .markdown blockquote {
   border-left: 3px solid var(--c-primary);
   padding: 4px 18px; margin: 16px 0;
