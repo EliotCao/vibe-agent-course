@@ -73,21 +73,15 @@ flowchart LR
 - **不怕新词**：字节级 BPE 有 256 个字节兜底，任何没见过的词或字符都能编码，不会出现 `<UNK>`
 - **保留语义**：高频词完整保留，低频词的碎片也常常是有意义的片段
 
-> BPE 不是唯一的子词方案：BERT 用 WordPiece，T5 用 Unigram（SentencePiece），思路一样、切法不同。
-
 > [!TIP]
 >
 > 你不需要自己实现分词器——模型提供商已经训练好了。我们只需要理解"Token 是怎么来的"，就能更好地估算成本和管理上下文。
 
 
 
-## 什么是 Token
-
 <img src="./images/03-tokenization.png" alt="Token 不是字也不是词，而是介于两者之间的子词单位" width="480">
 
 **Token 不是字、不是词，是介于两者之间的"子词单位"（subword）。**
-
-LLM 不直接处理字符串——它先把文本切成 token 序列，再对每个 token 做概率预测。你可以把 token 理解为模型世界里的"原子"。
 
 ### 不同语言的 Token 差异
 
