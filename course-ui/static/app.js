@@ -497,7 +497,7 @@ async function renderLecture(path) {
               <span class="notes-key mono">${escapeHtml(path.split('/').pop())}</span>
             </div>
             <div class="notes-actions">
-              <button class="iconbtn primary" data-act="notes-sync"  title="把所有笔记写到仓库 notes/ 并 git commit">☁ 同步到仓库</button>
+              <button class="iconbtn primary" data-act="notes-sync"  title="把所有笔记写入仓库 notes/ 并 commit，可选择同时 push">☁ 同步到仓库</button>
               <button class="iconbtn" data-act="notes-export" title="导出全部笔记为 Markdown">↓ 导出</button>
               <button class="iconbtn" data-act="notes-clear"  title="清空当前页笔记">✕</button>
             </div>
@@ -739,8 +739,14 @@ function setupNotes(path) {
     syncBtn.addEventListener('click', () => syncNotesToRepo(syncBtn));
   }
   if (clearBtn) {
-    clearBtn.addEventListener('click', () => {
-      if (!confirm('确认清空当前页笔记？')) return;
+    clearBtn.addEventListener('click', async () => {
+      const ok = await showModal({
+        title: '清空当前页笔记？',
+        desc: '只会删除本页在浏览器里保存的内容，仓库 notes/ 下已同步的文件不受影响。',
+        confirmText: '清空',
+        danger: true,
+      });
+      if (!ok) return;
       ta.value = '';
       localStorage.removeItem(key);
       updateMeta();
@@ -768,10 +774,27 @@ function collectAllNotes() {
 }
 
 // 把所有笔记写到仓库 notes/ 目录并 git commit；可选 push
+// 注意：不能以 vibe-notes:: 开头，否则会被 collectAllNotes() 当成笔记一起同步
+const PUSH_PREF_KEY = 'vibe-ui.pref-push';
+
 async function syncNotesToRepo(btn) {
   const all = collectAllNotes();
   if (!all.length) { toast('还没有任何笔记', 'info'); return; }
-  const wantPush = confirm(`将把 ${all.length} 份笔记写入仓库 notes/ 目录并 git commit。\n\n是否同时推送到远程？\n点「确定」同时 push；点「取消」只本地 commit。`);
+
+  const preferPush = localStorage.getItem(PUSH_PREF_KEY) !== '0';
+  const choice = await showModal({
+    title: '同步笔记到仓库',
+    desc: `将把 ${all.length} 份笔记写入仓库 notes/ 目录，然后 git commit。`,
+    checkbox: {
+      label: '同时推送到远程',
+      hint: '开启后 commit 完成会自动 git push 到当前分支的上游仓库',
+      checked: preferPush,
+    },
+    confirmText: '开始同步',
+  });
+  if (!choice) return;
+  const wantPush = !!choice.checked;
+  localStorage.setItem(PUSH_PREF_KEY, wantPush ? '1' : '0');
 
   const orig = btn.textContent;
   btn.disabled = true;
@@ -792,6 +815,12 @@ async function syncNotesToRepo(btn) {
     if (data.committed) msg += ' · 已 commit';
     if (data.pushed)    msg += ' · 已 push';
     toast(msg, 'success', 3500);
+    if (data.commit_error) {
+      toast('commit 未成功：' + data.commit_error, 'error', 5000);
+    }
+    if (wantPush && !data.pushed) {
+      toast('push 未成功：' + (data.push_error || '未知原因'), 'error', 5000);
+    }
     console.log('[notes-sync]', data.log);
   } catch (e) {
     toast('同步失败：' + e, 'error');
@@ -1344,6 +1373,88 @@ function toast(msg, type = 'info', dur = 2200) {
 function progress(active) {
   const el = $('#progress-line');
   if (el) el.classList.toggle('active', !!active);
+}
+
+// ---------------- 通用弹窗 ----------------
+// 替代原生 confirm/prompt：resolve 为 null（取消）或 { checked }（确认）。
+// opts: { title, desc, confirmText, cancelText, checkbox?: { label, hint, checked }, danger? }
+function showModal(opts = {}) {
+  const {
+    title = '',
+    desc = '',
+    confirmText = '确定',
+    cancelText = '取消',
+    checkbox = null,
+    danger = false,
+  } = opts;
+
+  return new Promise((resolve) => {
+    const mask = document.createElement('div');
+    mask.className = 'modal-mask';
+    mask.innerHTML = `
+      <div class="modal-card" role="dialog" aria-modal="true">
+        <h3 class="modal-title"></h3>
+        <p class="modal-desc"></p>
+        ${checkbox ? `
+        <label class="modal-option">
+          <input type="checkbox" ${checkbox.checked ? 'checked' : ''} />
+          <span class="modal-option-text"></span>
+        </label>` : ''}
+        <div class="modal-foot">
+          <button type="button" class="modal-btn muted" data-modal="cancel"></button>
+          <button type="button" class="modal-btn primary" data-modal="confirm"></button>
+        </div>
+      </div>`;
+
+    // 用 textContent 填充，避免把笔记数量等动态内容当 HTML 解析
+    $('.modal-title', mask).textContent = title;
+    const descEl = $('.modal-desc', mask);
+    descEl.textContent = desc;
+    descEl.style.display = desc ? '' : 'none';
+    if (checkbox) {
+      const textEl = $('.modal-option-text', mask);
+      textEl.textContent = checkbox.label || '';
+      if (checkbox.hint) {
+        const hint = document.createElement('span');
+        hint.className = 'modal-option-hint';
+        hint.textContent = checkbox.hint;
+        textEl.appendChild(hint);
+      }
+    }
+    const cancelBtn = $('[data-modal=cancel]', mask);
+    const confirmBtn = $('[data-modal=confirm]', mask);
+    cancelBtn.textContent = cancelText;
+    confirmBtn.textContent = confirmText;
+    if (danger) confirmBtn.style.background = 'var(--c-rose)';
+
+    let settled = false;
+    const close = (result) => {
+      if (settled) return;
+      settled = true;
+      document.removeEventListener('keydown', onKey);
+      mask.classList.add('fade-out');
+      setTimeout(() => mask.remove(), 180);
+      resolve(result);
+    };
+    const confirm = () => {
+      const box = $('input[type=checkbox]', mask);
+      close({ checked: box ? box.checked : true });
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); close(null); }
+      else if (e.key === 'Enter' && document.activeElement !== cancelBtn) {
+        e.preventDefault(); confirm();
+      }
+    };
+
+    cancelBtn.addEventListener('click', () => close(null));
+    confirmBtn.addEventListener('click', confirm);
+    mask.addEventListener('mousedown', (e) => { if (e.target === mask) close(null); });
+    document.addEventListener('keydown', onKey);
+
+    document.body.appendChild(mask);
+    confirmBtn.focus();
+  });
 }
 
 // ---------------- 跳转到 CNB 云端 IDE ----------------

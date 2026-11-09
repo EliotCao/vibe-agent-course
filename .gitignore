@@ -24,7 +24,7 @@ ENV/
 
 # OS
 .DS_Store
-
+.Trash-0
 .workbuddy
 
 # Codebuddy 工作计划（运行时生成，不提交）

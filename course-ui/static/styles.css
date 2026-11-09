@@ -974,6 +974,61 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 @keyframes toastIn  { from { opacity: 0; transform: translateX(-50%) translateY(10px); } }
 @keyframes toastOut { to   { opacity: 0; transform: translateX(-50%) translateY(10px); } }
 
+/* =========================================================================
+   通用弹窗（替代原生 confirm）—— 遮罩 + 居中卡片
+   ========================================================================= */
+.modal-mask {
+  position: fixed; inset: 0; z-index: 120;
+  background: rgba(0, 0, 0, 0.28);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: maskIn .18s var(--ease) both;
+}
+.modal-mask.fade-out { animation: maskOut .18s var(--ease) both; }
+.modal-card {
+  width: 100%; max-width: 400px;
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 24px 24px 18px;
+  animation: modalIn .22s var(--ease-out) both;
+}
+.modal-title {
+  font-size: 16px; font-weight: 600; letter-spacing: -0.01em;
+  color: var(--c-text); margin: 0 0 8px;
+}
+.modal-desc {
+  font-size: 13px; line-height: 1.6; color: var(--c-text-2);
+  margin: 0; white-space: pre-line;
+}
+.modal-option {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-top: 16px; padding: 12px 14px;
+  background: var(--c-bg-soft); border-radius: var(--radius);
+  cursor: pointer; user-select: none;
+}
+.modal-option input { margin: 2px 0 0; accent-color: var(--c-primary); }
+.modal-option-text { font-size: 13px; color: var(--c-text); line-height: 1.5; }
+.modal-option-hint { display: block; font-size: 12px; color: var(--c-text-3); }
+.modal-foot {
+  display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px;
+}
+.modal-btn {
+  border: none; border-radius: 980px; cursor: pointer;
+  padding: 9px 20px; font-size: 13px; font-weight: 500;
+  font-family: inherit; transition: background .15s var(--ease), opacity .15s var(--ease);
+}
+.modal-btn.muted { background: var(--c-bg-soft); color: var(--c-text); }
+.modal-btn.muted:hover { background: #ececf0; }
+.modal-btn.primary { background: var(--c-primary); color: #fff; }
+.modal-btn.primary:hover { background: var(--c-primary-h); }
+.modal-btn:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+@keyframes maskIn  { from { opacity: 0; } }
+@keyframes maskOut { to   { opacity: 0; } }
+@keyframes modalIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } }
+
 /* 讲义 ↔ Demo 跨标签跳转 */
 .cross-tab-jump {
   display: inline-flex; align-items: center; gap: 6px;

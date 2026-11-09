@@ -63,15 +63,24 @@ def _safe_resolve(rel: str) -> Path:
     return target
 
 
-def _run_git(args: list[str], cwd: Path) -> tuple[int, str]:
-    """运行 git 子命令，返回 (returncode, combined_output)。"""
+def _run_git(args: list[str], cwd: Path, timeout: float = 30) -> tuple[int, str]:
+    """运行 git 子命令，返回 (returncode, combined_output)。
+
+    - 关闭交互式凭据提示（GIT_TERMINAL_PROMPT=0）：服务端没有 TTY，一旦需要输入
+      用户名/密码就会卡到超时，不如直接失败并把原因返回给前端。
+    - push 这类网络操作由调用方传更大的 timeout。
+    """
+    env = os.environ.copy()
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    env.setdefault("GIT_ASKPASS", "true")
     try:
         proc = subprocess.run(
             ["git", *args],
             cwd=str(cwd),
             capture_output=True,
             text=True,
-            timeout=30,
+            timeout=timeout,
+            env=env,
         )
         return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
     except FileNotFoundError:
@@ -80,6 +89,16 @@ def _run_git(args: list[str], cwd: Path) -> tuple[int, str]:
         return 124, "git timeout"
     except Exception as e:  # noqa: BLE001
         return 1, f"git error: {e}"
+
+
+def _git_error_line(output: str) -> str:
+    """从 git 输出里挑一行最能说明问题的文本，用于前端提示。"""
+    lines = [ln.strip() for ln in (output or "").splitlines() if ln.strip()]
+    for ln in lines:
+        low = ln.lower()
+        if low.startswith(("fatal:", "error:", "remote:", "! [")) or "denied" in low:
+            return ln
+    return lines[-1] if lines else ""
 
 
 def _sort_key(name: str) -> tuple:
@@ -506,6 +525,10 @@ class Handler(BaseHTTPRequestHandler):
                         continue
                     # 安全：只允许把笔记写到当前仓库范围内的 notes/ 目录
                     safe_name = p.lstrip("/").replace("..", "_")
+                    raw_name = safe_name
+                    # 笔记路径本身常以 .md 结尾，别拼出 xxx.md.md
+                    if safe_name.lower().endswith(".md"):
+                        safe_name = safe_name[:-3]
                     out = (notes_root / (safe_name + ".md")).resolve()
                     try:
                         out.relative_to(notes_root.resolve())
@@ -519,13 +542,20 @@ class Handler(BaseHTTPRequestHandler):
                     )
                     out.write_text(header + c.strip() + "\n", encoding="utf-8")
                     written.append(out.relative_to(ROOT).as_posix())
+                    # 顺手清理旧版本拼出来的 xxx.md.md 重复文件
+                    if safe_name != raw_name:
+                        legacy = (notes_root / (raw_name + ".md")).resolve()
+                        if legacy != out and legacy.is_file():
+                            legacy.unlink()
 
-                # 尝试 git add + commit
+                # 尝试 git add + commit；push 由前端勾选决定
                 git_log: list[str] = []
                 committed = False
                 pushed = False
-                if written:
-                    try:
+                commit_error = ""
+                push_error = ""
+                try:
+                    if written:
                         rc, ot = _run_git(["add", "notes"], cwd=ROOT)
                         git_log.append(f"add: rc={rc} {ot.strip()[:200]}")
                         # 确认有变化才 commit
@@ -536,24 +566,61 @@ class Handler(BaseHTTPRequestHandler):
                             msg = (
                                 f"docs(notes): sync {len(written)} note(s) from Course UI"
                             )
-                            rc, ot = _run_git(
-                                [
-                                    "-c", "user.name=Course UI",
-                                    "-c", "user.email=course-ui@local",
-                                    "commit", "-m", msg,
-                                ],
-                                cwd=ROOT,
-                            )
+                            # 身份沿用仓库/全局配置：CNB 环境里 commit 需要当前令牌用户签名，
+                            # 写死一个假身份会被签名钩子拒绝（403），导致 commit 和 push 全部失败。
+                            # 只有配置缺失时才用环境变量兜底。
+                            _, cfg_name = _run_git(["config", "user.name"], cwd=ROOT)
+                            _, cfg_mail = _run_git(["config", "user.email"], cwd=ROOT)
+                            commit_args = ["commit", "-m", msg]
+                            if not cfg_name.strip():
+                                fallback = (
+                                    os.environ.get("GIT_COMMITTER_NAME")
+                                    or os.environ.get("CNB_TOKEN_USER_NAME")
+                                    or "Course UI"
+                                )
+                                commit_args[:0] = ["-c", f"user.name={fallback}"]
+                            if not cfg_mail.strip():
+                                fallback = (
+                                    os.environ.get("GIT_COMMITTER_EMAIL")
+                                    or "course-ui@local"
+                                )
+                                commit_args[:0] = ["-c", f"user.email={fallback}"]
+                            rc, ot = _run_git(commit_args, cwd=ROOT)
                             git_log.append(f"commit: rc={rc} {ot.strip()[:200]}")
                             committed = rc == 0
+                            if not committed:
+                                commit_error = _git_error_line(ot) or "git commit 失败"
                         else:
                             git_log.append("commit: skipped (no changes)")
-                        if push and committed:
-                            rc, ot = _run_git(["push"], cwd=ROOT)
-                            git_log.append(f"push: rc={rc} {ot.strip()[:300]}")
-                            pushed = rc == 0
-                    except Exception as e:  # noqa: BLE001
-                        git_log.append(f"git error: {e}")
+
+                    # 只要用户勾了 push 就推：即使本次没有新 commit，
+                    # 也可以把之前留在本地的提交送上去。
+                    if push:
+                        rc, br = _run_git(
+                            ["rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT
+                        )
+                        branch = br.strip() if rc == 0 else ""
+                        rc, _ = _run_git(
+                            [
+                                "rev-parse", "--abbrev-ref",
+                                "--symbolic-full-name", "@{u}",
+                            ],
+                            cwd=ROOT,
+                        )
+                        has_upstream = rc == 0
+                        if not has_upstream and branch and branch != "HEAD":
+                            # 首次推送：绑定 origin/<branch>，下次直接 git push 即可
+                            push_args = ["push", "-u", "origin", branch]
+                        else:
+                            push_args = ["push"]
+                        rc, ot = _run_git(push_args, cwd=ROOT, timeout=120)
+                        git_log.append(f"push: rc={rc} {ot.strip()[:300]}")
+                        pushed = rc == 0
+                        if not pushed:
+                            push_error = _git_error_line(ot) or "git push 失败"
+                except Exception as e:  # noqa: BLE001
+                    git_log.append(f"git error: {e}")
+                    push_error = push_error or f"git error: {e}"
 
                 return self._send_json(
                     {
@@ -561,6 +628,8 @@ class Handler(BaseHTTPRequestHandler):
                         "written": written,
                         "committed": committed,
                         "pushed": pushed,
+                        "commit_error": commit_error,
+                        "push_error": push_error,
                         "log": git_log,
                     }
                 )
